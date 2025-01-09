@@ -22,7 +22,7 @@ void race_state(int *id, size_t size) {
 	}
 
 	/* Search for each id in the list */
-	for (i = 0; i < size; i++) {
+	for (i = 0; i < (int)size; i++) {
 		id_found = 0;  /* not found */
 		for (j = 0; j < ids_size; j++) {
 			if (id[i] == ids[j]) {
