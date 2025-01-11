@@ -9,11 +9,11 @@
  * @lap: lap number
  * @next: points to the next car/node
  */
-typedef struct car {
-	int id;
-	int lap;
-	struct car *next;
-} car;
+// typedef struct car {
+// 	int id;
+// 	int lap;
+// 	struct car *next;
+// } car;
 
 void race_state(int *id, size_t size);
 
