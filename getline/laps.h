@@ -16,5 +16,6 @@
 // } car;
 
 void race_state(int *id, size_t size);
+void add_new_vehicle(int id, int current_size, int *ids, int *lap);
 
 #endif
