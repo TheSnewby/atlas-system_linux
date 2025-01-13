@@ -1,6 +1,20 @@
 #include "_getline.h"
 
 /**
+ * _strlen - returns the lengths of a string
+ * @str: string
+ *
+ * Return: length of string
+ */
+int _strlen(char *str)
+{
+	int i;
+	for (i = 0; str[i] != '\0'; i++)
+		continue;
+	return (i);
+}
+
+/**
  * line_end_check - checks for newline \n
  * @buf: passed buffer
  *
@@ -60,7 +74,7 @@ char *_getline(const int fd)
 		}
 		else
 		{
-			full_read_size = strlen(full_read);
+			full_read_size = _strlen(full_read);
 			rd_rtn = read(fd, buf, READ_SIZE);
 			if (rd_rtn == 0)
 				close(fd);
@@ -78,7 +92,7 @@ char *_getline(const int fd)
 			}
 		}
 	}
-	full_read_size = strlen(full_read);
+	full_read_size = _strlen(full_read);
 	full_read = realloc(full_read, (full_read_size + 1) * sizeof(char));
 	if (full_read == NULL)
 	{

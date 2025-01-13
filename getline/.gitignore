@@ -2,6 +2,7 @@
 1-main.c
 2-main.c
 a.out
+getline
 
 # Prerequisites
 *.d
