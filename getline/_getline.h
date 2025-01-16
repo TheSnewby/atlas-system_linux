@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *_getline(const int fd);
+char *_getline(const int);
+int line_end_check(char buf[], int);
 
 #endif

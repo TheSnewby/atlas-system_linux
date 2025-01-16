@@ -1,98 +1,97 @@
 #include "_getline.h"
 
 /**
- * _strlen - returns the lengths of a string
- * @str: string
- *
- * Return: length of string
- */
-int _strlen(char *str)
-{
-	int i;
-	for (i = 0; str[i] != '\0'; i++)
-		continue;
-	return (i);
-}
-
-/**
- * line_end_check - checks for end of line \n or EOF
- * @buf: passed buffer
- * @size: size of buffer
- *
- * 	Return: returns a string up to \n, or string up to size if EOF
- */
-char *line_end_fix(char buf[], int size)
-{
-	int i = 0;
-	char *new_buf = NULL;
-
-	while (i < size)
-	{
-		if(buf[i] == '\n')
-		{
-			new_buf = (char *)malloc((i + 1) * sizeof(char));
-			if (new_buf == NULL)
-			{
-				fprintf(stderr, "Malloc Fail in line_end_check");
-				return (NULL);
-			}
-			new_buf = strncpy(new_buf, buf, i);
-			new_buf[i] = '\0';
-			return (new_buf);
-		}
-		i++;
-	}
-	new_buf = (char *)malloc((i + 1) * sizeof(char));
-	if (new_buf == NULL)
-	{
-		fprintf(stderr, "Malloc Fail in line_end_check");
-		return (NULL);
-	}
-	new_buf = strncpy(new_buf, buf, size);
-	new_buf[i] = '\0';
-	return (new_buf);
-}
-
-/**
  * line_end_check - checks for newline \n
- * @buf: passed buffer
- * @size: size of buffer
+ * @input: unprocessed input
+ * @size: size of input
  *
- * 	Return: 0 if not found, 1 if found
+ * Return: 0 if not found, index of \n or EOF if found
  */
-int line_end_check(char buf[], int size)
+int line_end_check(char *input, int size)
 {
 	int i = 0;
 
 	while (i < size)
 	{
-		if(buf[i] == '\n')
-			return (1);
+		if (input[i] == '\n')
+			return (i);
 		i++;
 	}
 	if (size < READ_SIZE)
-		return (1);
+		return (i);
 	return (0);
 }
 
 /**
- * malloc_buffer - mallocs a buffer into a string
- * @buf: buffer
- * @size: size of buffer
+ * line_end - checks for end of line \n or EOF,
+ * removes chars from line_end from input
+ * @input: processed input
+ * @input_size: size of input
  *
- * Return - malloc'd string or NULL if failure
+ * Return: returns a string up to \n, or string up to size if EOF
  */
-char *malloc_buffer(char buf[], int size)
+char *line_end(char **input, int *input_size)
 {
-	char *new_buf = (char *)malloc((size) * sizeof(char));
-	if (new_buf == NULL)
+	int i = 0, line_length;
+	char *line_end = NULL, *new_input = NULL;
+
+	if (*input == NULL || *input_size <= 0)
+		return (NULL);
+
+	while (i < *input_size && (*input)[i] != '\n')  /* find \n or EOF */
+		i++;
+
+	line_length = i;  /* length of line_end */
+
+	line_end = (char *)malloc((line_length + 1) * sizeof(char));
+	if (line_end == NULL)
 	{
-		fprintf(stderr, "Malloc Fail in line_end_check");
+		fprintf(stderr, "Malloc failed for line_end\n");
 		return (NULL);
 	}
-	new_buf = strncpy(new_buf, buf, size);
-	new_buf[size] = '\0';
-	return (new_buf);
+	strncpy(line_end, *input, line_length);
+	line_end[line_length] = '\0';
+	/* remove the line_end from the original input string */
+	int remaining_size = *input_size - line_length - 1;
+
+	if (remaining_size > 0)
+	{
+		new_input = (char *)malloc(remaining_size * sizeof(char));
+		if (new_input == NULL)
+		{
+			fprintf(stderr, "Malloc failed for new_input\n");
+			free(line_end);
+			return (NULL);
+		}
+		if (i < *input_size && (*input)[i] == '\n')
+			memcpy(new_input, *input + line_length + 1, remaining_size);
+		else
+			memcpy(new_input, *input + line_length, remaining_size);
+	}
+	free(*input);
+	*input = new_input;
+	*input_size = remaining_size;
+	return (line_end);
+}
+
+/**
+ * reset_getline - resets and frees static and dynamic variables
+ * @fd: file descriptor
+ * @input: dynamic string containing possible read input
+ * @input_size: tracks number of chars in input
+ *
+ * Return: void
+ */
+void reset_getline(const int *fd, char **input, int *input_size)
+{
+	*input_size = 0;
+	if (input && *input)
+	{
+		free(*input);
+		*input = NULL;
+	}
+	if (fd)
+		close(*fd);
 }
 
 /**
@@ -103,57 +102,39 @@ char *malloc_buffer(char buf[], int size)
  */
 char *_getline(const int fd)
 {
-	char buf[READ_SIZE] ={0};  /* buffer */
-	char *full_read = NULL;  /* the full text up to end of line or file */
-	int rd_rtn = 0;  /* return value of the read() */
-	char *full_read_tracker;  /* ptr to current final location */
+	char buf[READ_SIZE] = {0};  /* buffer of all input sans previous lines*/
+	static char *input;  /* static buffer for processing lines */
+	char *line = NULL;  /* output line */
+	int rd_rtn = 0;  /* read return value */
+	static int input_size;  /* tracks number of chars in input */
+
+	if (!input)
+	{
+		input = (char *)malloc(READ_SIZE * sizeof(char));
+		memset(input, 0, READ_SIZE);
+		input_size = 0;
+	}
 
 	if (fd < 0)
+	{
+		reset_getline(&fd, &input, &input_size);
 		return (NULL);
+	}
 
-	rd_rtn = read(fd, buf, READ_SIZE);
-	if (rd_rtn <= 0)  /* if error or EOF return NULL */
+	while (!line_end_check(input, input_size))  /* loop until \n or EOF found */
 	{
-		close(fd);
-		return (NULL);
-	}
-	while (rd_rtn > 0)
-	{
-		if (!full_read)  /* initial empty */
+		rd_rtn = read(fd, buf, READ_SIZE);
+		if (rd_rtn > 0)
 		{
-			if(line_end_check(buf, rd_rtn))
-			{
-				full_read = line_end_fix(buf, rd_rtn);
-				return (full_read);
-			}
-			full_read = malloc_buffer(buf, rd_rtn);
+			input = (char *)realloc(input, (input_size + rd_rtn + 1) * sizeof(char));
+			memcpy(input + input_size, buf, rd_rtn);
+			input_size += rd_rtn;
+			input[input_size] = '\0';
 		}
-		else
-		{
-			memset(buf, 0, READ_SIZE);
-			rd_rtn = read(fd, buf, READ_SIZE);
-			if (rd_rtn == 0)
-				close(fd);
-			else
-			{
-				full_read = realloc(full_read, (_strlen(full_read) + rd_rtn + 1)
-				* sizeof(char));
-				if (full_read == NULL)
-				{
-					close(fd);
-					return (NULL);
-				}
-				full_read_tracker = full_read + _strlen(full_read);
-				strcpy(full_read_tracker, buf);
-			}
-		}
+		else if (rd_rtn <= 0)  /* break if no more data to read */
+			break;
 	}
-	full_read = realloc(full_read, (_strlen(full_read) + 1) * sizeof(char));
-	if (full_read == NULL)
-	{
-		close(fd);
-		return (NULL);
-	}
-	full_read[_strlen(full_read)] = '\0';
-	return (full_read);
+	if (input_size > 0)
+		line = line_end(&input, &input_size);
+	return (line);
 }
