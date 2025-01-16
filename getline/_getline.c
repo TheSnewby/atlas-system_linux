@@ -16,7 +16,6 @@ int alloc_check(char *string)
 	return (0);
 }
 
-
 /**
  * line_end_check - checks for newline \n
  * @input: unprocessed input
@@ -92,23 +91,63 @@ char *line_end(char **input, int *input_size)
 }
 
 /**
- * reset_getline - resets and frees static and dynamic variables
- * @fd: file descriptor
- * @input: dynamic string containing possible read input
- * @input_size: tracks number of chars in input
+ * get_fd_state - gets or creates the fd_state for the current fd
+ * @fd: fd
+ * @head: current head of linked list
+ *
+ * Return: first fd_state
+ */
+fd_state_n *get_fd_state(int fd, fd_state_n **head)
+{
+	fd_state_n *current = *head;
+
+	while (current)
+	{
+		if (current->fd == fd)
+			return (current);
+		current = current->next;
+	}
+
+	current = malloc(sizeof(fd_state_n));
+	if (!current)
+		return (NULL);
+
+	current->fd = fd;
+	current->input = NULL;
+	current->input_size = 0;
+	current->next = *head;
+	*head = current;
+
+	return (current);
+}
+
+/**
+ * remove_fd_state - removes and frees fd_state from list
+ * @head: head of liest
+ * @fd: fd
  *
  * Return: void
  */
-void reset_getline(const int *fd, char **input, int *input_size)
+void remove_fd_state(fd_state_n **head, int fd)
 {
-	*input_size = 0;
-	if (input && *input)
+	fd_state_n *current = *head, *prev = NULL;
+
+	while (current)
 	{
-		free(*input);
-		*input = NULL;
+		if(current->fd == fd)
+		{
+			if (prev)
+				prev->next = current->next;
+			else
+				*head = current->next;
+
+			free(current->input);
+			free(current);
+			return;
+		}
+		prev = current;
+		current = current->next;
 	}
-	if (fd)
-		close(*fd);
 }
 
 /**
@@ -120,43 +159,46 @@ void reset_getline(const int *fd, char **input, int *input_size)
 char *_getline(const int fd)
 {
 	char buf[READ_SIZE] = {0};  /* buffer of all input sans previous lines*/
-	static char *input;  /* static buffer for processing lines */
 	char *line = NULL;  /* output line */
 	int rd_rtn = 0;  /* read return value */
-	static int input_size;  /* tracks number of chars in input */
-
-	if (!input)
-	{
-		input = (char *)malloc(READ_SIZE * sizeof(char));
-		if (alloc_check(input))
-			return (NULL);
-		memset(input, 0, READ_SIZE);
-		input_size = 0;
-	}
+	static fd_state_n *head;
+	fd_state_n *fd_state;
 
 	if (fd < 0)
 	{
-		reset_getline(&fd, &input, &input_size);
+		remove_fd_state(&head, fd);
 		if (fd != -1)
 			return (NULL);
 	}
-
-	while (!line_end_check(input, input_size))  /* loop until \n or EOF found */
+	fd_state = get_fd_state(fd, &head);
+	if (!fd_state)
+		return (NULL);
+	if (!fd_state->input)
+	{
+		fd_state->input = malloc(READ_SIZE);
+		if (alloc_check(fd_state->input))
+			return (NULL);
+		fd_state->input_size = 0;
+	}
+	while (!line_end_check(fd_state->input, fd_state->input_size))
 	{
 		rd_rtn = read(fd, buf, READ_SIZE);
 		if (rd_rtn > 0)
 		{
-			input = (char *)realloc(input, (input_size + rd_rtn + 1) * sizeof(char));
-			if (alloc_check(input))
-				return (NULL);
-			memcpy(input + input_size, buf, rd_rtn);
-			input_size += rd_rtn;
-			input[input_size] = '\0';
+			fd_state->input = realloc(fd_state->input, fd_state->input_size +
+			rd_rtn + 1);
+			if (alloc_check(fd_state->input))
+				return NULL;
+
+			memcpy(fd_state->input + fd_state->input_size, buf, rd_rtn);
+			fd_state->input_size += rd_rtn;
+			fd_state->input[fd_state->input_size] = '\0';
 		}
-		else if (rd_rtn <= 0)  /* break if no more data to read */
+		else if (rd_rtn <= 0)
 			break;
 	}
-	if (input_size > 0)
-		line = line_end(&input, &input_size);
+	if (fd_state->input_size > 0)
+		line = line_end(&fd_state->input, &fd_state->input_size);
+
 	return (line);
 }
