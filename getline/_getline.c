@@ -1,6 +1,23 @@
 #include "_getline.h"
 
 /**
+ * alloc_check - checks dynamic allocation didn't cause an issue
+ * @string: dynamically allocated string
+ *
+ * Return: 1 if successful, 0 if successful
+ */
+int alloc_check(char *string)
+{
+	if (!string)  /* if NULL */
+	{
+		fprintf(stderr, "Memory allocation failed\n");
+		return (1);
+	}
+	return (0);
+}
+
+
+/**
  * line_end_check - checks for newline \n
  * @input: unprocessed input
  * @size: size of input
@@ -32,7 +49,7 @@ int line_end_check(char *input, int size)
  */
 char *line_end(char **input, int *input_size)
 {
-	int i = 0, line_length;
+	int i = 0, line_length, remaining_size;
 	char *line_end = NULL, *new_input = NULL;
 
 	if (*input == NULL || *input_size <= 0)
@@ -40,10 +57,10 @@ char *line_end(char **input, int *input_size)
 
 	while (i < *input_size && (*input)[i] != '\n')  /* find \n or EOF */
 		i++;
-
 	line_length = i;  /* length of line_end */
-
 	line_end = (char *)malloc((line_length + 1) * sizeof(char));
+	if (alloc_check(line_end))
+		return (NULL);
 	if (line_end == NULL)
 	{
 		fprintf(stderr, "Malloc failed for line_end\n");
@@ -51,12 +68,12 @@ char *line_end(char **input, int *input_size)
 	}
 	strncpy(line_end, *input, line_length);
 	line_end[line_length] = '\0';
-	/* remove the line_end from the original input string */
-	int remaining_size = *input_size - line_length - 1;
-
+	remaining_size = *input_size - line_length - 1;
 	if (remaining_size > 0)
 	{
 		new_input = (char *)malloc(remaining_size * sizeof(char));
+		if (alloc_check(new_input))
+			return (NULL);
 		if (new_input == NULL)
 		{
 			fprintf(stderr, "Malloc failed for new_input\n");
@@ -111,6 +128,8 @@ char *_getline(const int fd)
 	if (!input)
 	{
 		input = (char *)malloc(READ_SIZE * sizeof(char));
+		if (alloc_check(input))
+			return (NULL);
 		memset(input, 0, READ_SIZE);
 		input_size = 0;
 	}
@@ -127,6 +146,8 @@ char *_getline(const int fd)
 		if (rd_rtn > 0)
 		{
 			input = (char *)realloc(input, (input_size + rd_rtn + 1) * sizeof(char));
+			if (alloc_check(input))
+				return (NULL);
 			memcpy(input + input_size, buf, rd_rtn);
 			input_size += rd_rtn;
 			input[input_size] = '\0';
