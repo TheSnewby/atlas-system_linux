@@ -137,7 +137,8 @@ char *_getline(const int fd)
 	if (fd < 0)
 	{
 		reset_getline(&fd, &input, &input_size);
-		return (NULL);
+		if (fd != -1)
+			return (NULL);
 	}
 
 	while (!line_end_check(input, input_size))  /* loop until \n or EOF found */
