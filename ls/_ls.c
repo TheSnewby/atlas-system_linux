@@ -19,6 +19,7 @@
  * 
  * Currently compiles with:
  * gcc *.c -o hls
+ * ./hls to run
  */
 
 
@@ -65,7 +66,7 @@ int *parse_options(int argc, char **argv)
  *
  * Return: string of formatted text in pwd
  */
-char *_ls(int argc, char **argv)  /* argv[0] is program */
+char *_ls(int argc, char **argv)  /* argv[0] is program hls */
 {
 	int i, option_start_index;
 	char *cmd = "ls";
@@ -76,22 +77,15 @@ char *_ls(int argc, char **argv)  /* argv[0] is program */
 	int *options;
 	// DIR *dirs[] = NULL;
 
+	for (i = 0; i < argc; i++)
+		printf("argv[%d]: %s\n", i, argv[i]);
 
-	if (argc < 2)
-	{
-		printf("argc < 2\n");  /* DEBUG */
-		return (NULL);
-	}
+	if (argc >= 2)
+		options = parse_options(argc, argv);
+	else
+		// options = [0, 0];
 
-	if (strcmp(argv[1], "hls"))
-	{
-		printf("Incorrect command for hls.\n");
-		return (NULL);
-	}
-
-	options = parse_options(argc, argv);
-	// printf("cwd is: %s\n", cwd);  /* DEBUG */
-	/* or set cwd equal to "." */
+	/* set cwd equal to "." if none given */
 
 	/* FIGURE OUT DIRECTORY */
 	/* concat directories to "./" */
