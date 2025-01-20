@@ -37,11 +37,15 @@ void print_dir(int argc, char *directory, int *options)
 	DIR *dir;
 
 	if (argc == 1)
+	{
 		if ((dir = opendir(".")) == NULL)
 			fprintf(stderr, "opendir failure in print_dir\n");
+	}
 	else
+	{
 		if ((dir = opendir(directory)) == NULL)
 			fprintf(stderr, "opendir failure in print_dir\n");
+	}
 
 	if (options[0] == 0 && options[1] == 0)
 	{
@@ -85,11 +89,9 @@ int *parse_options(int argc, char **argv)
 				switch(argv[i][j]) {
 					case 'l':
 						options[0] = 1;  /* sets long (-l) option */
-						printf("L FOUND!\n");
 						break;
 					case 'a':
 						options[1] = 1;  /* sets all (-a) option */
-						printf("A FOUND!\n");
 						break;
 					default:  /* if unrecognized, print error */
 						fprintf(stderr, "ls: invalid option -- %c\n", argv[i][j]);
@@ -110,7 +112,7 @@ int *parse_options(int argc, char **argv)
  */
 char *_ls(int argc, char **argv)  /* argv[0] is program hls, consider moving all to main */
 {
-	int i, j;
+	int i, j, print_count = 0;
 	int *options;
 	char directory[PATH_MAX];
 
@@ -127,7 +129,10 @@ char *_ls(int argc, char **argv)  /* argv[0] is program hls, consider moving all
 				sprintf(directory, "%s%s", "./", argv[i]); 
 				print_dir(argc, directory, options);
 				sprintf(directory, "./");  /* reset directory, memset not allowed */
+				print_count++;
 			}
+			if (print_count == 0)
+				print_dir(argc, ".", options);
 		}
 	}
 	return (NULL);
