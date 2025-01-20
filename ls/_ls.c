@@ -23,17 +23,39 @@
 
 
 /**
- * parse_options - accumulates all options after possible directory
+ * parse_options - accumulates all options
  * @argc: number of arguments
  * @argv: array of arguments
- * @option_start_index: index of argv at which options start
  *
- * Return: string/array of options (integer)? , NULL if no options?
+ * Return: int array of options where [0] = 1 is -l and [1] = 1 is -a,
+ * (add more as needed). NULL if no options.
  */
-char *parse_options(int argc, char **argv, int options_start_index)
+int *parse_options(int argc, char **argv)
 {
-	/* feel free to change or remove this preliminary function */
-	return (NULL);
+	int i, j;
+	int static options[MAX_OPTIONS] = {0};  /* see Return above */
+
+	for (i = 1; i < argc; i++)  /* iterate through argvs */
+	{
+		if (argv[i][0] == '-')  /* if option */
+		{
+			for (j = 1; argv[i][j] != '\0'; j++)  /* iterate through chars */
+			{
+				switch(argv[i][j]) {
+					case 'l':
+						options[0] = 1;  /* sets long (-l) option */
+						break;
+					case 'a':
+						options[1] = 1;  /* sets all (-a) option */
+						break;
+					default:  /* if unrecognized, print error */
+						fprintf(stderr, "ls: invalid option -- %c", argv[i][j]);
+				}
+			}
+		}
+	}
+
+	return (options);
 }
 
 /**
@@ -51,6 +73,7 @@ char *_ls(int argc, char **argv)  /* argv[0] is program */
 	char cwd[PATH_MAX];
 	DIR *dir;
 	struct dirent *entry;
+	int *options;
 	// DIR *dirs[] = NULL;
 
 
@@ -65,44 +88,24 @@ char *_ls(int argc, char **argv)  /* argv[0] is program */
 		printf("Incorrect command for hls.\n");
 		return (NULL);
 	}
-	if (getcwd(cwd, sizeof(cwd)) == NULL)  /* might remove because '.' works */
-	{
-		printf("getcwd is NULL\n");  /* DEBUG */
-		return (NULL);
-	}
+
+	options = parse_options(argc, argv);
 	// printf("cwd is: %s\n", cwd);  /* DEBUG */
 	/* or set cwd equal to "." */
 
 	/* FIGURE OUT DIRECTORY */
-	/* figure out whether 2nd argument is a directory */
-	/* concat the directory to "./" */
-	
-	if (argc >= 3) /* this section needs to be redone, supposed to handle more than one argument */
-	{
-		if(((dir = opendir(strcat("./", argv[2]))) != NULL))  /* check if third argument is a directory */
-		{  /* directories can be called like this: ls subdir and ls subdir/ */
-			option_start_index = 3;
-			parse_options(argc, argv, option_start_index);
-		}
-		else
-			{
-				if((dir = opendir(".")) != NULL)
-				{
-					option_start_index = 2;
-					parse_options(argc, argv, option_start_index);
-				}
-			}
-	}
-	else
-		if ((dir = opendir(".")) == NULL)
-		{
-			printf("opendir failure\n");
-			return (NULL);
-		}
+	/* concat directories to "./" */
 
-	
-	while((entry = readdir(dir)) != NULL)
-		printf("%s\n", entry->d_name);
+	if ((dir = opendir(".")) == NULL)
+	{
+		printf("opendir failure\n");
+		return (NULL);
+	}
+
+
+	while((entry = readdir(dir)) != NULL)  /* prints contents of directory */
+		printf("%s\t", entry->d_name);
+	printf("\n");
 	if (closedir(dir) < 0)
 	{
 		printf("closedir failure\n");
