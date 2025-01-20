@@ -1,6 +1,6 @@
 # ls
 
-current ls functionality includes:
+## current ls functionality includes:
 -la
 -l -a
 test -la
@@ -17,6 +17,8 @@ Also means that printing should occur for each directory and handle options.
 By default readdir returns all contents including hidden, so hidden need
 to be removed if -a is not given.
 
-Currently compiles with:
+# Currently compiles with:
 gcc *.c -o hls
+gcc -Wall -Werror -Wextra -pedantic *.c -o hls
 ./hls to run
+./hls -a works now
