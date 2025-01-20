@@ -1,26 +1,4 @@
 #include "_ls.h"
-/**
- * current ls functionality includes:
- * -la
- * -l -a
- * test -la
- * -la test
- * test/ -la
- * /etc -la
- * test /etc -la
- * test -la /etc
- * 
- * where test is a valid subdirectory and /etc is a known path to a folder.
- * 
- * This means that there should be a collection of directories, and options.
- * Also means that printing should occur for each directory and handle options.
- * By default readdir returns all contents including hidden, so hidden need
- * to be removed if -a is not given.
- * 
- * Currently compiles with:
- * gcc *.c -o hls
- * ./hls to run
- */
 
 /**
  * print_dir - prints the passed directory
@@ -32,24 +10,25 @@
  */
 void print_dir(int argc, char *directory, int *options)
 {
-	int i;
 	struct dirent *entry;
 	DIR *dir;
 
 	if (argc == 1)
 	{
-		if ((dir = opendir(".")) == NULL)
+		dir = opendir(".");
+		if (dir == NULL)
 			fprintf(stderr, "opendir failure in print_dir\n");
 	}
 	else
 	{
-		if ((dir = opendir(directory)) == NULL)
+		dir = opendir(directory);
+		if (dir == NULL)
 			fprintf(stderr, "opendir failure in print_dir\n");
 	}
 
 	if (options[0] == 0 && options[1] == 0)
 	{
-		while((entry = readdir(dir)) != NULL)
+		while ((entry = readdir(dir)) != NULL)
 		{
 			if (entry->d_name[0] != '.')
 				printf("%s\t", entry->d_name);  /* might need formatting rework? */
@@ -58,7 +37,7 @@ void print_dir(int argc, char *directory, int *options)
 	}
 	else if (options[0] == 0 && options[1] == 1)  /* only -a */
 	{
-		while((entry = readdir(dir)) != NULL)  /* prints all of directory */
+		while ((entry = readdir(dir)) != NULL)  /* prints all of directory */
 			printf("%s\t", entry->d_name);  /* might need formatting rework? */
 		printf("\n");
 	}
@@ -78,7 +57,7 @@ void print_dir(int argc, char *directory, int *options)
 int *parse_options(int argc, char **argv)
 {
 	int i, j;
-	int static options[MAX_OPTIONS] = {0};  /* see Return above */
+	static int options[MAX_OPTIONS] = {0};  /* see Return above */
 
 	for (i = 1; i < argc; i++)  /* iterate through argvs */
 	{
@@ -86,15 +65,16 @@ int *parse_options(int argc, char **argv)
 		{
 			for (j = 1; argv[i][j] != '\0'; j++)  /* iterate through chars */
 			{
-				switch(argv[i][j]) {
-					case 'l':
-						options[0] = 1;  /* sets long (-l) option */
-						break;
-					case 'a':
-						options[1] = 1;  /* sets all (-a) option */
-						break;
-					default:  /* if unrecognized, print error */
-						fprintf(stderr, "ls: invalid option -- %c\n", argv[i][j]);
+				switch (argv[i][j])
+				{
+				case 'l':
+					options[0] = 1;  /* sets long (-l) option */
+					break;
+				case 'a':
+					options[1] = 1;  /* sets all (-a) option */
+					break;
+				default:  /* if unrecognized, print error */
+					fprintf(stderr, "ls: invalid option -- %c\n", argv[i][j]);
 				}
 			}
 		}
@@ -110,9 +90,9 @@ int *parse_options(int argc, char **argv)
  *
  * Return: string of formatted text in pwd
  */
-char *_ls(int argc, char **argv)  /* argv[0] is program hls, consider moving all to main */
+char *_ls(int argc, char **argv)  /* consider moving all contents to main */
 {
-	int i, j, print_count = 0;
+	int i, print_count = 0;
 	int *options;
 	char directory[PATH_MAX];
 
@@ -126,7 +106,7 @@ char *_ls(int argc, char **argv)  /* argv[0] is program hls, consider moving all
 		{
 			if (argv[i][0] != '-')
 			{
-				sprintf(directory, "%s%s", "./", argv[i]); 
+				sprintf(directory, "%s%s", "./", argv[i]);
 				print_dir(argc, directory, options);
 				sprintf(directory, "./");  /* reset directory, memset not allowed */
 				print_count++;
@@ -138,6 +118,13 @@ char *_ls(int argc, char **argv)  /* argv[0] is program hls, consider moving all
 	return (NULL);
 }
 
+/**
+ * main - main entry
+ * @argc: number of arguments
+ * @argv: array of arguments
+ *
+ * Return: 0
+ */
 int main(int argc, char **argv)
 {
 	_ls(argc, argv);
