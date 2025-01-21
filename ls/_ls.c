@@ -10,6 +10,7 @@
  */
 void long_print_dir(int argc, char *directory, int *options)
 {
+	printf("%d, %s, %d", argc, directory, options[0]);
 	return;
 }
 
