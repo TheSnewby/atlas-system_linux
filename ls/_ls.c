@@ -1,6 +1,19 @@
 #include "_ls.h"
 
 /**
+ * long_print_dir - handles long format for printing
+ * @argc: number of arguments
+ * @directory: string of directory
+ * @options: options array where [0] = 1 means long (-l) and [1] = all (-a)
+ *
+ * Return: void
+ */
+void long_print_dir(argc, directory, options)
+{
+	return;
+}
+
+/**
  * print_dir - prints the passed directory
  * @argc: number of arguments
  * @directory: string of directory
