@@ -102,13 +102,13 @@ int *parse_options(int argc, char **argv)
 }
 
 /**
- * _ls - recreates ls functionality
+ * main - main entry
  * @argc: number of arguments
  * @argv: array of arguments
  *
- * Return: string of formatted text in pwd
+ * Return: 0
  */
-char *_ls(int argc, char **argv)  /* consider moving all contents to main */
+int main(int argc, char **argv)
 {
 	int i, print_count = 0;
 	int *options;
@@ -133,19 +133,6 @@ char *_ls(int argc, char **argv)  /* consider moving all contents to main */
 				print_dir(argc, ".", options);
 		}
 	}
-	return (NULL);
-}
-
-/**
- * main - main entry
- * @argc: number of arguments
- * @argv: array of arguments
- *
- * Return: 0
- */
-int main(int argc, char **argv)
-{
-	_ls(argc, argv);
 	return (0);
 }
 
