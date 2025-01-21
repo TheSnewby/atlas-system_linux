@@ -8,7 +8,7 @@
  *
  * Return: void
  */
-void long_print_dir(argc, directory, options)
+void long_print_dir(int argc, char *directory, int *options)
 {
 	return;
 }
