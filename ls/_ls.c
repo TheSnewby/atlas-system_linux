@@ -18,7 +18,8 @@ void long_print_dir(int argc, char *directory, int *options)
  * print_dir - prints the passed directory
  * @argc: number of arguments
  * @directory: string of directory
- * @options: options array where [0] = 1 means long (-l) and [1] = all (-a)
+ * @options: options array where [0] = 1 means long (-l) and [1] = all (-a),
+ * [2] = 1 is -A, and [3] = 1 is -1
  *
  * Return: void
  */
@@ -27,12 +28,18 @@ void print_dir(int argc, char *directory, int *options, char *program_name)
 	struct dirent *entry;
 	DIR *dir;
 	char *dir_of_file = NULL, *file_name = NULL;
+	int op_long = options[0], op_all = options[1];
+	int op_almost = options[2], op_vert = options[3];
 
 	if (argc == 1)
 	{
 		dir = opendir(".");
 		if (dir == NULL)
-			fprintf(stderr, "opendir failure in print_dir\n");
+		{
+			fprintf(stderr, "%s: ", program_name);  /* insert proper error msg */
+			perror(NULL);
+			exit(errno);  /* not sure if correct */
+		}
 	}
 	else
 	{
@@ -42,30 +49,39 @@ void print_dir(int argc, char *directory, int *options, char *program_name)
 			file_name = get_file_of_path(directory, program_name);
 			free(dir_of_file);
 			free(file_name);
-			/* opendir(dir of file) and only print the file_name record */
+			/* TODO: opendir(dir of file) and only print the file_name record */
 		}
 		dir = opendir(directory);
 		if (dir == NULL)
-			fprintf(stderr, "opendir failure in print_dir for directory: %s\n",
-			directory);
+		{
+			fprintf(stderr, "%s: ", program_name);  /* insert proper error msg */
+			perror(NULL);
+			exit(errno);  /* not sure if correct */
+		}
 	}
 
-	if (options[0] == 0 && options[1] == 0)
+	if (op_long == 0 && op_all == 0 && op_almost == 0)
 	{
 		while ((entry = readdir(dir)) != NULL)
 		{
-			if (entry->d_name[0] != '.')
-				printf("%s\t", entry->d_name);  /* might need formatting rework? */
+			if (entry->d_name[0] != '.')  /* as long as not hidden & not vertical*/
+			{
+				if (op_vert == 0)
+					printf("%s\t", entry->d_name);
+				else
+					printf("%s\n", entry->d_name);
+			}  /* might need formatting rework? */
 		}
-		printf("\n");
+		if (op_vert == 0)
+			printf("\n");
 	}
-	else if (options[0] == 0 && options[1] == 1)  /* only -a */
+	else if (op_long == 0 && op_all == 1)  /* only -a */
 	{
 		while ((entry = readdir(dir)) != NULL)  /* prints all of directory */
 			printf("%s\t", entry->d_name);  /* might need formatting rework? */
 		printf("\n");
 	}
-	else if(options[0] == 1 && options[1] == 0)
+	else if(op_long == 1 && op_all == 0)
 		long_print_dir(argc, directory, options);
 	else
 		long_print_dir(argc, directory, options);
@@ -79,7 +95,7 @@ void print_dir(int argc, char *directory, int *options, char *program_name)
  * @argv: array of arguments
  *
  * Return: int array of options where [0] = 1 is -l and [1] = 1 is -a,
- * (add more as needed). NULL if no options.
+ * [2] = 1 is -A, and [3] = 1 is -1. Default array of zeros.
  */
 int *parse_options(int argc, char **argv)
 {
@@ -99,6 +115,12 @@ int *parse_options(int argc, char **argv)
 					break;
 				case 'a':
 					options[1] = 1;  /* sets all (-a) option */
+					break;
+				case 'A':
+					options[2] = 1;  /* sets almost all (-A) option */
+					break;
+				case '1':
+					options[3] = 1;  /* sets vertical (-1) option*/
 					break;
 				default:  /* if unrecognized, print error */
 					fprintf(stderr, "ls: invalid option -- %c\n", argv[i][j]);
