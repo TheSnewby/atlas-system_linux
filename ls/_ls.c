@@ -23,7 +23,8 @@ void print_dir(int argc, char *directory, int *options)
 	{
 		dir = opendir(directory);
 		if (dir == NULL)
-			fprintf(stderr, "opendir failure in print_dir\n");
+			fprintf(stderr, "opendir failure in print_dir for directory: %s\n",
+			directory);
 	}
 
 	if (options[0] == 0 && options[1] == 0)
@@ -41,7 +42,10 @@ void print_dir(int argc, char *directory, int *options)
 			printf("%s\t", entry->d_name);  /* might need formatting rework? */
 		printf("\n");
 	}
-
+	else if(options[0] == 1 && options[1] == 0)
+		long_print_dir(argc, directory, options);
+	else
+		long_print_dir(argc, directory, options);
 	if (closedir(dir) < 0)
 		fprintf(stderr, "closedir failure in print_dir\n");
 }
