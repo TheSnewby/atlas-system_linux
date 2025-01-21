@@ -22,10 +22,11 @@ void long_print_dir(int argc, char *directory, int *options)
  *
  * Return: void
  */
-void print_dir(int argc, char *directory, int *options)
+void print_dir(int argc, char *directory, int *options, char *program_name)
 {
 	struct dirent *entry;
 	DIR *dir;
+	char *dir_of_file = NULL, *file_name = NULL;
 
 	if (argc == 1)
 	{
@@ -35,6 +36,14 @@ void print_dir(int argc, char *directory, int *options)
 	}
 	else
 	{
+		if (is_file(directory, program_name))
+		{
+			dir_of_file = get_dir_of_path(directory, program_name);
+			file_name = get_file_of_path(directory, program_name);
+			free(dir_of_file);
+			free(file_name);
+			/* opendir(dir of file) and only print the file_name record */
+		}
 		dir = opendir(directory);
 		if (dir == NULL)
 			fprintf(stderr, "opendir failure in print_dir for directory: %s\n",
@@ -117,7 +126,7 @@ int main(int argc, char **argv)
 	options = parse_options(argc, argv);
 
 	if (argc == 1)  /* default no arguments */
-		print_dir(argc, ".", options);
+		print_dir(argc, ".", options, argv[0]);
 	else  /* iterate through arguments and print dirs */
 	{
 		for (i = 1; i < argc; i++)
@@ -125,12 +134,12 @@ int main(int argc, char **argv)
 			if (argv[i][0] != '-')
 			{
 				sprintf(directory, "%s%s", "./", argv[i]);
-				print_dir(argc, directory, options);
+				print_dir(argc, directory, options, argv[0]);
 				sprintf(directory, "./");  /* reset directory, memset not allowed */
 				print_count++;
 			}
 			if (print_count == 0)
-				print_dir(argc, ".", options);
+				print_dir(argc, ".", options, argv[0]);
 		}
 	}
 	return (0);
