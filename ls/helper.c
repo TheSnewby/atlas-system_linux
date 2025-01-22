@@ -59,7 +59,7 @@ char *get_dir_of_path(char *fp, char *program_name)
 }
 
 /**
- * get_file_of_path - grabs filename of path in file_path
+ * get_file_of_path - grabs file name of path in file_path
  * @fp: full file path
  * @program_name: name of program (argv[0])
  *
