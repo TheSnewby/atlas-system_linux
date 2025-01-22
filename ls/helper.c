@@ -15,9 +15,9 @@ int is_file(char *directory, char *program_name)
 	lstat_rtn = lstat(directory, &buf);
 	if (lstat_rtn == -1)
 	{
-		fprintf(stderr, "%s: ", program_name);  /* insert proper error msg */
+		fprintf(stderr, "%s: ", program_name); /* insert proper error msg */
 		perror(NULL);
-		exit(errno);  /* not sure if correct */
+		exit(errno); /* not sure if correct */
 	}
 	return (S_ISREG(buf.st_mode));
 }
@@ -39,16 +39,16 @@ char *get_dir_of_path(char *fp, char *program_name)
 
 	for (i = fp_size; i >= 0; i--)
 	{
-		if(fp[i] == '/')
+		if (fp[i] == '/')
 			break;
 	}
 	dir_size = i;
 	dir = (char *)malloc((dir_size + 1) * sizeof(char));
-	if (dir)
+	if (dir == NULL) /* now checks for failure, not success */
 	{
-		fprintf(stderr, "%s: ", program_name);  /* insert proper error msg */
+		fprintf(stderr, "%s: ", program_name); /* insert proper error msg */
 		perror(NULL);
-		exit(errno);  /* not sure if correct */
+		exit(errno); /* not sure if correct */
 	}
 	for (i = 0; i < dir_size; i++)
 	{
@@ -60,37 +60,42 @@ char *get_dir_of_path(char *fp, char *program_name)
 
 /**
  * get_file_of_path - grabs filename of path in file_path
- * @file_path: string of file_path
+ * @fp: full file path
+ * @program_name: name of program (argv[0])
  *
- * Return: string of file name
+ * Return: pointer to string of file name
  */
 char *get_file_of_path(char *fp, char *program_name)
 {
-	int i = 0, fp_size, file_name_size;
-	char *file_name = NULL;
+	int i;
+	int fp_size = 0;	  /* stores full path length */
+	int slash_index = -1; /* stores position of last slash */
 
-	while (fp[i] != '\0')
-		i++;
-	fp_size = i;
+	while (fp[fp_size] != '\0') /* get length of input path */
+		fp_size++;
 
-	for (i = fp_size; i >= 0; i--)
+	for (i = fp_size; i >= 0; i--) /* find last slash in path */
 	{
-		if(fp[i] == '/')
+		if (fp[i] == '/')
+		{
+			slash_index = i;
 			break;
+		}
 	}
+	/* position of file name in path */
+	int start = (slash_index == -1) ? 0 : slash_index + 1;
+	int file_name_size = fp_size - start;
 
-	file_name_size = fp_size - i;
-	file_name = (char *)malloc((file_name_size + 1) * sizeof(char));
-	if (file_name)
+	char *file_name = malloc(file_name_size + 1); /* name + /0 */
+	if (file_name == NULL)
 	{
-		fprintf(stderr, "%s: ", program_name);  /* insert proper error msg */
+		fprintf(stderr, "%s: ", program_name); /* still needs error message */
 		perror(NULL);
-		exit(errno);  /* not sure if correct */
+		exit(errno);
 	}
 
-	for (i = i; i < fp_size; i++)
-		file_name[i] = fp[i];
-	file_name[file_name_size] = '\0';
+	memcpy(file_name, &fp[start], file_name_size); /* just file name */
+	file_name[file_name_size] = '\0';			   /* null terminate */
 
 	return (file_name);
 }
