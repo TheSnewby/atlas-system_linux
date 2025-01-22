@@ -28,7 +28,7 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 	struct dirent *entry;
 	DIR *dir;
 	/* char *dir_of_file = NULL; */
-	char *file_name = NULL;
+	char *file_name = NULL, original_path[PATH_MAX];
 	int op_long = options[0], op_all = options[1];
 	int op_almost = options[2], op_vert = options[3];
 
@@ -46,6 +46,7 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 	{
 		if (is_file(path, program_name))
 		{
+			remove_dot_slash(original_path, path);
 			file_name = get_file_of_path(path, program_name);
 			path = get_dir_of_path(path, program_name);
 			/* free(dir);*/
@@ -76,7 +77,7 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 				}
 				else  /* path is a file */
 					if (_strcmp(file_name, entry->d_name) == 0)
-						printf("%s", entry->d_name);
+						printf("%s", original_path);
 			}  /* might need formatting rework? */
 		}
 		if (op_vert == 0)

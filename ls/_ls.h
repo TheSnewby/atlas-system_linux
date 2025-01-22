@@ -12,11 +12,13 @@
 
 #define MAX_OPTIONS 4  /* currently only handles -l and -a */
 
-char *_ls(int argc, char **argv);
+char *_ls(int, char **);
 int is_file(char*, char*);
 char *get_dir_of_path(char *, char*);
 char *get_file_of_path(char *, char *);
 int _strcmp(char *, char*);
-char *_memcpy(char *dest, char *src, int n);
+char *_memcpy(char *, char *, int);
+char *_strcpy(char *, char *);
+char *remove_dot_slash(char *, char *);
 
 #endif
