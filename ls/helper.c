@@ -1,4 +1,51 @@
 #include "_ls.h"
+/**
+ * _memcpy - copies memory area
+ * @dest: copy to
+ * @src: copy from
+ * @n: number of bytes copied
+ *
+ * Return: pointer to memory area
+*/
+char *_memcpy(char *dest, char *src, int n)
+{
+	int i;
+
+	for (i = 0; i < n; i++)
+		dest[i] = src[i];
+
+	return (dest);
+}
+
+/**
+ * _strcmp - compares two strings
+ * @s1: 1st string
+ * @s2: 2nd string
+ *
+ * Return: 0 if equal, < 0 if s1 < s2, > 0 otherwise
+*/
+int _strcmp(char *s1, char *s2)
+{
+	int diff = 0;
+	int i;
+	int s1end = 1;
+	int s2end = 1;
+
+	for (i = 0; s1end != 0 && s2end != 0; i++)
+	{
+		if (s1[i] == '\0')
+			s1end = 0;
+		if (s2[i] == '\0')
+			s2end = 0;
+		if (s1[i] != s2[i])
+		{
+			diff += s1[i] - s2[i];
+			break;
+		}
+	}
+
+	return (diff);
+}
 
 /**
  * is_file - returns whether a directory is actually a file
@@ -83,7 +130,7 @@ char *get_file_of_path(char *fp, char *program_name)
 		}
 	}
 	/* position of file name in path */
-	int start = (slash_index == -1) ? 0 : slash_index + 1;
+	int start = (slash_index == -1) ? 0 : slash_index + 1;  /*CHECK LOGIC HERE*/
 	int file_name_size = fp_size - start;
 
 	char *file_name = malloc(file_name_size + 1); /* name + /0 */

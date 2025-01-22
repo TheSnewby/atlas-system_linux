@@ -16,5 +16,7 @@ char *_ls(int argc, char **argv);
 int is_file(char*, char*);
 char *get_dir_of_path(char *, char*);
 char *get_file_of_path(char *, char *);
+int _strcmp(char *, char*);
+char *_memcpy(char *dest, char *src, int n);
 
 #endif

@@ -27,7 +27,8 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 {
 	struct dirent *entry;
 	DIR *dir;
-	char *dir_of_file = NULL, *file_name = NULL;
+	/* char *dir_of_file = NULL; */
+	char *file_name = NULL;
 	int op_long = options[0], op_all = options[1];
 	int op_almost = options[2], op_vert = options[3];
 
@@ -45,10 +46,10 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 	{
 		if (is_file(path, program_name))
 		{
-			dir_of_file = get_dir_of_path(path, program_name);
 			file_name = get_file_of_path(path, program_name);
-			free(dir_of_file);
-			free(file_name);
+			path = get_dir_of_path(path, program_name);
+			/* free(dir);*/
+			/* free(file_name); */
 			/* TODO: opendir(dir of file) and only print the file_name record */
 		}
 		dir = opendir(path);
@@ -64,12 +65,18 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 	{
 		while ((entry = readdir(dir)) != NULL)
 		{
-			if (entry->d_name[0] != '.')  /* as long as not hidden & not vertical*/
+			if (entry->d_name[0] != '.')  /* only non-hidden */
 			{
-				if (op_vert == 0)
-					printf("%s\t", entry->d_name);
-				else
-					printf("%s\n", entry->d_name);
+				if (!file_name)  /* path isn't a file */
+				{
+					if (op_vert == 0)
+						printf("%s\t", entry->d_name);
+					else
+						printf("%s\n", entry->d_name);
+				}
+				else  /* path is a file */
+					if (_strcmp(file_name, entry->d_name) == 0)
+						printf("%s", entry->d_name);
 			}  /* might need formatting rework? */
 		}
 		if (op_vert == 0)
@@ -90,6 +97,11 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 		fprintf(stderr, "%s: ", program_name);  /* insert proper error msg */
 		perror(NULL);
 		exit(errno);  /* not sure if correct */
+	}
+	if (file_name)
+	{
+		free(file_name);
+		free(path);
 	}
 }
 
