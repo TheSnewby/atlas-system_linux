@@ -15,15 +15,15 @@ void long_print_dir(int argc, char *directory, int *options)
 }
 
 /**
- * print_dir - prints the passed directory
+ * print_dir - prints the passed path
  * @argc: number of arguments
- * @directory: string of directory
+ * @path: string of path
  * @options: options array where [0] = 1 means long (-l) and [1] = all (-a),
  * [2] = 1 is -A, and [3] = 1 is -1
  *
  * Return: void
  */
-void print_dir(int argc, char *directory, int *options, char *program_name)
+void print_dir(int argc, char *path, int *options, char *program_name)
 {
 	struct dirent *entry;
 	DIR *dir;
@@ -43,15 +43,15 @@ void print_dir(int argc, char *directory, int *options, char *program_name)
 	}
 	else
 	{
-		if (is_file(directory, program_name))
+		if (is_file(path, program_name))
 		{
-			dir_of_file = get_dir_of_path(directory, program_name);
-			file_name = get_file_of_path(directory, program_name);
+			dir_of_file = get_dir_of_path(path, program_name);
+			file_name = get_file_of_path(path, program_name);
 			free(dir_of_file);
 			free(file_name);
 			/* TODO: opendir(dir of file) and only print the file_name record */
 		}
-		dir = opendir(directory);
+		dir = opendir(path);
 		if (dir == NULL)
 		{
 			fprintf(stderr, "%s: ", program_name);  /* insert proper error msg */
@@ -82,11 +82,15 @@ void print_dir(int argc, char *directory, int *options, char *program_name)
 		printf("\n");
 	}
 	else if(op_long == 1 && op_all == 0)
-		long_print_dir(argc, directory, options);
+		long_print_dir(argc, path, options);
 	else
-		long_print_dir(argc, directory, options);
+		long_print_dir(argc, path, options);
 	if (closedir(dir) < 0)
-		fprintf(stderr, "closedir failure in print_dir\n");
+	{
+		fprintf(stderr, "%s: ", program_name);  /* insert proper error msg */
+		perror(NULL);
+		exit(errno);  /* not sure if correct */
+	}
 }
 
 /**
