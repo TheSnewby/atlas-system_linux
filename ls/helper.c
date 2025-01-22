@@ -94,7 +94,9 @@ char *get_file_of_path(char *fp, char *program_name)
 		exit(errno);
 	}
 
-	memcpy(file_name, &fp[start], file_name_size); /* just file name */
+	/* memcpy(file_name, &fp[start], file_name_size); just file name */
+	for (i = 0; i < file_name_size; i++)
+		file_name[i] = fp[start + i];
 	file_name[file_name_size] = '\0';			   /* null terminate */
 
 	return (file_name);
