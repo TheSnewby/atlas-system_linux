@@ -31,16 +31,23 @@ char *_strcpy(char *dest, char *src)
  */
 char *remove_dot_slash(char *dest, char *src)
 {
-	int i;
+    int i;
 
-	if (!dest || !src)
-		return (NULL);
+    if (!dest || !src)
+        return (NULL);
 
-	for (i = 0; src[i] != '\0'; i++)
-		dest[i] = src[i + 2];
-	dest[i] = '\0';
+    if (src[0] == '.' && src[1] == '/') { /* if string starts with ./ */
+        for (i = 0; src[i + 2] != '\0'; i++) { /* skip em */
+            dest[i] = src[i + 2];
+        }
+        dest[i] = '\0';
+    }
 
-	return (dest);
+	else { /* otherwise, just copy string */
+        _strcpy(dest, src);
+    }
+
+    return (dest);
 }
 
 /**
