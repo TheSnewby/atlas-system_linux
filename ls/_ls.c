@@ -1,6 +1,35 @@
 #include "_ls.h"
 
 /**
+ * print_error - prints errors
+ * @msg_num: int denoting which message to print
+ * @program_name: name of program
+ * @file_path: file path
+ * @errnum: errno of error
+ * @str_one: possible malloc'd str that needs freeing
+ * @str_two: possible malloc'd str that needs freeing
+ *
+ * Return: 0 if it shouldn't quit, or passed errno to exit ?
+ */
+int print_error(int msg_num, char* program_name, char *file_path, int errnum, char *str_one, char *str_two)
+{
+	/* initial thoughts */
+	if (msg_num == 1)  /* cannot access file */
+	{
+		fprintf(stderr, "%s: cannot access %s: ", program_name, file_path);
+		perror(NULL);
+		exit(errno);
+	}
+	if (str_one)
+		free(str_one);
+	if (str_two)
+		free(str_two);
+
+	return (errnum);
+}
+
+
+/**
  * long_print_dir - handles long format for printing
  * @argc: number of arguments
  * @directory: string of directory
@@ -12,6 +41,14 @@ void long_print_dir(int argc, char *directory, int *options)
 {
 	printf("%d, %s, %d", argc, directory, options[0]);
 	return;
+
+	/**
+	 * consider calling long_print_dir just to print a non \n line up to
+	 * just before the next directory
+	 * 
+	 * e.g. printf(permissions, ... timestamp) but without a \n because the
+	 *      calling function will take care of that?
+	 */
 }
 
 /**
@@ -38,7 +75,7 @@ void print_dir(int argc, char *path, int *options, char *program_name, int is_mu
 		dir = opendir(".");
 		if (dir == NULL)
 		{
-			fprintf(stderr, "%s: cannot access %s: ",
+			fprintf(stderr, "%s-1: cannot access %s: ",
 			program_name, original_path);
 			perror(NULL);
 			exit(errno);  /* not sure if correct */
@@ -54,9 +91,9 @@ void print_dir(int argc, char *path, int *options, char *program_name, int is_mu
 		dir = opendir(path);
 		if (dir == NULL)
 		{
-			if (is_multi_dir == 0)
+			if (is_multi_dir == 0)  /* handle invalid dir if multiple dirs */
 			{
-				fprintf(stderr, "%s: cannot access %s: ",
+				fprintf(stderr, "%s-2: cannot access %s: ",
 				program_name, original_path);
 				perror(NULL);
 			}
@@ -100,13 +137,13 @@ void print_dir(int argc, char *path, int *options, char *program_name, int is_mu
 			printf("%s\t", entry->d_name);  /* might need formatting rework? */
 		printf("\n");
 	}
-	else if(op_long == 1 && op_all == 0)
+	else if(op_long == 1 && op_all == 0)  		/* probably rewrite */
 		long_print_dir(argc, path, options);
-	else
+	else										/* probably rewrite */
 		long_print_dir(argc, path, options);
 	if (closedir(dir) < 0)
 	{
-		fprintf(stderr, "%s: cannot access %s: ", program_name, original_path);
+		fprintf(stderr, "%s-3: cannot access %s: ", program_name, original_path);
 		perror(NULL);
 		exit(errno);  /* not sure if correct */
 	}
@@ -169,23 +206,26 @@ int *parse_options(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
-	int i, print_count = 0, dir_count = 0;
+	int i, print_count = 0, dir_count = 0, is_multi_dir = 0;
 	int *options;
 	char directory[PATH_MAX];
 
 	options = parse_options(argc, argv);
 
 	if (argc == 1)  /* default no arguments */
-		print_dir(argc, ".", options, argv[0], 0);
+		print_dir(argc, ".", options, argv[0], is_multi_dir);
 	else  /* iterate through arguments and print dirs */
 	{
 		for (i = 1; i < argc; i++)  /* tracks if multiple directories */
 		{
 			sprintf(directory, "%s%s", "./", argv[i]);
-			if ((argv[i][0] != '-') && (is_dir(directory)))
+			if ((argv[i][0] != '-') && (!is_file(directory)))
 				dir_count++;
 			sprintf(directory, "./");  /* reset directory, memset not allowed */
 		}
+
+		if (dir_count > 1)
+			is_multi_dir++;
 
 		for (i = 1; i < argc; i++)
 		{
@@ -199,12 +239,12 @@ int main(int argc, char **argv)
 						printf("\n");
 					printf("%s:\n", argv[i]);
 				}
-				print_dir(argc, directory, options, argv[0], 1);
+				print_dir(argc, directory, options, argv[0], is_multi_dir);
 				sprintf(directory, "./");  /* reset directory, memset not allowed */
 				print_count++;
 			}
 			if (print_count == 0)
-				print_dir(argc, ".", options, argv[0], 1);
+				print_dir(argc, ".", options, argv[0], is_multi_dir);
 		}
 	}
 	return (0);
