@@ -1,51 +1,4 @@
 #include "_ls.h"
-/**
- * _memcpy - copies memory area
- * @dest: copy to
- * @src: copy from
- * @n: number of bytes copied
- *
- * Return: pointer to memory area
-*/
-char *_memcpy(char *dest, char *src, int n)
-{
-	int i;
-
-	for (i = 0; i < n; i++)
-		dest[i] = src[i];
-
-	return (dest);
-}
-
-/**
- * _strcmp - compares two strings
- * @s1: 1st string
- * @s2: 2nd string
- *
- * Return: 0 if equal, < 0 if s1 < s2, > 0 otherwise
-*/
-int _strcmp(char *s1, char *s2)
-{
-	int diff = 0;
-	int i;
-	int s1end = 1;
-	int s2end = 1;
-
-	for (i = 0; s1end != 0 && s2end != 0; i++)
-	{
-		if (s1[i] == '\0')
-			s1end = 0;
-		if (s2[i] == '\0')
-			s2end = 0;
-		if (s1[i] != s2[i])
-		{
-			diff += s1[i] - s2[i];
-			break;
-		}
-	}
-
-	return (diff);
-}
 
 /**
  * is_file - returns whether a directory is actually a file
@@ -58,11 +11,13 @@ int is_file(char *directory, char *program_name)
 {
 	struct stat buf;
 	int lstat_rtn = 0;
+	char original_path[PATH_MAX];
 
 	lstat_rtn = lstat(directory, &buf);
 	if (lstat_rtn == -1)
 	{
-		fprintf(stderr, "%s: ", program_name); /* insert proper error msg */
+		remove_dot_slash(original_path, directory);
+		fprintf(stderr, "%s: cannot access %s: ", program_name, original_path);
 		perror(NULL);
 		exit(errno); /* not sure if correct */
 	}

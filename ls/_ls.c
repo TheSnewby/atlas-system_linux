@@ -32,12 +32,14 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 	int op_long = options[0], op_all = options[1];
 	int op_almost = options[2], op_vert = options[3];
 
+	remove_dot_slash(original_path, path);
 	if (argc == 1)
 	{
 		dir = opendir(".");
 		if (dir == NULL)
 		{
-			fprintf(stderr, "%s: ", program_name);  /* insert proper error msg */
+			fprintf(stderr, "%s: cannot access %s: ",
+			program_name, original_path);
 			perror(NULL);
 			exit(errno);  /* not sure if correct */
 		}
@@ -46,17 +48,14 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 	{
 		if (is_file(path, program_name))
 		{
-			remove_dot_slash(original_path, path);
 			file_name = get_file_of_path(path, program_name);
 			path = get_dir_of_path(path, program_name);
-			/* free(dir);*/
-			/* free(file_name); */
-			/* TODO: opendir(dir of file) and only print the file_name record */
 		}
 		dir = opendir(path);
 		if (dir == NULL)
 		{
-			fprintf(stderr, "%s: ", program_name);  /* insert proper error msg */
+			fprintf(stderr, "%s: cannot access %s: ",
+			program_name, original_path);
 			perror(NULL);
 			exit(errno);  /* not sure if correct */
 		}
@@ -95,7 +94,7 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 		long_print_dir(argc, path, options);
 	if (closedir(dir) < 0)
 	{
-		fprintf(stderr, "%s: ", program_name);  /* insert proper error msg */
+		fprintf(stderr, "%s: cannot access %s: ", program_name, original_path);
 		perror(NULL);
 		exit(errno);  /* not sure if correct */
 	}

@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#define MAX_OPTIONS 4  /* currently only handles -l and -a */
+#define MAX_OPTIONS 4  /* currently handles -l, -a, -A, -1 */
 
 char *_ls(int, char **);
 int is_file(char*, char*);
