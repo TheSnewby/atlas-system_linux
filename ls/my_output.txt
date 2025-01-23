@@ -1,0 +1,15 @@
+test:
+abc
+file
+File2
+file3
+folder1
+Folder2
+folder3
+test/folder1:
+folder1-1
+folder1-2
+folder1-3
+test/Folder2:
+file1
+file2

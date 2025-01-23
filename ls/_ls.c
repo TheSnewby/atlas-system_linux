@@ -178,7 +178,7 @@ int main(int argc, char **argv)
 		for (i = 1; i < argc; i++)  /* tracks if multiple directories */
 		{
 			sprintf(directory, "%s%s", "./", argv[i]);
-			if (argv[i][0] != '-' && !is_file(directory, argv[0]))
+			if ((argv[i][0] != '-') && (!is_file(directory, argv[0])))
 				dir_count++;
 			sprintf(directory, "./");  /* reset directory, memset not allowed */
 		}
@@ -190,7 +190,11 @@ int main(int argc, char **argv)
 				sprintf(directory, "%s%s", "./", argv[i]);
 				/* prints directory if multiple directories, otherwise doesn't */
 				if ((dir_count > 1) && (!is_file(directory, argv[0])))
+				{
+					if (print_count)
+						printf("\n");
 					printf("%s:\n", argv[i]);
+				}
 				print_dir(argc, directory, options, argv[0]);
 				sprintf(directory, "./");  /* reset directory, memset not allowed */
 				print_count++;
