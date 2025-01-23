@@ -1,26 +1,39 @@
 #include "_ls.h"
 
 /**
- * is_file - returns whether a directory is actually a file
+ * is_dir - returns whether a directory is actually a file
  * @directory: string of filepath
- * @program_name: argv[0]
  *
  * Return: 0 if not a file, 1 if a file
  */
-int is_file(char *directory, char *program_name)
+int is_dir(char *directory)
 {
 	struct stat buf;
 	int lstat_rtn = 0;
-	char original_path[PATH_MAX];
+	// char original_path[PATH_MAX];
 
 	lstat_rtn = lstat(directory, &buf);
 	if (lstat_rtn == -1)
-	{
-		remove_dot_slash(original_path, directory);
-		fprintf(stderr, "%s: cannot access %s: ", program_name, original_path);
-		perror(NULL);
-		exit(errno); /* not sure if correct */
-	}
+		return (0);
+	return (S_ISDIR(buf.st_mode));
+}
+
+
+/**
+ * is_file - returns whether a directory is actually a file
+ * @directory: string of filepath
+ *
+ * Return: 0 if not a file, 1 if a file
+ */
+int is_file(char *directory)
+{
+	struct stat buf;
+	int lstat_rtn = 0;
+	// char original_path[PATH_MAX];
+
+	lstat_rtn = lstat(directory, &buf);
+	if (lstat_rtn == -1)
+		return (0);
 	return (S_ISREG(buf.st_mode));
 }
 
