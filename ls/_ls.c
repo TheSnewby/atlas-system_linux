@@ -208,10 +208,10 @@ int main(int argc, char **argv)
 {
 	int i, print_count = 0, dir_count = 0, is_multi_dir = 0;
 	int *options;
-	char directory[PATH_MAX];
+	char directory[PATH_MAX], original_path[PATH_MAX];
 
 	options = parse_options(argc, argv);
-
+	
 	if (argc == 1)  /* default no arguments */
 		print_dir(argc, ".", options, argv[0], is_multi_dir);
 	else  /* iterate through arguments and print dirs */
@@ -219,8 +219,15 @@ int main(int argc, char **argv)
 		for (i = 1; i < argc; i++)  /* tracks if multiple directories */
 		{
 			sprintf(directory, "%s%s", "./", argv[i]);
-			if ((argv[i][0] != '-') && (!is_file(directory)))
+			if ((argv[i][0] != '-') && (is_dir(directory)))
 				dir_count++;
+			if (!is_dir(directory) && !is_file(directory))
+			{
+				remove_dot_slash(original_path, directory);
+				fprintf(stderr, "%s: cannot access %s: ", argv[0], original_path);
+				perror(NULL);
+				exit(errno);
+			}
 			sprintf(directory, "./");  /* reset directory, memset not allowed */
 		}
 
