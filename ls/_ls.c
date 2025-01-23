@@ -75,7 +75,7 @@ void print_dir(int argc, char *path, int *options, char *program_name, int is_mu
 		dir = opendir(".");
 		if (dir == NULL)
 		{
-			fprintf(stderr, "%s-1: cannot access %s: ",
+			fprintf(stderr, "%s: cannot access %s: ",
 			program_name, original_path);
 			perror(NULL);
 			exit(errno);  /* not sure if correct */
@@ -93,7 +93,7 @@ void print_dir(int argc, char *path, int *options, char *program_name, int is_mu
 		{
 			if (is_multi_dir == 0)  /* handle invalid dir if multiple dirs */
 			{
-				fprintf(stderr, "%s-2: cannot access %s: ",
+				fprintf(stderr, "%s: cannot access %s: ",
 				program_name, original_path);
 				perror(NULL);
 			}
@@ -143,7 +143,7 @@ void print_dir(int argc, char *path, int *options, char *program_name, int is_mu
 		long_print_dir(argc, path, options);
 	if (closedir(dir) < 0)
 	{
-		fprintf(stderr, "%s-3: cannot access %s: ", program_name, original_path);
+		fprintf(stderr, "%s: cannot access %s: ", program_name, original_path);
 		perror(NULL);
 		exit(errno);  /* not sure if correct */
 	}
