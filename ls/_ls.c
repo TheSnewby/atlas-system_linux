@@ -32,7 +32,7 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 	int op_long = options[0], op_all = options[1];
 	int op_almost = options[2], op_vert = options[3];
 
-	remove_dot_slash(original_path, path);
+	remove_dot_slash(original_path, path);  /* used in error messages */
 	if (argc == 1)
 	{
 		dir = opendir(".");
@@ -75,8 +75,16 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 						printf("%s\n", entry->d_name);
 				}
 				else  /* path is a file */
+				{
 					if (_strcmp(file_name, entry->d_name) == 0)
+					{
 						printf("%s", original_path);
+						if (op_vert == 0)
+							printf("\t");
+						else
+							printf("\n");
+					}
+				}
 			}  /* might need formatting rework? */
 		}
 		if (op_vert == 0)
@@ -157,7 +165,7 @@ int *parse_options(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
-	int i, print_count = 0;
+	int i, print_count = 0, dir_count = 0;
 	int *options;
 	char directory[PATH_MAX];
 
@@ -167,11 +175,22 @@ int main(int argc, char **argv)
 		print_dir(argc, ".", options, argv[0]);
 	else  /* iterate through arguments and print dirs */
 	{
+		for (i = 1; i < argc; i++)  /* tracks if multiple directories */
+		{
+			sprintf(directory, "%s%s", "./", argv[i]);
+			if (argv[i][0] != '-' && !is_file(directory, argv[0]))
+				dir_count++;
+			sprintf(directory, "./");  /* reset directory, memset not allowed */
+		}
+
 		for (i = 1; i < argc; i++)
 		{
 			if (argv[i][0] != '-')
 			{
 				sprintf(directory, "%s%s", "./", argv[i]);
+				/* prints directory if multiple directories, otherwise doesn't */
+				if ((dir_count > 1) && (!is_file(directory, argv[0])))
+					printf("%s:\n", argv[i]);
 				print_dir(argc, directory, options, argv[0]);
 				sprintf(directory, "./");  /* reset directory, memset not allowed */
 				print_count++;
