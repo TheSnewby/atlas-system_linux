@@ -12,8 +12,8 @@
 
 #define MAX_OPTIONS 4  /* currently handles -l, -a, -A, -1 */
 
-char *_ls(int, char **);
-int is_file(char*, char*);
+int is_file(char *);
+int is_dir(char *);
 char *get_dir_of_path(char *, char*);
 char *get_file_of_path(char *, char *);
 int _strcmp(char *, char*);

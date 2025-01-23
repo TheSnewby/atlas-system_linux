@@ -46,7 +46,7 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 	}
 	else
 	{
-		if (is_file(path, program_name))
+		if (is_file(path))
 		{
 			file_name = get_file_of_path(path, program_name);
 			path = get_dir_of_path(path, program_name);
@@ -54,10 +54,14 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 		dir = opendir(path);
 		if (dir == NULL)
 		{
-			fprintf(stderr, "%s: cannot access %s: ",
-			program_name, original_path);
-			perror(NULL);
-			exit(errno);  /* not sure if correct */
+			return;
+			/**
+			 * fprintf(stderr, "%s: cannot access %s: ",
+			 * program_name, original_path);
+			 * perror(NULL);
+			 * return;
+			 * exit(errno);   not sure if correct
+			 */
 		}
 	}
 
@@ -178,7 +182,7 @@ int main(int argc, char **argv)
 		for (i = 1; i < argc; i++)  /* tracks if multiple directories */
 		{
 			sprintf(directory, "%s%s", "./", argv[i]);
-			if ((argv[i][0] != '-') && (!is_file(directory, argv[0])))
+			if ((argv[i][0] != '-') && (is_dir(directory)))
 				dir_count++;
 			sprintf(directory, "./");  /* reset directory, memset not allowed */
 		}
@@ -189,7 +193,7 @@ int main(int argc, char **argv)
 			{
 				sprintf(directory, "%s%s", "./", argv[i]);
 				/* prints directory if multiple directories, otherwise doesn't */
-				if ((dir_count > 1) && (!is_file(directory, argv[0])))
+				if ((dir_count > 1) && (is_dir(directory)))
 				{
 					if (print_count)
 						printf("\n");
