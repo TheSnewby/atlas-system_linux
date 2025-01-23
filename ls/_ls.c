@@ -57,11 +57,10 @@ void long_print_dir(int argc, char *directory, int *options)
  * @path: string of path
  * @options: options array where [0] = 1 means long (-l) and [1] = all (-a),
  * [2] = 1 is -A, and [3] = 1 is -1
- * @is_multi_dir: 1 if multiple directories, 0 if not 
  *
  * Return: void
  */
-void print_dir(int argc, char *path, int *options, char *program_name, int is_multi_dir)
+void print_dir(int argc, char *path, int *options, char *program_name)
 {
 	struct dirent *entry;
 	DIR *dir;
@@ -91,12 +90,12 @@ void print_dir(int argc, char *path, int *options, char *program_name, int is_mu
 		dir = opendir(path);
 		if (dir == NULL)
 		{
-			if (is_multi_dir == 0)  /* handle invalid dir if multiple dirs */
-			{
-				fprintf(stderr, "%s: cannot access %s: ",
-				program_name, original_path);
-				perror(NULL);
-			}
+			// if (is_multi_dir == 0)  /* handle invalid dir if multiple dirs */
+			// {
+			// 	fprintf(stderr, "%s: cannot access %s: ",
+			// 	program_name, original_path);
+			// 	perror(NULL);
+			// }
 			return;
 			/* exit(errno);   not sure if correct */
 		}
@@ -213,7 +212,7 @@ int main(int argc, char **argv)
 	options = parse_options(argc, argv);
 	
 	if (argc == 1)  /* default no arguments */
-		print_dir(argc, ".", options, argv[0], is_multi_dir);
+		print_dir(argc, ".", options, argv[0]);
 	else  /* iterate through arguments and print dirs */
 	{
 		for (i = 1; i < argc; i++)  /* tracks if multiple directories */
@@ -246,12 +245,12 @@ int main(int argc, char **argv)
 						printf("\n");
 					printf("%s:\n", argv[i]);
 				}
-				print_dir(argc, directory, options, argv[0], is_multi_dir);
+				print_dir(argc, directory, options, argv[0]);
 				sprintf(directory, "./");  /* reset directory, memset not allowed */
 				print_count++;
 			}
 			if (print_count == 0)
-				print_dir(argc, ".", options, argv[0], is_multi_dir);
+				print_dir(argc, ".", options, argv[0]);
 		}
 	}
 	return (0);
