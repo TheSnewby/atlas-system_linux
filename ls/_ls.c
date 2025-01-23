@@ -226,7 +226,7 @@ int main(int argc, char **argv)
 				remove_dot_slash(original_path, directory);
 				fprintf(stderr, "%s: cannot access %s: ", argv[0], original_path);
 				perror(NULL);
-				exit(errno);
+				// exit(errno);
 			}
 			sprintf(directory, "./");  /* reset directory, memset not allowed */
 		}
