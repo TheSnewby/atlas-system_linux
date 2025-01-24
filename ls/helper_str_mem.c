@@ -36,14 +36,17 @@ char *remove_dot_slash(char *dest, char *src)
     if (!dest || !src)
         return (NULL);
 
-    if (src[0] == '.' && src[1] == '/') { /* if string starts with ./ */
-        for (i = 0; src[i + 2] != '\0'; i++) { /* skip em */
+    if (src[0] == '.' && src[1] == '/') /* if string starts with ./ */
+	{
+        for (i = 0; src[i + 2] != '\0'; i++) /* copy without ./ */
+		{
             dest[i] = src[i + 2];
         }
         dest[i] = '\0';
     }
 
-	else { /* otherwise, just copy string */
+	else 
+	{ /* otherwise, just copy string */
         _strcpy(dest, src);
     }
 
