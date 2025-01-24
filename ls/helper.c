@@ -1,40 +1,46 @@
 #include "_ls.h"
 
 /**
- * is_dir - returns whether a directory is actually a file
- * @directory: string of filepath
+ * is_dir - checks if the path is a directory
+ * @directory: string of path being checked
  *
- * Return: 0 if not a file, 1 if a file
+ * Return: 1 if directory, otherwise 0
  */
 int is_dir(char *directory)
 {
-	struct stat buf;
-	int lstat_rtn = 0;
-	// char original_path[PATH_MAX];
+    struct stat buf; /* struct to hold file info */
 
-	lstat_rtn = lstat(directory, &buf);
-	if (lstat_rtn == -1)
+    if (lstat(directory, &buf) == -1) /* check for lstat failure */
+	{
+		char error_message[256]; /* buffer for error message */
+		sprintf(error_message, "ls: cannot access %s", directory);
+		perror(error_message);
 		return (0);
-	return (S_ISDIR(buf.st_mode));
+	}
+
+    return (S_ISDIR(buf.st_mode)); /* actual directory check */
 }
 
 
 /**
- * is_file - returns whether a directory is actually a file
- * @directory: string of filepath
+ * is_file - checks if the path is a file
+ * @directory: string of path being checked
  *
- * Return: 0 if not a file, 1 if a file
+ * Return: 1 if standard file, otherwise 0
  */
 int is_file(char *directory)
 {
-	struct stat buf;
-	int lstat_rtn = 0;
-	// char original_path[PATH_MAX];
+    struct stat buf; /* holds file info */
 
-	lstat_rtn = lstat(directory, &buf);
-	if (lstat_rtn == -1)
+    if (lstat(directory, &buf) == -1) /* lsat failure check */
+	{
+		char error_message[256];
+		sprintf(error_message, "ls: cannot access %s", directory);
+		perror(error_message);
 		return (0);
-	return (S_ISREG(buf.st_mode));
+	}
+
+    return (S_ISREG(buf.st_mode)); /* actual file check */
 }
 
 /**
@@ -58,18 +64,21 @@ char *get_dir_of_path(char *fp, char *program_name)
 			break;
 	}
 	dir_size = i;
-	dir = (char *)malloc((dir_size + 1) * sizeof(char));
-	if (dir == NULL) /* now checks for failure, not success */
+
+	dir = malloc((dir_size + 1) * sizeof(char)); /* removed (char *) */
+	if (!dir) /* now checks for failure, not success */
 	{
-		fprintf(stderr, "%s: ", program_name); /* insert proper error msg */
-		perror(NULL);
-		exit(errno); /* not sure if correct */
+		char error_message[256];
+		sprintf(error_message, "%s: ", program_name); /* NEEDS ERROR MESSAGE */
+		perror(error_message);
+		exit(errno);
 	}
 	for (i = 0; i < dir_size; i++)
 	{
 		dir[i] = fp[i];
 	}
 	dir[dir_size] = '\0';
+
 	return (dir);
 }
 
@@ -98,21 +107,39 @@ char *get_file_of_path(char *fp, char *program_name)
 		}
 	}
 	/* position of file name in path */
-	int start = (slash_index == -1) ? 0 : slash_index + 1;  /*CHECK LOGIC HERE*/
+	int start;
+	if (slash_index == -1) /* no slash */
+        start = 0;
+	else /* slash found */
+	{
+        start = slash_index + 1;
+	}
 	int file_name_size = fp_size - start;
 
 	char *file_name = malloc(file_name_size + 1); /* name + /0 */
 	if (file_name == NULL)
 	{
-		fprintf(stderr, "%s: ", program_name); /* still needs error message */
-		perror(NULL);
+		char error_message[256];
+		sprintf(error_message, "%s: ", program_name); /* NEEDS ERROR MESSAGE */
+		perror(error_message);
 		exit(errno);
 	}
-
-	/* memcpy(file_name, &fp[start], file_name_size); just file name */
+	/* copy file name into allocated memory */
 	for (i = 0; i < file_name_size; i++)
 		file_name[i] = fp[start + i];
-	file_name[file_name_size] = '\0';			   /* null terminate */
+	file_name[file_name_size] = '\0';
+
+	if (file_name_size == 0) /* if file name empty */
+	{
+		char error_msg[] = "ls: missing file operand\n";
+		int len = 0;
+
+		while (error_msg[len] != '\0') /* get error message length */
+			len++;
+
+		write(STDOUT_FILENO, error_msg, len);
+		exit(EXIT_FAILURE);
+	}
 
 	return (file_name);
 }
