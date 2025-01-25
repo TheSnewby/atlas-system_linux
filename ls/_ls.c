@@ -131,10 +131,24 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 	{
 		if (op_almost)
 			if ((!_strcmp(entry->d_name, ".")) || (!_strcmp(entry->d_name, "..")))  /* what about if file? */
+			{
+				if (file_name)
+				{
+					free(file_name);
+					free(path);
+				}
 				continue;
+			}
 		if (!op_all)
 			if (entry->d_name[0] == '.')
+			{
+				if (file_name)
+				{
+					free(file_name);
+					free(path);
+				}
 				continue;
+			}
 
 		if (!file_name)  /* path isn't a file */
 		{
