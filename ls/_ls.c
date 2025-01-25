@@ -92,10 +92,10 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 	DIR *dir;
 	char *file_name = NULL, original_path[PATH_MAX];
 	int op_long = options[0], op_all = options[1];
-	int op_almost = options[2], op_vert = options[3];
+	int op_almost = options[2], op_one = options[3];
 
 	if (op_long)
-		op_vert = 1;
+		op_one = 1;  /* use vertical printing for long printing */
 
 	remove_dot_slash(original_path, path);  /* used in error messages */
 	if (argc == 1)
@@ -127,47 +127,41 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 		}
 	}
 
-	if (op_all == 0 && op_almost == 0)
+	while ((entry = readdir(dir)) != NULL)
 	{
-		while ((entry = readdir(dir)) != NULL)
+		if (op_almost)
+			if ((!_strcmp(entry->d_name, ".")) || (!_strcmp(entry->d_name, "..")))  /* what about if file? */
+				continue;
+		if (!op_all)
+			if (entry->d_name[0] == '.')
+				continue;
+
+		if (!file_name)  /* path isn't a file */
 		{
-			if (entry->d_name[0] != '.')  /* only non-hidden */
-			{
-				if (op_long)
-						long_print_dir(entry->d_name);
-				if (!file_name)  /* path isn't a file */
-				{
-					if (op_vert == 0)
-						printf("%s\t", entry->d_name);
-					else
-						printf("%s\n", entry->d_name);
-				}
-				else  /* path is a file */
-				{
-					if (_strcmp(file_name, entry->d_name) == 0)
-					{
-						printf("%s", original_path);
-						if (op_vert == 0)
-							printf("\t");
-						else
-							printf("\n");
-					}
-				}
-			}  /* might need formatting rework? */
+			if (op_long)
+				long_print_dir(entry->d_name);
+			if (op_one == 0)
+				printf("%s\t", entry->d_name);
+			else
+				printf("%s\n", entry->d_name);
 		}
-		if (op_vert == 0)
-			printf("\n");
+		else  /* path is a file */
+		{
+			if (op_long)
+				long_print_dir(entry->d_name);
+			if (_strcmp(file_name, entry->d_name) == 0)
+			{
+				printf("%s", original_path);
+				if (op_one == 0)
+					printf("\t");
+				else
+					printf("\n");
+			}
+		}
 	}
-	else if (op_long == 0 && op_all == 1)  /* only -a */
-	{
-		while ((entry = readdir(dir)) != NULL)  /* prints all of directory */
-			printf("%s\t", entry->d_name);  /* might need formatting rework? */
+	if (op_one == 0)
 		printf("\n");
-	}
-	else if(op_long == 1 && op_all == 0)  		/* probably rewrite */
-		long_print_dir(path);
-	else										/* probably rewrite */
-		long_print_dir(path);
+
 	if (closedir(dir) < 0)
 	{
 		fprintf(stderr, "%s: cannot access %s: ", program_name, original_path);
