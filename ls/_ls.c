@@ -47,7 +47,7 @@ void long_print_dir(char *directory)
 	if (lstat(directory, &buf) == -1) /* check for lstat failure */
 	{
 		/* buffer for error message */
-		sprintf(error_message, "ls-1: cannot access %s", directory);
+		sprintf(error_message, "ls: cannot access %s", directory);
 		perror(error_message);
 		return;
 	}
@@ -103,7 +103,7 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 		dir = opendir(".");
 		if (dir == NULL)
 		{
-			fprintf(stderr, "%s-2: cannot access %s: ",
+			fprintf(stderr, "%s: cannot access %s: ",
 			program_name, original_path);
 			perror(NULL);
 			exit(errno);  /* not sure if correct */
@@ -119,7 +119,7 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 		dir = opendir(path);
 		if (dir == NULL)
 		{
-			fprintf(stderr, "%s-3: cannot access %s: ",
+			fprintf(stderr, "%s: cannot access %s: ",
 			program_name, original_path);
 			perror(NULL);
 			return;
@@ -178,7 +178,7 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 
 	if (closedir(dir) < 0)
 	{
-		fprintf(stderr, "%s: cannot access %s-4: ", program_name, original_path);
+		fprintf(stderr, "%s: cannot access %s: ", program_name, original_path);
 		perror(NULL);
 		exit(errno);  /* not sure if correct */
 	}
