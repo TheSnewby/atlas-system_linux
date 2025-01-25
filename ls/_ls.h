@@ -9,6 +9,10 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <pwd.h>
+#include <grp.h>
+#include <time.h>
+#include <fcntl.h>
 
 #define MAX_OPTIONS 4  /* currently handles -l, -a, -A, -1 */
 
@@ -20,5 +24,7 @@ int _strcmp(char *, char*);
 char *_memcpy(char *, char *, int);
 char *_strcpy(char *, char *);
 char *remove_dot_slash(char *, char *);
+void get_perms(struct stat, char *);
+void char_replacer(char *, char, char);
 
 #endif

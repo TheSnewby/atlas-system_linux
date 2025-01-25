@@ -100,3 +100,23 @@ int _strcmp(char *s1, char *s2)
 
 	return (diff);
 }
+
+/**
+ * char_replacer - replaces character with another in string
+ * @str: string to be adjusted
+ * @target: character to be replaced
+ * @replacement: replacing character
+ *
+ * Return: void
+ */
+void char_replacer(char *str, char target, char replacement)
+{
+	int i;
+
+	if (!str)
+		return;
+
+	for (i = 0; str[i] != '\0'; i++)
+		if (str[i] == target)
+			str[i] = replacement;
+}
