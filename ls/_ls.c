@@ -83,11 +83,10 @@ void long_print_dir(char *directory)
  * @path: string of path
  * @options: options array where [0] = 1 means long (-l) and [1] = all (-a),
  * [2] = 1 is -A, and [3] = 1 is -1
- * @is_multi_dir: 1 if multiple directories, 0 if not 
  *
  * Return: void
  */
-void print_dir(int argc, char *path, int *options, char *program_name, int is_multi_dir)
+void print_dir(int argc, char *path, int *options, char *program_name)
 {
 	struct dirent *entry;
 	DIR *dir;
@@ -120,12 +119,9 @@ void print_dir(int argc, char *path, int *options, char *program_name, int is_mu
 		dir = opendir(path);
 		if (dir == NULL)
 		{
-			if (is_multi_dir == 0)  /* handle invalid dir if multiple dirs */
-			{
-				fprintf(stderr, "%s: cannot access %s: ",
-				program_name, original_path);
-				perror(NULL);
-			}
+			fprintf(stderr, "%s: cannot access %s: ",
+			program_name, original_path);
+			perror(NULL);
 			return;
 			/* exit(errno);   not sure if correct */
 		}
@@ -237,26 +233,23 @@ int *parse_options(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
-	int i, print_count = 0, dir_count = 0, is_multi_dir = 0;
+	int i, print_count = 0, dir_count = 0;
 	int *options;
 	char directory[PATH_MAX];
 
 	options = parse_options(argc, argv);
 
 	if (argc == 1)  /* default no arguments */
-		print_dir(argc, ".", options, argv[0], is_multi_dir);
+		print_dir(argc, ".", options, argv[0]);
 	else  /* iterate through arguments and print dirs */
 	{
 		for (i = 1; i < argc; i++)  /* tracks if multiple directories */
 		{
 			sprintf(directory, "%s%s", "./", argv[i]);
-			if ((argv[i][0] != '-') && (!is_file(directory)))
+			if ((argv[i][0] != '-') && (is_dir(directory)))
 				dir_count++;
 			sprintf(directory, "./");  /* reset directory, memset not allowed */
 		}
-
-		if (dir_count > 1)
-			is_multi_dir++;
 
 		for (i = 1; i < argc; i++)
 		{
@@ -270,12 +263,12 @@ int main(int argc, char **argv)
 						printf("\n");
 					printf("%s:\n", argv[i]);
 				}
-				print_dir(argc, directory, options, argv[0], is_multi_dir);
+				print_dir(argc, directory, options, argv[0]);
 				sprintf(directory, "./");  /* reset directory, memset not allowed */
 				print_count++;
 			}
 			if (print_count == 0)
-				print_dir(argc, ".", options, argv[0], is_multi_dir);
+				print_dir(argc, ".", options, argv[0]);
 		}
 	}
 	return (0);
