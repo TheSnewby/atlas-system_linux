@@ -57,12 +57,7 @@ int is_dir(char *directory)
     struct stat buf; /* struct to hold file info */
 
     if (lstat(directory, &buf) == -1) /* check for lstat failure */
-	{
-		char error_message[256]; /* buffer for error message */
-		sprintf(error_message, "ls: cannot access %s", directory);
-		perror(error_message);
 		return (0);
-	}
 
     return (S_ISDIR(buf.st_mode)); /* actual directory check */
 }
@@ -79,12 +74,7 @@ int is_file(char *directory)
     struct stat buf; /* holds file info */
 
     if (lstat(directory, &buf) == -1) /* lsat failure check */
-	{
-		char error_message[256];
-		sprintf(error_message, "ls: cannot access %s", directory);
-		perror(error_message);
 		return (0);
-	}
 
     return (S_ISREG(buf.st_mode)); /* actual file check */
 }
@@ -110,12 +100,12 @@ char *get_dir_of_path(char *fp, char *program_name)
 			break;
 	}
 	dir_size = i;
+	char error_message[256];
 
 	dir = malloc((dir_size + 1) * sizeof(char)); /* removed (char *) */
 	if (!dir) /* now checks for failure, not success */
 	{
-		char error_message[256];
-		sprintf(error_message, "%s: ", program_name); /* NEEDS ERROR MESSAGE */
+		sprintf(error_message, "%s-7: ", program_name); /* NEEDS ERROR MESSAGE */
 		perror(error_message);
 		exit(errno);
 	}
@@ -137,9 +127,10 @@ char *get_dir_of_path(char *fp, char *program_name)
  */
 char *get_file_of_path(char *fp, char *program_name)
 {
-	int i;
+	int i, start;
 	int fp_size = 0;	  /* stores full path length */
 	int slash_index = -1; /* stores position of last slash */
+	char error_message[256];
 
 	while (fp[fp_size] != '\0') /* get length of input path */
 		fp_size++;
@@ -153,7 +144,6 @@ char *get_file_of_path(char *fp, char *program_name)
 		}
 	}
 	/* position of file name in path */
-	int start;
 	if (slash_index == -1) /* no slash */
         start = 0;
 	else /* slash found */
@@ -165,7 +155,6 @@ char *get_file_of_path(char *fp, char *program_name)
 	char *file_name = malloc(file_name_size + 1); /* name + /0 */
 	if (file_name == NULL)
 	{
-		char error_message[256];
 		sprintf(error_message, "%s: ", program_name); /* NEEDS ERROR MESSAGE */
 		perror(error_message);
 		exit(errno);
