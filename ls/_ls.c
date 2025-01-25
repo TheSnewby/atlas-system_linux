@@ -30,25 +30,51 @@ int print_error(int msg_num, char* program_name, char *file_path, int errnum, ch
 
 
 /**
- * long_print_dir - handles long format for printing
+ * long_print_dir - handles long format by printing the non \n string of info
  * @argc: number of arguments
  * @directory: string of directory
- * @options: options array where [0] = 1 means long (-l) and [1] = all (-a)
  *
  * Return: void
  */
-void long_print_dir(int argc, char *directory, int *options)
+void long_print_dir(char *directory)
 {
-	printf("%d, %s, %d", argc, directory, options[0]);
-	return;
+	struct stat buf;
+	struct passwd *pwd = NULL;
+	struct group *group = NULL;
+	char uname[32], gname[32], *last_mod = NULL;
+	char error_message[256], perms[11] = "----------";
 
-	/**
-	 * consider calling long_print_dir just to print a non \n line up to
-	 * just before the next directory
-	 * 
-	 * e.g. printf(permissions, ... timestamp) but without a \n because the
-	 *      calling function will take care of that?
-	 */
+	if (lstat(directory, &buf) == -1) /* check for lstat failure */
+	{
+		/* buffer for error message */
+		sprintf(error_message, "ls: cannot access %s", directory);
+		perror(error_message);
+		return;
+	}
+
+	get_perms(buf, perms);
+
+	pwd = getpwuid(buf.st_uid);  /* get user name from pwd struct */
+	if (pwd)
+		sprintf(uname, "%s", pwd->pw_name);
+	else
+		sprintf(uname, "%u", buf.st_uid);
+
+	group = getgrgid(buf.st_gid);  /* get group name from group struct */
+	if (group)
+		sprintf(gname, "%s", group->gr_name);
+	else
+		sprintf(uname, "%u", buf.st_uid);
+
+	last_mod = ctime(&buf.st_mtime);  /* get time last modified from ctime */
+	char_replacer(last_mod, '\n', '\0');
+
+
+	printf("%s %lu %s %s %8ld %s ", perms, buf.st_nlink, uname, gname, buf.st_size, last_mod);
+
+	/* currently prints out year, whereas ls on shows year if it is different */
+	/* ...compared to the current year*/
+	/* ls replaces the hour:minutes with the year */
 }
 
 /**
@@ -68,6 +94,9 @@ void print_dir(int argc, char *path, int *options, char *program_name, int is_mu
 	char *file_name = NULL, original_path[PATH_MAX];
 	int op_long = options[0], op_all = options[1];
 	int op_almost = options[2], op_vert = options[3];
+
+	if (op_long)
+		op_vert = 1;
 
 	remove_dot_slash(original_path, path);  /* used in error messages */
 	if (argc == 1)
@@ -102,12 +131,14 @@ void print_dir(int argc, char *path, int *options, char *program_name, int is_mu
 		}
 	}
 
-	if (op_long == 0 && op_all == 0 && op_almost == 0)
+	if (op_all == 0 && op_almost == 0)
 	{
 		while ((entry = readdir(dir)) != NULL)
 		{
 			if (entry->d_name[0] != '.')  /* only non-hidden */
 			{
+				if (op_long)
+						long_print_dir(entry->d_name);
 				if (!file_name)  /* path isn't a file */
 				{
 					if (op_vert == 0)
@@ -138,9 +169,9 @@ void print_dir(int argc, char *path, int *options, char *program_name, int is_mu
 		printf("\n");
 	}
 	else if(op_long == 1 && op_all == 0)  		/* probably rewrite */
-		long_print_dir(argc, path, options);
+		long_print_dir(path);
 	else										/* probably rewrite */
-		long_print_dir(argc, path, options);
+		long_print_dir(path);
 	if (closedir(dir) < 0)
 	{
 		fprintf(stderr, "%s: cannot access %s: ", program_name, original_path);

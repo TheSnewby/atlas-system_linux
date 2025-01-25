@@ -1,6 +1,52 @@
 #include "_ls.h"
 
 /**
+ * get_perms - get the permissions of a file path
+ * @buf: lstat return of file path
+ * @perms: permissions buffer
+ *
+ * Return: void, perms is modified here
+ */
+void get_perms(struct stat buf, char *perms)
+{
+	_memcpy(perms, "----------", 10);  /* default setting */
+
+	/* set file type, default is regular file '-' set in calling function*/
+	if (S_ISDIR(buf.st_mode))
+		perms[0] = 'd';
+	else if (S_ISSOCK(buf.st_mode))
+		perms[0] = 's';
+	else if (S_ISLNK(buf.st_mode))
+		perms[0] = 'l';
+	else if (S_ISBLK(buf.st_mode))
+		perms[0]= 'b';
+	else if (S_ISCHR(buf.st_mode))
+		perms[0] = 'c';
+	else if (S_ISFIFO(buf.st_mode))
+		perms[0] = 'p';
+
+	/* set USR, GRP, and OTH permissions, default '-' set in calling function */
+	if (buf.st_mode & S_IRUSR)
+		perms[1] = 'r';
+	if (buf.st_mode & S_IWUSR)
+		perms[2] = 'w';
+	if (buf.st_mode & S_IXUSR)
+		perms[3] = 'x';
+	if (buf.st_mode & S_IRGRP)
+		perms[4] = 'r';
+	if (buf.st_mode & S_IWGRP)
+		perms[5] = 'w';
+	if (buf.st_mode & S_IXGRP)
+		perms[6] = 'x';
+	if (buf.st_mode & S_IROTH)
+		perms[7] = 'r';
+	if (buf.st_mode & S_IWOTH)
+		perms[8] = 'w';
+	if (buf.st_mode & S_IXOTH)
+		perms[9] = 'x';
+}
+
+/**
  * is_dir - checks if the path is a directory
  * @directory: string of path being checked
  *
