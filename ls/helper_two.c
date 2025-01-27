@@ -44,38 +44,30 @@ char *adjust_long_time(char *str)
 void print_error(int msg_num, char* program_name, char *file_path, int errnum,
 char *str_one, char *str_two)
 {
-	/* initial thoughts */
-	if ((msg_num == 1) && (errnum == 2))  /* cannot access file */
+	switch (msg_num)
 	{
-		fprintf(stderr, "%s: cannot access '%s': ", program_name, file_path);
+	case 1: /* non-fatal */
+		if (errnum == 2) /* file not found */
+			fprintf(stderr, "%s: cannot access '%s': ", program_name, file_path);
+		else if (errnum == 13) /* permission denied */
+			fprintf(stderr, "%s: cannot open directory '%s': ", program_name, file_path);
 		perror(NULL);
-	}
-	else if ((msg_num == 2) && (errnum == 2))  /* cannot access file and exit */
-	{
-		fprintf(stderr, "%s: cannot access '%s': ", program_name, file_path);
-		perror(NULL);
-		exit(errnum);
-	}
-	else if ((msg_num == 1) && (errnum == 13))  /* cannot open directory */
-	{
-		fprintf(stderr, "%s: cannot open direcotry '%s': ", program_name, file_path);
-		perror(NULL);
-	}
-	else if ((msg_num == 2) && (errnum == 13))  /* cannot open directory */
-	{
-		fprintf(stderr, "%s: cannot open direcotry '%s': ", program_name, file_path);
+		break;
+
+	case 2: /* deadly */
+		if (errnum == 2) /* not found */
+			fprintf(stderr, "%s: cannot access '%s': ", program_name, file_path);
+		else if (errnum == 13)
+			fprintf(stderr, "%s: cannot open directory '%s': ", program_name, file_path);
 		perror(NULL);
 		exit(errnum);
 	}
 
 	if (str_one)
-	{
 		free(str_one);
-		str_one = NULL;
-	}
+
 	if (str_two)
-	{
 		free(str_two);
-		str_two = NULL;
-	}
+
+	return (0); /* 0 if not fatal */
 }
