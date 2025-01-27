@@ -43,7 +43,7 @@ void long_print(char *path)
 
 	if (mod_time->tm_year == curr_time->tm_year) /* if same year */
 	{
-		sprintf(time_str, sizeof(time_str), "%s %2d %02d:%02d",
+		sprintf(time_str, "%s %2d %02d:%02d",
 				get_month_name(mod_time->tm_mon),
 				mod_time->tm_mday,
 				mod_time->tm_hour,
@@ -51,13 +51,13 @@ void long_print(char *path)
 	}
 	else /* if different year */
 	{
-		sprintf(time_str, sizeof(time_str), "%s %2d  %d",
+		sprintf(time_str, "%s %2d  %d",
 				get_month_name(mod_time->tm_mon),
 				mod_time->tm_mday,
 				mod_time->tm_year + 1900);
 	}
 
-	printf("%s %lu %s %s 5ld %s %s\n",
+	printf("%s %lu %s %s %5ld %s %s\n",
 			perms, buf.st_nlink, uname, gname, buf.st_size, time_str, path);
 }
 
