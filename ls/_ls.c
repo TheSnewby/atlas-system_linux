@@ -228,6 +228,7 @@ int main(int argc, char **argv)
 		if (argv[i][0] != '-')
 		{
 			sprintf(path, "%s%s", "./", argv[i]);
+
 			if (is_dir(path)) /* directories */
 			{
 				if (dir_count > 1) /* print directory name if multiple */
@@ -238,6 +239,10 @@ int main(int argc, char **argv)
 				}
 				print_dir(path, options, argv[0]);
 				print_count++;
+			}
+			else if (!is_file(path)) /* invalid paths */
+			{
+				print_error(1, argv[0], argv[i], errno, NULL, NULL);
 			}
 		}
 	}
