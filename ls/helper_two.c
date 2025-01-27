@@ -45,15 +45,25 @@ void print_error(int msg_num, char* program_name, char *file_path, int errnum,
 char *str_one, char *str_two)
 {
 	/* initial thoughts */
-	if (msg_num == 1)  /* cannot access file */
+	if ((msg_num == 1) && (errnum == 2))  /* cannot access file */
 	{
-		fprintf(stderr, "%s: cannot access %s: ", program_name, file_path);
+		fprintf(stderr, "%s: cannot access '%s': ", program_name, file_path);
 		perror(NULL);
 	}
-
-	if (msg_num == 2)  /* cannot access file and exit */
+	else if ((msg_num == 2) && (errnum == 2))  /* cannot access file and exit */
 	{
-		fprintf(stderr, "%s: cannot access %s: ", program_name, file_path);
+		fprintf(stderr, "%s: cannot access '%s': ", program_name, file_path);
+		perror(NULL);
+		exit(errnum);
+	}
+	else if ((msg_num == 1) && (errnum == 13))  /* cannot open directory */
+	{
+		fprintf(stderr, "%s: cannot open direcotry '%s': ", program_name, file_path);
+		perror(NULL);
+	}
+	else if ((msg_num == 2) && (errnum == 13))  /* cannot open directory */
+	{
+		fprintf(stderr, "%s: cannot open direcotry '%s': ", program_name, file_path);
 		perror(NULL);
 		exit(errnum);
 	}

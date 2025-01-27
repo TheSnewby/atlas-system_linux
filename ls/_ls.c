@@ -92,14 +92,14 @@ void print_dir(char *path, int *options, char *program_name)
 	while ((entry = readdir(dir)) != NULL)
 	{
 		if (op_almost)
+		{
 			if ((!_strcmp(entry->d_name, ".")) ||
 			(!_strcmp(entry->d_name, "..")))
 				continue;
-		if (!op_all)
-			if (entry->d_name[0] == '.')
-			{
+		}
+		else if (!op_all)
+			if ((entry->d_name[0] == '.') && !op_almost)
 				continue;
-			}
 
 		if (!file_name)  /* path isn't a file */
 		{
