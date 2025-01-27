@@ -191,7 +191,7 @@ int *parse_options(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
-	int i, print_count = 0, dir_count = 0, non_dir_count = 0;
+	int i, print_count = 0, dir_count = 0;
 	int *options;
 	char path[PATH_MAX];
 
