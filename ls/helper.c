@@ -153,28 +153,23 @@ char *get_file_of_path(char *fp, char *program_name)
 	int file_name_size = fp_size - start;
 
 	char *file_name = malloc(file_name_size + 1); /* name + /0 */
-	if (file_name == NULL)
+	if (!file_name)
 	{
-		sprintf(error_message, "%s: ", program_name); /* NEEDS ERROR MESSAGE */
-		perror(error_message);
-		exit(errno);
-	}
+        sprintf(error_message, "%s: Memory allocation failed in get_file_of_path", program_name);
+        perror(error_message);
+        exit(errno);
+    }
 	/* copy file name into allocated memory */
 	for (i = 0; i < file_name_size; i++)
 		file_name[i] = fp[start + i];
 	file_name[file_name_size] = '\0';
 
-	if (file_name_size == 0) /* if file name empty */
-	{
-		char error_msg[] = "ls: missing file operand\n";
-		int len = 0;
-
-		while (error_msg[len] != '\0') /* get error message length */
-			len++;
-
-		write(STDOUT_FILENO, error_msg, len);
-		exit(EXIT_FAILURE);
-	}
+    if (file_name_size == 0)
+    {
+        char error_msg[] = "ls: missing file operand\n";
+        write(STDOUT_FILENO, error_msg, sizeof(error_msg) - 1);
+        exit(EXIT_FAILURE);
+    }
 
 	return (file_name);
 }
