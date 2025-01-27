@@ -211,22 +211,22 @@ int main(int argc, char **argv)
 			else if (!is_dir(path))
 			{
 				print_error(1, argv[0], argv[i], errno, NULL, NULL);
-				non_dir_count++;
 			}
 			else
 				dir_count++;
 		}
 	}
 
-	if (non_dir_count > 0 && dir_count > 0)
+	if (non_dir_count > 0 && dir_count > 0) /* if both files & directories */
 		printf("\n");
 
 	for (i = 1; i < argc; i++)
 	{
 		if (argv[i][0] != '-')
 		{
-			sprintf(path, "%s%s", "./", argv[i]);
 			/* prints directory name if multiple directories */
+			sprintf(path, "%s%s", "./", argv[i]);
+
 			if (is_dir(path))
 			{
 				if (dir_count > 1)
