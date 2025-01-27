@@ -1,35 +1,6 @@
 #include "_ls.h"
 
 /**
- * print_error - prints errors
- * @msg_num: int denoting which message to print
- * @program_name: name of program
- * @file_path: file path
- * @errnum: errno of error
- * @str_one: possible malloc'd str that needs freeing
- * @str_two: possible malloc'd str that needs freeing
- *
- * Return: 0 if it shouldn't quit, or passed errno to exit ?
- */
-int print_error(int msg_num, char* program_name, char *file_path, int errnum, char *str_one, char *str_two)
-{
-	/* initial thoughts */
-	if (msg_num == 1)  /* cannot access file */
-	{
-		fprintf(stderr, "%s: cannot access %s: ", program_name, file_path);
-		perror(NULL);
-		exit(errno);
-	}
-	if (str_one)
-		free(str_one);
-	if (str_two)
-		free(str_two);
-
-	return (errnum);
-}
-
-
-/**
  * long_print_dir - handles long format by printing the non \n string of info
  * @argc: number of arguments
  * @directory: string of directory
@@ -104,10 +75,8 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 		dir = opendir(".");
 		if (dir == NULL)
 		{
-			fprintf(stderr, "%s: cannot access %s: ",
-			program_name, original_path);
-			perror(NULL);
-			exit(errno);  /* not sure if correct */
+			print_error(1, program_name, path, errno, NULL, NULL);
+			return;
 		}
 	}
 	else
@@ -120,14 +89,11 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 		dir = opendir(path);
 		if (dir == NULL)
 		{
-			fprintf(stderr, "%s: cannot access %s: ",
-			program_name, original_path);
-			perror(NULL);
+			print_error(1, program_name, path, errno, NULL, NULL);
 			return;
-			/* exit(errno);   not sure if correct */
 		}
 	}
-
+	/* consider refactoring this next section to another function */
 	while ((entry = readdir(dir)) != NULL)
 	{
 		if (op_almost)
@@ -178,11 +144,7 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 		printf("\n");
 
 	if (closedir(dir) < 0)
-	{
-		fprintf(stderr, "%s: cannot access %s: ", program_name, original_path);
-		perror(NULL);
-		exit(errno);  /* not sure if correct */
-	}
+		print_error(2, program_name, path, errno, NULL, NULL);
 	if (file_name)
 	{
 		free(file_name);
