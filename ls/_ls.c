@@ -191,7 +191,7 @@ int *parse_options(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
-	int i, print_count = 0, dir_count = 0;
+	int i, print_count = 0, dir_count = 0, non_dir_count = 0;
 	int *options;
 	char path[PATH_MAX];
 
@@ -205,14 +205,21 @@ int main(int argc, char **argv)
 			if (is_file(path))
 			{
 				printf("%s\n", argv[i]);
+				non_dir_count++;
 				print_count++;
 			}
 			else if (!is_dir(path))
 			{
 				print_error(1, argv[0], argv[i], errno, NULL, NULL);
+				non_dir_count++;
 			}
+			else
+				dir_count++;
 		}
 	}
+
+	if (non_dir_count > 0 && dir_count > 0)
+		printf("\n");
 
 	for (i = 1; i < argc; i++)
 	{
@@ -222,10 +229,12 @@ int main(int argc, char **argv)
 			/* prints directory name if multiple directories */
 			if (is_dir(path))
 			{
-				if (print_count > 0)
-					printf("\n"); /* separate files and directories */
 				if (dir_count > 1)
-					printf("%s:\n", argv[i]); /* if multiple directories */
+				{
+					if (print_count > 0)
+						printf("\n");
+					printf("%s:\n", argv[i]);
+				}
 				print_dir(path, options, argv[0]);
 				print_count++;
 			}
