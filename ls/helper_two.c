@@ -44,30 +44,27 @@ char *adjust_long_time(char *str)
 void print_error(int msg_num, char* program_name, char *file_path, int errnum,
 char *str_one, char *str_two)
 {
-	switch (msg_num)
-	{
-	case 1: /* non-fatal */
-		if (errnum == 2) /* file not found */
-			fprintf(stderr, "%s: cannot access '%s': ", program_name, file_path);
-		else if (errnum == 13) /* permission denied */
-			fprintf(stderr, "%s: cannot open directory '%s': ", program_name, file_path);
-		perror(NULL);
-		break;
+    /* figure out which message should be printed */
+    if (errnum == 2) /* file not found */
+        fprintf(stderr, "%s: cannot access '%s': ", program_name, file_path);
+    else if (errnum == 13) /* permission denied */
+        fprintf(stderr, "%s: cannot open directory '%s': ", program_name, file_path);
 
-	case 2: /* deadly */
-		if (errnum == 2) /* not found */
-			fprintf(stderr, "%s: cannot access '%s': ", program_name, file_path);
-		else if (errnum == 13)
-			fprintf(stderr, "%s: cannot open directory '%s': ", program_name, file_path);
-		perror(NULL);
-		exit(errnum);
-	}
+    perror(NULL); /* system error message */
 
-	if (str_one)
-		free(str_one);
+    /* fatal errors */
+    if (msg_num == 2)
+    {
+        if (str_one)
+            free(str_one);
+        if (str_two)
+            free(str_two);
+        exit(errnum);
+    }
 
-	if (str_two)
-		free(str_two);
-
-	return (0); /* 0 if not fatal */
+    /* clean-up for non-fatal */
+    if (str_one)
+        free(str_one);
+    if (str_two)
+        free(str_two);
 }
