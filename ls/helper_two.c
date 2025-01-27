@@ -45,9 +45,9 @@ char *str_one, char *str_two)
 {
     /* figure out which message should be printed */
     if (errnum == 2) /* file not found */
-        fprintf(stderr, "%s: cannot access '%s': ", program_name, file_path);
+        fprintf(stderr, "%s: cannot access %s: ", program_name, file_path);
     else if (errnum == 13) /* permission denied */
-        fprintf(stderr, "%s: cannot open directory '%s': ", program_name, file_path);
+        fprintf(stderr, "%s: cannot open directory %s: ", program_name, file_path);
 
     perror(NULL); /* system error message */
 
