@@ -28,5 +28,9 @@ void get_perms(struct stat, char *);
 void char_replacer(char *, char, char);
 char *adjust_long_time(char *);
 void print_error(int, char*, char *, int, char *, char *);
+void long_print(char *);
+void print_dir(char *, int *, char *);
+int *parse_options(int, char **);
+char *get_month_name(int);
 
 #endif

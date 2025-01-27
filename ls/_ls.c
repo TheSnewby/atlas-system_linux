@@ -12,8 +12,10 @@ void long_print(char *path)
 	struct stat buf;
 	struct passwd *pwd = NULL;
 	struct group *group = NULL;
-	char uname[32], gname[32], *last_mod = NULL;
-	char error_message[256], perms[11] = "----------";
+	char uname[32], gname[32], time_str[32], perms[11] = "----------";
+	char error_message[256];
+	time_t current_time = time(NULL);
+	struct tm *mod_time = NULL, *curr_time = localtime(&current_time);
 
 	if (lstat(path, &buf) == -1) /* check for lstat failure */
 	{
@@ -37,17 +39,26 @@ void long_print(char *path)
 	else
 		sprintf(uname, "%u", buf.st_uid);
 
-	last_mod = ctime(&buf.st_mtime); /* get time last modified from ctime */
-	char_replacer(last_mod, '\n', '\0');
+	mod_time = localtime(&buf.st_mtime); /* get last update time */
 
-	last_mod = adjust_long_time(last_mod);
+	if (mod_time->tm_year == curr_time->tm_year) /* if same year */
+	{
+		sprintf(time_str, sizeof(time_str), "%s %2d %02d:%02d",
+				get_month_name(mod_time->tm_mon),
+				mod_time->tm_mday,
+				mod_time->tm_hour,
+				mod_time->tm_min);
+	}
+	else /* if different year */
+	{
+		sprintf(time_str, sizeof(time_str), "%s %2d  %d",
+				get_month_name(mod_time->tm_mon),
+				mod_time->tm_mday,
+				mod_time->tm_year + 1900);
+	}
 
-	printf("%s %lu %s %s %5ld %s ", perms, buf.st_nlink, uname, gname,
-		   buf.st_size, last_mod);
-
-	/* currently prints out year, whereas ls on shows year if it is different */
-	/* ...compared to the current year*/
-	/* ls replaces the hour:minutes with the year */
+	printf("%s %lu %s %s 5ld %s %s\n",
+			perms, buf.st_nlink, uname, gname, buf.st_size, time_str, path);
 }
 
 /**

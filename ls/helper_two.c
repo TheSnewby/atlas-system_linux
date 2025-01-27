@@ -61,3 +61,17 @@ char *str_one, char *str_two)
     if (msg_num == 2)
         exit(errnum);
 }
+
+/**
+ * get_month_name - gets and abbreviates month name
+ * @month: month number
+ *
+ * Return: pointer to month abbreviation
+ */
+char *get_month_name(int month)
+{
+	char *months[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
+	"Aug", "Sep", "Oct", "Nov", "Dec"};
+
+	return (months[month]);
+}
