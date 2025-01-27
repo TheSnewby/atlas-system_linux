@@ -59,7 +59,13 @@ char *str_one, char *str_two)
 	}
 
 	if (str_one)
+	{
 		free(str_one);
+		str_one = NULL;
+	}
 	if (str_two)
+	{
 		free(str_two);
+		str_two = NULL;
+	}
 }

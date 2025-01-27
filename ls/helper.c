@@ -105,7 +105,7 @@ char *get_dir_of_path(char *fp, char *program_name)
 	dir = malloc((dir_size + 1) * sizeof(char)); /* removed (char *) */
 	if (!dir) /* now checks for failure, not success */
 	{
-		sprintf(error_message, "%s-7: ", program_name); /* NEEDS ERROR MESSAGE */
+		sprintf(error_message, "%s: ", program_name); /* NEEDS ERROR MESSAGE */
 		perror(error_message);
 		exit(errno);
 	}

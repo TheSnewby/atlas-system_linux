@@ -27,6 +27,6 @@ char *remove_dot_slash(char *, char *);
 void get_perms(struct stat, char *);
 void char_replacer(char *, char, char);
 char *adjust_long_time(char *);
-print_error(int, char*, char *, int, char *, char *);
+void print_error(int, char*, char *, int, char *, char *);
 
 #endif
