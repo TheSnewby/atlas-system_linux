@@ -63,7 +63,7 @@ void print_dir(char *path, int *options, char *program_name)
 {
 	struct dirent *entry;
 	DIR *dir;
-	char *file_name = NULL, original_path[PATH_MAX];
+	char *file_name = NULL, original_path[PATH_MAX], long_path[PATH_MAX];
 	int op_long = options[0], op_all = options[1];
 	int op_almost = options[2], op_one = options[3], print_vert = 0;
 
@@ -103,8 +103,9 @@ void print_dir(char *path, int *options, char *program_name)
 
 		if (!file_name)  /* path isn't a file */
 		{
+			sprintf(long_path, "%s/%s", path, entry->d_name);
 			if (op_long)
-				long_print(entry->d_name);
+				long_print(long_path);
 			if (print_vert == 0)
 				printf("%s\t", entry->d_name);
 			else
