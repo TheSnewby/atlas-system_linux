@@ -77,11 +77,17 @@ void print_dir(char *path, int *options, char *program_name)
 		path = get_dir_of_path(path, program_name);
 	}
 	dir = opendir(path);
-	if (dir == NULL)
+	if ((dir == NULL) && !file_name)
 	{
-		print_error(1, program_name, path, errno, file_name, program_name);
+		print_error(1, program_name, original_path, errno, NULL, NULL);
 		return;
 	}
+	else if ((dir == NULL) && file_name)
+	{
+		print_error(1, program_name, original_path, errno, file_name, program_name);
+		return;
+	}
+
 	/* consider refactoring this next section to another function */
 	while ((entry = readdir(dir)) != NULL)
 	{
@@ -184,7 +190,7 @@ int *parse_options(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
-	int i, print_count = 0, dir_count = 0, file_count = 0;
+	int i, print_count = 0, dir_count = 0, non_dir_count = 0;
 	int *options;
 	char path[PATH_MAX];
 
@@ -195,11 +201,11 @@ int main(int argc, char **argv)
 		sprintf(path, "%s%s", "./", argv[i]);
 		if ((argv[i][0] != '-') && (is_dir(path)))
 			dir_count++;
-		else if ((argv[i][0] != '-') && (is_file(path)))
-			file_count++;
+		else if ((argv[i][0] != '-') && (!is_dir(path)))
+			non_dir_count++;
 		sprintf(path, "./");  /* reset path, memset not allowed */
 	}
-	if (!dir_count && !file_count)  /* default no files nor folders */
+	if (!dir_count && !non_dir_count)  /* default no files nor folders */
 		print_dir(".", options, argv[0]);
 	else /* iterate through arguments and print files & directories */
 	{
