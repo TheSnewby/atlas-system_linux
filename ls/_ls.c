@@ -1,13 +1,13 @@
 #include "_ls.h"
 
 /**
- * long_print_dir - handles long format by printing the non \n string of info
+ * long_print - handles long format by printing the non \n string of info
  * @argc: number of arguments
- * @directory: string of directory
+ * @path: string of path
  *
  * Return: void
  */
-void long_print_dir(char *directory)
+void long_print(char *path)
 {
 	struct stat buf;
 	struct passwd *pwd = NULL;
@@ -15,10 +15,10 @@ void long_print_dir(char *directory)
 	char uname[32], gname[32], *last_mod = NULL;
 	char error_message[256], perms[11] = "----------";
 
-	if (lstat(directory, &buf) == -1) /* check for lstat failure */
+	if (lstat(path, &buf) == -1) /* check for lstat failure */
 	{
 		/* buffer for error message */
-		sprintf(error_message, "ls: cannot access %s", directory);
+		sprintf(error_message, "ls: cannot access %s", path);
 		perror(error_message);
 		return;
 	}
@@ -42,7 +42,8 @@ void long_print_dir(char *directory)
 
 	last_mod = adjust_long_time(last_mod);
 
-	printf("%s %lu %s %s %5ld %s ", perms, buf.st_nlink, uname, gname, buf.st_size, last_mod);
+	printf("%s %lu %s %s %5ld %s ", perms, buf.st_nlink, uname, gname,
+	buf.st_size, last_mod);
 
 	/* currently prints out year, whereas ls on shows year if it is different */
 	/* ...compared to the current year*/
@@ -51,77 +52,54 @@ void long_print_dir(char *directory)
 
 /**
  * print_dir - prints the passed path
- * @argc: number of arguments
  * @path: string of path
  * @options: options array where [0] = 1 means long (-l) and [1] = all (-a),
  * [2] = 1 is -A, and [3] = 1 is -1
+ * @program_name: name of compiled program
  *
  * Return: void
  */
-void print_dir(int argc, char *path, int *options, char *program_name)
+void print_dir(char *path, int *options, char *program_name)
 {
 	struct dirent *entry;
 	DIR *dir;
 	char *file_name = NULL, original_path[PATH_MAX];
 	int op_long = options[0], op_all = options[1];
-	int op_almost = options[2], op_one = options[3];
+	int op_almost = options[2], op_one = options[3], print_vert = 0;
 
-	if (op_long)
-		op_one = 1;  /* use vertical printing for long printing */
+	if (op_long || op_one)
+		print_vert = 1;  /* use vertical printing */
 
 	remove_dot_slash(original_path, path);  /* used in error messages */
-	if (argc == 1)
+	if (is_file(path))
 	{
-		dir = opendir(".");
-		if (dir == NULL)
-		{
-			print_error(1, program_name, path, errno, NULL, NULL);
-			return;
-		}
+		file_name = get_file_of_path(path, program_name);
+		path = get_dir_of_path(path, program_name);
 	}
-	else
+	dir = opendir(path);
+	if (dir == NULL)
 	{
-		if (is_file(path))
-		{
-			file_name = get_file_of_path(path, program_name);
-			path = get_dir_of_path(path, program_name);
-		}
-		dir = opendir(path);
-		if (dir == NULL)
-		{
-			print_error(1, program_name, path, errno, NULL, NULL);
-			return;
-		}
+		print_error(1, program_name, path, errno, file_name, program_name);
+		return;
 	}
 	/* consider refactoring this next section to another function */
 	while ((entry = readdir(dir)) != NULL)
 	{
 		if (op_almost)
-			if ((!_strcmp(entry->d_name, ".")) || (!_strcmp(entry->d_name, "..")))  /* what about if file? */
-			{
-				if (file_name)
-				{
-					free(file_name);
-					free(path);
-				}
+			if ((!_strcmp(entry->d_name, ".")) ||
+			(!_strcmp(entry->d_name, "..")))
 				continue;
-			}
 		if (!op_all)
 			if (entry->d_name[0] == '.')
 			{
-				if (file_name)
-				{
-					free(file_name);
-					free(path);
-				}
 				continue;
 			}
 
 		if (!file_name)  /* path isn't a file */
 		{
 			if (op_long)
-				long_print_dir(entry->d_name);
-			if (op_one == 0)
+				long_print(entry->d_name);
+			if (print_vert == 0)
 				printf("%s\t", entry->d_name);
 			else
 				printf("%s\n", entry->d_name);
@@ -129,18 +107,18 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 		else  /* path is a file */
 		{
 			if (op_long)
-				long_print_dir(entry->d_name);
+				long_print(entry->d_name);
 			if (_strcmp(file_name, entry->d_name) == 0)
 			{
 				printf("%s", original_path);
-				if (op_one == 0)
+				if (print_vert == 0)
 					printf("\t");
 				else
 					printf("\n");
 			}
 		}
 	}
-	if (op_one == 0)
+	if (print_vert == 0)
 		printf("\n");
 
 	if (closedir(dir) < 0)
@@ -148,7 +126,9 @@ void print_dir(int argc, char *path, int *options, char *program_name)
 	if (file_name)
 	{
 		free(file_name);
+		file_name = NULL;
 		free(path);
+		path = NULL;
 	}
 }
 
@@ -204,41 +184,41 @@ int *parse_options(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
-	int i, print_count = 0, dir_count = 0;
+	int i, print_count = 0, dir_count = 0, file_count = 0;
 	int *options;
-	char directory[PATH_MAX];
+	char path[PATH_MAX];
 
 	options = parse_options(argc, argv);
 
 	for (i = 1; i < argc; i++)  /* counts number of directories */
 	{
-		sprintf(directory, "%s%s", "./", argv[i]);
-		if ((argv[i][0] != '-') && (is_dir(directory)))
+		sprintf(path, "%s%s", "./", argv[i]);
+		if ((argv[i][0] != '-') && (is_dir(path)))
 			dir_count++;
-		sprintf(directory, "./");  /* reset directory, memset not allowed */
+		else if ((argv[i][0] != '-') && (is_file(path)))
+			file_count++;
+		sprintf(path, "./");  /* reset path, memset not allowed */
 	}
-	if (!dir_count)  /* default no arguments */
-		print_dir(argc, ".", options, argv[0]);
-	else /* iterate through arguments and print dirs */
+	if (!dir_count && !file_count)  /* default no files nor folders */
+		print_dir(".", options, argv[0]);
+	else /* iterate through arguments and print files & directories */
 	{
 		for (i = 1; i < argc; i++)
 		{
 			if (argv[i][0] != '-')
 			{
-				sprintf(directory, "%s%s", "./", argv[i]);
-				/* prints directory if multiple directories, otherwise doesn't */
-				if ((dir_count > 1) && (is_dir(directory)))
+				sprintf(path, "%s%s", "./", argv[i]);
+				/* prints directory if multiple directories */
+				if ((dir_count > 1) && (is_dir(path)))
 				{
 					if (print_count)
 						printf("\n");
 					printf("%s:\n", argv[i]);
 				}
-				print_dir(argc, directory, options, argv[0]);
-				sprintf(directory, "./");  /* reset directory, memset not allowed */
+				print_dir(path, options, argv[0]);
+				sprintf(path, "./");  /* reset path, memset not allowed */
 				print_count++;
 			}
-			if (print_count == 0)
-				print_dir(argc, ".", options, argv[0]);
 		}
 	}
 	return (0);
