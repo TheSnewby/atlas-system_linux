@@ -215,18 +215,30 @@ int main(int argc, char **argv)
 		{
 			sprintf(path, "%s%s", "./", argv[i]);
 			/* prints directory name if multiple directories */
-			if (is_dir(path))
+			if (!is_dir(path))
 			{
-				if (dir_count > 1)
-				{
-					if (print_count > 0)
-						printf("\n");
-					printf("%s:\n", argv[i]);
-				}
-			}
-
 				print_dir(path, options, argv[0]);
 				print_count++;
+			}
+		}
+	}
+
+	for (i = 1; i < argc; i++)
+	{
+		if (argv[i][0] != '-')
+		{
+			sprintf(path, "%s%s", "./", argv[i]);
+			if (is_dir(path)) /* directories */
+			{
+				if (dir_count > 1) /* print directory name if multiple */
+				{
+					if (print_count > 0)
+						printf("\n"); /* separate directories */
+					printf("%s:\n", argv[i]);
+				}
+				print_dir(path, options, argv[0]);
+				print_count++;
+			}
 		}
 	}
 
