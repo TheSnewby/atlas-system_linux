@@ -46,25 +46,19 @@ char *str_one, char *str_two)
 {
     /* figure out which message should be printed */
     if (errnum == 2) /* file not found */
-        fprintf(stderr, "%s: cannot access '%s': ", program_name, file_path);
+        fprintf(stderr, "%s: cannot access '%s':", program_name, file_path);
     else if (errnum == 13) /* permission denied */
-        fprintf(stderr, "%s: cannot open directory '%s': ", program_name, file_path);
+        fprintf(stderr, "%s: cannot open directory '%s':", program_name, file_path);
 
     perror(NULL); /* system error message */
-
-    /* fatal errors */
-    if (msg_num == 2)
-    {
-        if (str_one)
-            free(str_one);
-        if (str_two)
-            free(str_two);
-        exit(errnum);
-    }
 
     /* clean-up for non-fatal */
     if (str_one)
         free(str_one);
     if (str_two)
         free(str_two);
+
+	/* fatal errors */
+    if (msg_num == 2)
+        exit(errnum);
 }
