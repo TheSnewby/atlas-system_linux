@@ -25,25 +25,25 @@ void long_print(char *path)
 
 	get_perms(buf, perms);
 
-	pwd = getpwuid(buf.st_uid);  /* get user name from pwd struct */
+	pwd = getpwuid(buf.st_uid); /* get user name from pwd struct */
 	if (pwd)
 		sprintf(uname, "%s", pwd->pw_name);
 	else
 		sprintf(uname, "%u", buf.st_uid);
 
-	group = getgrgid(buf.st_gid);  /* get group name from group struct */
+	group = getgrgid(buf.st_gid); /* get group name from group struct */
 	if (group)
 		sprintf(gname, "%s", group->gr_name);
 	else
 		sprintf(uname, "%u", buf.st_uid);
 
-	last_mod = ctime(&buf.st_mtime);  /* get time last modified from ctime */
+	last_mod = ctime(&buf.st_mtime); /* get time last modified from ctime */
 	char_replacer(last_mod, '\n', '\0');
 
 	last_mod = adjust_long_time(last_mod);
 
 	printf("%s %lu %s %s %5ld %s ", perms, buf.st_nlink, uname, gname,
-	buf.st_size, last_mod);
+		   buf.st_size, last_mod);
 
 	/* currently prints out year, whereas ls on shows year if it is different */
 	/* ...compared to the current year*/
@@ -68,9 +68,9 @@ void print_dir(char *path, int *options, char *program_name)
 	int op_almost = options[2], op_one = options[3], print_vert = 0;
 
 	if (op_long || op_one)
-		print_vert = 1;  /* use vertical printing */
+		print_vert = 1; /* use vertical printing */
 
-	remove_dot_slash(original_path, path);  /* used in error messages */
+	remove_dot_slash(original_path, path); /* used in error messages */
 	if (is_file(path))
 	{
 		file_name = get_file_of_path(path, program_name);
@@ -94,14 +94,14 @@ void print_dir(char *path, int *options, char *program_name)
 		if (op_almost)
 		{
 			if ((!_strcmp(entry->d_name, ".")) ||
-			(!_strcmp(entry->d_name, "..")))
+				(!_strcmp(entry->d_name, "..")))
 				continue;
 		}
 		else if (!op_all)
 			if ((entry->d_name[0] == '.') && !op_almost)
 				continue;
 
-		if (!file_name)  /* path isn't a file */
+		if (!file_name) /* path isn't a file */
 		{
 			sprintf(long_path, "%s/%s", path, entry->d_name);
 			if (op_long)
@@ -111,7 +111,7 @@ void print_dir(char *path, int *options, char *program_name)
 			else
 				printf("%s\n", entry->d_name);
 		}
-		else  /* path is a file */
+		else /* path is a file */
 		{
 			if (op_long)
 				long_print(entry->d_name);
@@ -150,29 +150,29 @@ void print_dir(char *path, int *options, char *program_name)
 int *parse_options(int argc, char **argv)
 {
 	int i, j;
-	static int options[MAX_OPTIONS] = {0};  /* see Return above */
+	static int options[MAX_OPTIONS] = {0}; /* see Return above */
 
-	for (i = 1; i < argc; i++)  /* iterate through argvs */
+	for (i = 1; i < argc; i++) /* iterate through argvs */
 	{
-		if (argv[i][0] == '-')  /* if option */
+		if (argv[i][0] == '-') /* if option */
 		{
-			for (j = 1; argv[i][j] != '\0'; j++)  /* iterate through chars */
+			for (j = 1; argv[i][j] != '\0'; j++) /* iterate through chars */
 			{
 				switch (argv[i][j])
 				{
 				case 'l':
-					options[0] = 1;  /* sets long (-l) option */
+					options[0] = 1; /* sets long (-l) option */
 					break;
 				case 'a':
-					options[1] = 1;  /* sets all (-a) option */
+					options[1] = 1; /* sets all (-a) option */
 					break;
 				case 'A':
-					options[2] = 1;  /* sets almost all (-A) option */
+					options[2] = 1; /* sets almost all (-A) option */
 					break;
 				case '1':
-					options[3] = 1;  /* sets vertical (-1) option*/
+					options[3] = 1; /* sets vertical (-1) option*/
 					break;
-				default:  /* if unrecognized, print error */
+				default: /* if unrecognized, print error */
 					fprintf(stderr, "ls: invalid option -- %c\n", argv[i][j]);
 				}
 			}
@@ -197,11 +197,11 @@ int main(int argc, char **argv)
 
 	options = parse_options(argc, argv);
 
-	for (i = 1; i < argc; i++)  /* counts number of directories */
+	for (i = 1; i < argc; i++) /* counts number of directories */
 	{
-		sprintf(path, "%s%s", "./", argv[i]);
 		if (argv[i][0] != '-')
 		{
+			sprintf(path, "%s%s", "./", argv[i]);
 			if (is_dir(path))
 				dir_count++;
 			else
