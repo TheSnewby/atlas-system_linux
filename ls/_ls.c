@@ -216,7 +216,7 @@ int main(int argc, char **argv)
 			{
 				sprintf(path, "%s%s", "./", argv[i]);
 				/* prints directory if multiple directories */
-				if ((dir_count > 1) && (is_dir(path)))
+				if ((dir_count > 0) && (is_dir(path) && (non_dir_count > 0)))
 				{
 					if (print_count)
 						printf("\n");
