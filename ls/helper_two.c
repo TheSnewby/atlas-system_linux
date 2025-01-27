@@ -5,6 +5,9 @@
  * @str: string of time
  *
  * Return: modified string
+ *
+ * This can be further modified to replace hours:minutes with year if
+ * it's not the current year
  */
 char *adjust_long_time(char *str)
 {

@@ -71,7 +71,6 @@ void long_print_dir(char *directory)
 
 	last_mod = adjust_long_time(last_mod);
 
-
 	printf("%s %lu %s %s %5ld %s ", perms, buf.st_nlink, uname, gname, buf.st_size, last_mod);
 
 	/* currently prints out year, whereas ls on shows year if it is different */
