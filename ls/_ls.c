@@ -36,8 +36,8 @@ void long_print(char *path)
 
 	pwd = getpwuid(buf.st_uid); /* get user name from pwd struct */
 	group = getgrgid(buf.st_gid); /* get group name from group struct */
-	sprintf(uname, "%s", pwd ? pwd->pw_name : "");
-	sprintf(gname, "%s", group ? group->gr_name : "");
+	sprintf(uname, "%s", pwd ? pwd->pw_name : "unknown");
+	sprintf(gname, "%s", group ? group->gr_name : "unknown");
 
 	mod_time = localtime(&buf.st_mtime); /* get last update time */
 
