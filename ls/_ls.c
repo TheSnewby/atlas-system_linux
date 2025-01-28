@@ -95,7 +95,7 @@ void print_dir(char *path, int *options, char *program_name)
 	{
 		if (!op_all && entry->d_name[0] == '.') /* skip hidden files unless -a */
 			continue;
-		if (op_almost && (!_strcmp(entry->d_name, ".")) || (!_strcmp(entry->d_name, "..")))
+		if ((op_almost && (!_strcmp(entry->d_name, "."))) || (!_strcmp(entry->d_name, "..")))
 			continue;
 
 		sprintf(long_path, "%s/%s", path, entry->d_name);
