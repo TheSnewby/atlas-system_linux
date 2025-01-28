@@ -74,80 +74,38 @@ void print_dir(char *path, int *options, char *program_name)
 {
 	struct dirent *entry;
 	DIR *dir;
-	char *file_name = NULL, original_path[PATH_MAX], long_path[PATH_MAX];
-	int op_long = options[0], op_all = options[1];
-	int op_almost = options[2], op_one = options[3], print_vert = 0;
+	char long_path[PATH_MAX];
+	int op_long = options[0], op_all = options[1], op_almost = options[2];
+	char *clean_path = path;
 
-	if (op_long || op_one)
-		print_vert = 1; /* use vertical printing */
+	if (path[0] == '.' && path[1] == '/') /* if string starts with ./ */
+		clean_path = path + 2;
 
-	remove_dot_slash(original_path, path); /* used in error messages */
-	if (is_file(path))
-	{
-		file_name = get_file_of_path(path, program_name);
-		path = get_dir_of_path(path, program_name);
-	}
 	dir = opendir(path);
-	if ((dir == NULL) && !file_name)
+	if (dir == NULL)
 	{
-		print_error(1, program_name, original_path, errno, NULL, NULL);
+		print_error(1, program_name, clean_path, errno, NULL, NULL);
 		return;
 	}
-	else if ((dir == NULL) && file_name)
-	{
-		print_error(1, program_name, original_path, errno, file_name, program_name);
-		return;
-	}
+
+	while ((entry = readdir(dir)) != NULL)
 
 	/* consider refactoring this next section to another function */
 	while ((entry = readdir(dir)) != NULL)
 	{
-		if (op_almost)
-		{
-			if ((!_strcmp(entry->d_name, ".")) ||
-				(!_strcmp(entry->d_name, "..")))
-				continue;
-		}
-		else if (!op_all)
-			if ((entry->d_name[0] == '.') && !op_almost)
-				continue;
+		if (!op_all && entry->d_name[0] == '.') /* skip hidden files unless -a */
+			continue;
+		if (op_almost && (!_strcmp(entry->d_name, ".")) || (!_strcmp(entry->d_name, "..")))
+			continue;
 
-		if (!file_name) /* path isn't a file */
-		{
-			sprintf(long_path, "%s/%s", path, entry->d_name);
-			if (op_long)
-				long_print(long_path);
-			if (print_vert == 0)
-				printf("%s\t", entry->d_name);
-			else
-				printf("%s\n", entry->d_name);
-		}
-		else /* path is a file */
-		{
-			if (op_long)
-				long_print(entry->d_name);
-			if (_strcmp(file_name, entry->d_name) == 0)
-			{
-				printf("%s", original_path);
-				if (print_vert == 0)
-					printf("\t");
-				else
-					printf("\n");
-			}
-		}
+		sprintf(long_path, "%s/%s", path, entry->d_name);
+		if (op_long)
+			long_print(long_path);
+		else
+			printf("%s\n", entry->d_name);
 	}
-	if (print_vert == 0)
-		printf("\n");
 
-	if (closedir(dir) < 0)
-		print_error(2, program_name, path, errno, NULL, NULL);
-	if (file_name)
-	{
-		free(file_name);
-		file_name = NULL;
-		free(path);
-		path = NULL;
-	}
+	closedir(dir);
 }
 
 /**
@@ -237,7 +195,6 @@ int main(int argc, char **argv)
 		{
 			/* prints directory name if multiple directories */
 			sprintf(path, "%s%s", "./", argv[i]);
-
 			if (is_dir(path))
 			{
 				if (dir_count > 1)
