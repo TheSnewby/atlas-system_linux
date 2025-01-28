@@ -35,16 +35,9 @@ void long_print(char *path)
 	get_perms(buf, perms);
 
 	pwd = getpwuid(buf.st_uid); /* get user name from pwd struct */
-	if (pwd)
-		sprintf(uname, "%s", pwd->pw_name);
-	else
-		sprintf(uname, "%u", buf.st_uid);
-
 	group = getgrgid(buf.st_gid); /* get group name from group struct */
-	if (group)
-		sprintf(gname, "%s", group->gr_name);
-	else
-		sprintf(uname, "%u", buf.st_uid);
+	sprintf(uname, "%s", pwd ? pwd->pw_name : "");
+	sprintf(gname, "%s", group ? group->gr_name : "");
 
 	mod_time = localtime(&buf.st_mtime); /* get last update time */
 
