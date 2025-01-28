@@ -16,15 +16,18 @@ void long_print(char *path)
 	char error_message[256];
 	time_t current_time = time(NULL);
 	struct tm *mod_time = NULL, *curr_time = localtime(&current_time);
-	char *clean_path = path;
+	char *file_name = path;
 
-	if (path[0] == '.' && path[1] == '/') /* if string starts with ./ */
-		clean_path = path + 2;
+	for (char *p = path; *p; p++)
+	{
+		if (*p == '/')
+			file_name = p + 1;
+	}
 
 	if (lstat(path, &buf) == -1) /* check for lstat failure */
 	{
 		/* buffer for error message */
-		sprintf(error_message, "ls: cannot access %s", clean_path);
+		sprintf(error_message, "ls: cannot access %s", file_name);
 		perror(error_message);
 		return;
 	}
@@ -62,7 +65,7 @@ void long_print(char *path)
 	}
 
 	printf("%s %lu %s %s %5ld %s %s\n",
-			perms, buf.st_nlink, uname, gname, buf.st_size, time_str, clean_path);
+			perms, buf.st_nlink, uname, gname, buf.st_size, time_str, file_name);
 }
 
 /**
