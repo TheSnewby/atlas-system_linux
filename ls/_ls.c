@@ -78,8 +78,8 @@ void long_print(char *path)
  */
 void print_dir(char *path, int *options, char *program_name)
 {
-	struct dirent *entry;
-	DIR *dir;
+	struct dirent **entry_list;
+	int n;
 	char long_path[PATH_MAX];
 	int op_long = options[0], op_all = options[1], op_almost = options[2];
 	char *clean_path = path;
@@ -87,16 +87,17 @@ void print_dir(char *path, int *options, char *program_name)
 	if (path[0] == '.' && path[1] == '/') /* if string starts with ./ */
 		clean_path = path + 2;
 
-	dir = opendir(path);
-	if (dir == NULL)
+	n = scandir(path, &entry_list, NULL, alphasort);
+	if (n < 0)
 	{
 		print_error(1, program_name, clean_path, errno, NULL, NULL);
 		return;
 	}
 
-	/* consider refactoring this next section to another function */
-	while ((entry = readdir(dir)) != NULL)
+	for (int i = 0; i < n; i++)
 	{
+		struct dirent *entry = entry_list[i];
+
 		if (!op_all && entry->d_name[0] == '.') /* skip hidden files unless -a */
 			continue;
 
@@ -111,9 +112,11 @@ void print_dir(char *path, int *options, char *program_name)
 			long_print(long_path);
 		else
 			printf("%s\n", entry->d_name);
+
+		free(entry);
 	}
 
-	closedir(dir);
+	free(entry_list);
 }
 
 /**
