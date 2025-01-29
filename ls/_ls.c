@@ -99,13 +99,19 @@ void print_dir(char *path, int *options, char *program_name)
 		struct dirent *entry = entry_list[i];
 
 		if (!op_all && entry->d_name[0] == '.') /* skip hidden files unless -a */
+		{
+			free(entry);
 			continue;
+		}
 
 		if (op_almost &&
 			((entry->d_name[0] == '.' && entry->d_name[1] == '\0') ||
 			 (entry->d_name[0] == '.' && entry->d_name[1] == '.' &&
 			  entry->d_name[2] == '\0')))
+		{
+			free(entry);
 			continue;
+		}
 
 		sprintf(long_path, "%s/%s", path, entry->d_name);
 		if (op_long)
