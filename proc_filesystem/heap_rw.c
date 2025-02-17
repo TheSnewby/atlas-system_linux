@@ -20,12 +20,12 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 {
 	int ptrace_rtn = 0;
 	size_t word_size = sizeof(long);
-	char data[word_size], command[64];
+	char data[word_size], command[64], status_path[64];;
 	long word;
 	unsigned int addr;
 
 	printf("find: %s\nreplace: %s\n", find, replace);  /* debug */
-	sprintf(command, "cat /proc/%d/maps", pid);
+	sprintf(command, "cat /proc/%d/maps | grep heap", pid);
 	system(command);
 
 	ptrace_rtn = ptrace(PTRACE_ATTACH, pid, 0, 0);
@@ -39,11 +39,24 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 
 	for (addr = mem_begin; addr <= mem_end; addr += word_size)
 	{
+		sprintf(status_path, "/proc/%d/status", pid); /* status check */
+		FILE *status_file = fopen(status_path, "r");
+		if (!status_file)
+		{
+			perror("Process has exited");
+			return -1;
+		}
+		fclose(status_file);
+
+		if (kill(pid, 0) == -1)
+			perror("Process is no longer running: ");
+
 		word = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);
 		if (word == -1)
 		{
 			fprintf(stderr, "Error in ptrace peek: ");
 			perror(NULL);
+			fprintf(stderr, "Failed at address: 0x%x\n", addr);
 			break;
 		}
 		else
@@ -53,7 +66,13 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 				fprintf(stderr, "Invalid address: 0x%x\n", addr);
 				continue;
 			}
+
 			addr = addr & ~(word_size - 1);  /* Align to word size */
+			if (addr % word_size != 0)  /* more debug checks */
+			{
+				printf("Warning: Unaligned address 0x%x, skipping...\n", addr);
+				continue;
+			}
 
 			memcpy(data, &word, word_size);
 			data[word_size - 1] = '\0';
