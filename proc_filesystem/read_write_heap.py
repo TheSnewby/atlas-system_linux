@@ -25,14 +25,14 @@ def get_heap_address_range(pid:int) -> tuple[int, int]:
 		exit(1)
 	mem_length : int = int(len(heap_line_memory) / 2)
 
-	heap_range : tuple= (line[:mem_length], line [mem_length + 1:mem_length*2+1])
+	heap_range : tuple = (line[:mem_length], line [mem_length + 1:mem_length*2+1])
 	print(heap_range)
 	return heap_range
 
 def find_and_replace(pid: int, heap_range: tuple[int, int], find: str, replace: str):
 	"""finds and replaces a value in the memory range"""
 	heap_rw_lib = CDLL("./heap_rw.so")  # comment these three lines out when uncommenting the other lines
-	heap_rw_lib.heap_rw.argtypes = [c_int, c_char_p, c_char_p, c_char_p, c_char_p]
+	heap_rw_lib.heap_rw.argtypes = [c_int, c_int, c_int, c_char_p, c_char_p]
 	heap_rw_lib.heap_rw(pid, heap_range[0], heap_range[1], find, replace)
 	# path = f"proc/{pid}/mem"
 	# try:

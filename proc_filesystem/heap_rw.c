@@ -12,7 +12,7 @@
  *
  * Return: 0 is successful, other if error
  */
-int heap_rw(int pid, char *mem_begin, char *mem_end, char *find, char *replace)
+int heap_rw(int pid, int mem_begin, int mem_end, char *find, char *replace)
 {
 	int ptrace_rtn = 0;
 	size_t word_size = sizeof(long);
