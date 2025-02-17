@@ -26,11 +26,10 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 
 	//consider doing something with CAP_SYS_PTRACE
 
-	printf("in c\n(0x%08lx, 0x%08lx)\n", mem_begin, mem_end); /* debug */
-
+	printf("in c\n(%08lx, %08lx)\n", mem_begin, mem_end); /* debug */
 	printf("find: %s\nreplace: %s\n", find, replace);  /* debug */
 	sprintf(command, "cat /proc/%d/maps | grep heap", pid); /* debug */
-	system(command);  /* debug */
+	system(command);  /* debug - prints /proc/.../maps in checker */
 
 	ptrace_rtn = ptrace(PTRACE_ATTACH, pid, 0, 0);
 	if (ptrace_rtn == -1)
@@ -39,6 +38,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 		perror(NULL);
 		return (-1);
 	}
+
 	waitpid(pid, NULL, 0);  /* ensures process is fully stopped */
 
 	for (addr = mem_begin; addr <= mem_end; addr += word_size)
