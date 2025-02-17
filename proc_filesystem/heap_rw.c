@@ -24,11 +24,13 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 	long word;
 	unsigned int addr;
 
-	printf("in c\n(0x%08lx, 0x%08lx)\n", mem_begin, mem_end);
+	//consider doing something with CAP_SYS_PTRACE
+
+	printf("in c\n(0x%08lx, 0x%08lx)\n", mem_begin, mem_end); /* debug */
 
 	printf("find: %s\nreplace: %s\n", find, replace);  /* debug */
-	sprintf(command, "cat /proc/%d/maps | grep heap", pid);
-	system(command);
+	sprintf(command, "cat /proc/%d/maps | grep heap", pid); /* debug */
+	system(command);  /* debug */
 
 	ptrace_rtn = ptrace(PTRACE_ATTACH, pid, 0, 0);
 	if (ptrace_rtn == -1)
@@ -42,18 +44,18 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 	for (addr = mem_begin; addr <= mem_end; addr += word_size)
 	{
 		sprintf(status_path, "/proc/%d/status", pid); /* status check */
-		FILE *status_file = fopen(status_path, "r");
+		FILE *status_file = fopen(status_path, "r");  /* debug */
 		if (!status_file)
 		{
 			perror("Process has exited");
 			return -1;
 		}
-		fclose(status_file);
+		fclose(status_file);  /* debug */
 
-		if (kill(pid, 0) == -1)
+		if (kill(pid, 0) == -1)  /* ensure process is still open */
 			perror("Process is no longer running: ");
 
-		word = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);
+		word = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);  /* read data at addr */
 		if (word == -1)
 		{
 			fprintf(stderr, "Error in ptrace peek: ");
@@ -69,23 +71,23 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 				continue;
 			}
 
-			addr = addr & ~(word_size - 1);  /* Align to word size */
-			if (addr % word_size != 0)  /* more debug checks */
-			{
-				printf("Warning: Unaligned address 0x%x, skipping...\n", addr);
-				continue;
-			}
+			// addr = addr & ~(word_size - 1);  /* Align to word size */
+			// if (addr % word_size != 0)  /* more debug checks */
+			// {
+			// 	printf("Warning: Unaligned address 0x%x, skipping...\n", addr);
+			// 	continue;
+			// }
 
-			memcpy(data, &word, word_size);
+			memcpy(data, &word, word_size);  /* convert read value to string */
 			data[word_size - 1] = '\0';
-			printf("word: %s\n", data);  /* for debugging */
+			printf("word: %s\n", data);  /* debug */
 
-			if (strcmp(find, data) == 0)
+			if (strcmp(find, data) == 0)  /* look for target word */
 			{
-				printf("find found!\n");
+				printf("find found!\n");  /* debug */
 				memcpy(&word, replace, word_size);  /* store value of replace */
 
-				ptrace_rtn = ptrace(PTRACE_POKEDATA, pid, addr, word);  /* should (long)replace? */
+				ptrace_rtn = ptrace(PTRACE_POKEDATA, pid, addr, word);
 				if (ptrace_rtn == -1)
 				{
 					fprintf(stderr, "Error in ptrace poke: ");
@@ -102,7 +104,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 
 	ptrace_rtn = ptrace(PTRACE_DETACH, pid, 0, 0);  /* consider adding this to all errors */
 	if (ptrace_rtn == 0)
-		printf("Detached Successfully!\n");
+		printf("Detached successfully.\n");
 	return (0);
 }
 
