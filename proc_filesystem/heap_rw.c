@@ -44,7 +44,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 
 	for (addr = mem_begin; addr < mem_end; addr += word_size)
 	{
-		printf("addr: 0x%8lx\n", addr);
+		// printf("addr: 0x%8lx\n", addr);
 		sprintf(status_path, "/proc/%d/status", pid); /* status check */
 		FILE *status_file = fopen(status_path, "r");  /* debug */
 		if (!status_file)
@@ -82,7 +82,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 
 			memcpy(data, &word, word_size);  /* convert read value to string */
 			data[word_size - 1] = '\0';
-			printf("comparing find: %s, and peek_data: %s\n", find, data);  /* debug */
+			// printf("comparing find: %s, and peek_data: %s\n", find, data);  /* debug */
 
 			if (strcmp(find, data) == 0)  /* look for target word */
 			{
