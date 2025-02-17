@@ -57,4 +57,4 @@ if __name__ == "__main__":
 
 	pid = int(argv[1])
 	heap_range = get_heap_address_range(pid)
-	find_and_replace(heap_range, argv[2], argv[3])
+	find_and_replace(pid, heap_range, argv[2], argv[3])
