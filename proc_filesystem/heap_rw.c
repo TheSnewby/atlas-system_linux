@@ -68,8 +68,8 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 	return (0);
 }
 
-int main(void)
-{
-	heap_rw(610, "5570452c3000", "5570452e4000", "hi", "goodbye");
-	return 0;
-}
+// int main(void)
+// {
+// 	// heap_rw(610, "5570452c3000", "5570452e4000", "hi", "goodbye");
+// 	return 0;
+// }
