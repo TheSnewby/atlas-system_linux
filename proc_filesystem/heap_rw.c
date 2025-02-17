@@ -72,12 +72,12 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 				continue;
 			}
 
-			// addr = addr & ~(word_size - 1);  /* Align to word size */
-			// if (addr % word_size != 0)  /* more debug checks */
-			// {
-			// 	printf("Warning: Unaligned address 0x%x, skipping...\n", addr);
-			// 	continue;
-			// }
+			addr = addr & ~(word_size - 1);  /* Align to word size */
+			if (addr % word_size != 0)  /* more debug checks */
+			{
+				printf("Warning: Unaligned address 0x%lx, skipping...\n", addr);
+				continue;
+			}
 
 			memcpy(data, &word, word_size);  /* convert read value to string */
 			data[word_size - 1] = '\0';
@@ -103,8 +103,8 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 			}
 			/* have a case for *find being found in across multiple words? */
 		}
-		printf("counter: %d\n", counter++);
-	}
+		// printf("counter: %d\n", counter++);
+		}
 
 	ptrace_rtn = ptrace(PTRACE_DETACH, pid, 0, 0);  /* consider adding this to all errors */
 	if (ptrace_rtn == 0)
