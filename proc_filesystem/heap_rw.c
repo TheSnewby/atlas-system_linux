@@ -27,6 +27,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 	{
 		fprintf(stderr, "Error in ptrace attach: ");
 		perror(NULL);
+		return (-1);
 	}
 
 	for (addr = mem_begin; addr <= mem_end; addr += word_size)
@@ -40,21 +41,23 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 		}
 		else
 		{
-			memcpy(data, &word, word_size);  /* this section for personal benefit*/
+			memcpy(data, &word, word_size);
 			data[word_size - 1] = '\0';
-			printf("word: %s\n", data);
+			printf("word: %s\n", data);  /* for debugging */
 
-			if (strcmp(find, (char *)word) == 0)
+			if (strcmp(find, data) == 0)
 			{
 				printf("find found!\n");
-				ptrace_rtn = ptrace(PTRACE_POKEDATA, pid, addr, (long)replace);  /* should (long)replace? */
+				memcpy(&word, replace, word_size);  /* store value of replace */
+
+				ptrace_rtn = ptrace(PTRACE_POKEDATA, pid, addr, word);  /* should (long)replace? */
 				if (ptrace_rtn == -1)
 				{
 					fprintf(stderr, "Error in ptrace poke: ");
 					perror(NULL);
 				}
 			}
-			else if (strstr(find, (char *) word) != NULL)  /* find in word */
+			else if (strstr(find, data) != NULL)  /* find in word */
 			{
 				printf("find in word!\nFigure out what to do.\n");
 			}

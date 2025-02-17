@@ -13,6 +13,9 @@ def get_heap_address_range(pid:int) -> tuple[int, int]:
 				if "heap" in line:
 					heap_line_memory = line.split()[0]
 					break
+			if "heap" not in line:
+				print("Error: no heap section found.")
+				exit(1)
 	except PermissionError:
 		print("Error: Permission denid. Please check file permissions.")
 		exit(1)
@@ -35,6 +38,9 @@ def get_heap_address_range(pid:int) -> tuple[int, int]:
 def find_and_replace(pid: int, heap_range: tuple[int, int], find: str, replace: str):
 	"""finds and replaces a value in the memory range"""
 	heap_rw_lib = CDLL("./heap_rw.so")  # comment these three lines out when uncommenting the other lines
+	if not heap_rw_lib:
+		print("Error: heap_rw_lib failed to load")
+		exit(1)
 	heap_rw_lib.heap_rw.argtypes = [c_int, c_long, c_long, c_char_p, c_char_p]
 	c_return = heap_rw_lib.heap_rw(pid, heap_range[0], heap_range[1], find.encode('utf-8'), replace.encode('utf-8'))
 	if (c_return != 0):
