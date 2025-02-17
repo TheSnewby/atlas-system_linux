@@ -112,15 +112,15 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 	return (0);
 }
 
-int main(void)
-{
-	char *mem_begin_str= "55d11d33d000";
-	char *mem_end_str = "55d11d35e000";
-	char *begin_ptr;
-	char *end_ptr;
-	long mem_begin = strtol(mem_begin_str, &begin_ptr, 16);
-	long mem_end = strtol(mem_end_str, &end_ptr, 16);
+// int main(void)
+// {
+// 	char *mem_begin_str= "55d11d33d000";
+// 	char *mem_end_str = "55d11d35e000";
+// 	char *begin_ptr;
+// 	char *end_ptr;
+// 	long mem_begin = strtol(mem_begin_str, &begin_ptr, 16);
+// 	long mem_end = strtol(mem_end_str, &end_ptr, 16);
 
-	heap_rw(58535, mem_begin, mem_end, "hi", "ho");
-	return 0;
-}
+// 	heap_rw(58535, mem_begin, mem_end, "hi", "ho");
+// 	return 0;
+// }
