@@ -22,7 +22,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 	size_t word_size = sizeof(long);
 	char data[word_size], command[64], status_path[64];;
 	long word;
-	unsigned int addr;
+	long addr;
 
 	//consider doing something with CAP_SYS_PTRACE
 
@@ -40,9 +40,10 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 	}
 
 	waitpid(pid, NULL, 0);  /* ensures process is fully stopped */
-
+	int counter = 0;
 	for (addr = mem_begin; addr <= mem_end; addr += word_size)
 	{
+		printf("addr: 0x%8ldx\n", addr);
 		sprintf(status_path, "/proc/%d/status", pid); /* status check */
 		FILE *status_file = fopen(status_path, "r");  /* debug */
 		if (!status_file)
@@ -60,14 +61,14 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 		{
 			fprintf(stderr, "Error in ptrace peek: ");
 			perror(NULL);
-			fprintf(stderr, "Failed at address: 0x%x\n", addr);
+			fprintf(stderr, "Failed at address: 0x%lx\n", addr);
 			break;
 		}
 		else
 		{
 			if (addr < mem_begin || addr > mem_end) /* extra check for debug */
 			{
-				fprintf(stderr, "Invalid address: 0x%x\n", addr);
+				fprintf(stderr, "Invalid address: 0x%lx\n", addr);
 				continue;
 			}
 
@@ -93,13 +94,16 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 					fprintf(stderr, "Error in ptrace poke: ");
 					perror(NULL);
 				}
+				break;
 			}
 			else if (strstr(find, data) != NULL)  /* find in word */
 			{
 				printf("Found word!\nFigure out what to do.\n");
+				break;
 			}
 			/* have a case for *find being found in across multiple words? */
 		}
+		printf("counter: %d\n", counter++);
 	}
 
 	ptrace_rtn = ptrace(PTRACE_DETACH, pid, 0, 0);  /* consider adding this to all errors */
