@@ -41,7 +41,8 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 
 	waitpid(pid, NULL, 0);  /* ensures process is fully stopped */
 	int counter = 0;
-	for (addr = mem_begin; addr <= mem_end; addr += word_size)
+
+	for (addr = mem_begin; addr < mem_end; addr += word_size)
 	{
 		printf("addr: 0x%8lx\n", addr);
 		sprintf(status_path, "/proc/%d/status", pid); /* status check */
