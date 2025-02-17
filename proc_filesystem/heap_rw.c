@@ -12,7 +12,7 @@
  *
  * Return: 0 is successful, other if error
  */
-int heap_rw(int pid, int mem_begin, int mem_end, char *find, char *replace)
+int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 {
 	int ptrace_rtn = 0;
 	size_t word_size = sizeof(long);
@@ -29,9 +29,9 @@ int heap_rw(int pid, int mem_begin, int mem_end, char *find, char *replace)
 		perror(NULL);
 	}
 
-	for (addr = (long)mem_begin; addr <= (long)mem_end; addr += word_size)
+	for (addr = mem_begin; addr <= mem_end; addr += word_size)
 	{
-		word = ptrace(PTRACE_PEEKDATA, pid, mem_begin, NULL);
+		word = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);
 		if (word == -1)
 		{
 			fprintf(stderr, "Error in ptrace peek: ");
@@ -40,11 +40,14 @@ int heap_rw(int pid, int mem_begin, int mem_end, char *find, char *replace)
 		}
 		else
 		{
-			printf("word: %s\n", (char *) word);
+			memcpy(data, &word, word_size);  /* this section for personal benefit*/
+			data[word_size - 1] = '\0';
+			printf("word: %s\n", data);
+
 			if (strcmp(find, (char *)word) == 0)
 			{
 				printf("find found!\n");
-				ptrace_rtn = ptrace(PTRACE_POKEDATA, pid, addr, replace);  /* should (long)replace? */
+				ptrace_rtn = ptrace(PTRACE_POKEDATA, pid, addr, (long)replace);  /* should (long)replace? */
 				if (ptrace_rtn == -1)
 				{
 					fprintf(stderr, "Error in ptrace poke: ");
@@ -59,14 +62,14 @@ int heap_rw(int pid, int mem_begin, int mem_end, char *find, char *replace)
 		}
 	}
 
-	ptrace_rtn = (PTRACE_DETACH, pid, 0, 0);  /* consider adding this to all errors */
+	ptrace_rtn = ptrace(PTRACE_DETACH, pid, 0, 0);  /* consider adding this to all errors */
 	if (ptrace_rtn == 0)
 		printf("Detached Successfully!\n");
 	return (0);
 }
 
-// int main(void)
-// {
-// 	heap_rw(610, "5570452c3000", "5570452e4000", "hi", "goodbye");
-// 	return 0;
-// }
+int main(void)
+{
+	heap_rw(610, "5570452c3000", "5570452e4000", "hi", "goodbye");
+	return 0;
+}

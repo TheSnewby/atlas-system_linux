@@ -11,8 +11,7 @@ def get_heap_address_range(pid:int) -> tuple[int, int]:
 		with open(path) as file:
 			for line in file:
 				if "heap" in line:
-					substrings = line.split()
-					heap_line_memory = substrings[0]
+					heap_line_memory = line.split()[0]
 					break
 	except PermissionError:
 		print("Error: Permission denid. Please check file permissions.")
@@ -23,17 +22,24 @@ def get_heap_address_range(pid:int) -> tuple[int, int]:
 	except Exception as e:
 		print(f"An unexpected error occurred: {e}")
 		exit(1)
-	mem_length : int = int(len(heap_line_memory) / 2)
 
-	heap_range : tuple = (line[:mem_length], line [mem_length + 1:mem_length*2+1])
+	mem_start, mem_end = heap_line_memory.split("-")
+	heap_range = (int(mem_start, 16), int(mem_end, 16))
+
+	# mem_length : int = int(len(heap_line_memory) / 2)
+
+	# heap_range : tuple = (line[:mem_length], line [mem_length + 1:mem_length*2+1])
 	print(heap_range)
 	return heap_range
 
 def find_and_replace(pid: int, heap_range: tuple[int, int], find: str, replace: str):
 	"""finds and replaces a value in the memory range"""
 	heap_rw_lib = CDLL("./heap_rw.so")  # comment these three lines out when uncommenting the other lines
-	heap_rw_lib.heap_rw.argtypes = [c_int, c_int, c_int, c_char_p, c_char_p]
-	heap_rw_lib.heap_rw(pid, heap_range[0], heap_range[1], find, replace)
+	heap_rw_lib.heap_rw.argtypes = [c_int, c_long, c_long, c_char_p, c_char_p]
+	c_return = heap_rw_lib.heap_rw(pid, heap_range[0], heap_range[1], find.encode('utf-8'), replace.encode('utf-8'))
+	if (c_return != 0)
+		print(f"Error: Call to heap_rw.c returned with code {c_return}")
+		exit(1)
 	# path = f"proc/{pid}/mem"
 	# try:
 	# 	with open(path) as file:
@@ -56,5 +62,5 @@ if __name__ == "__main__":
 		raise TypeError("ruh roh")
 
 	pid = int(argv[1])
-	heap_range = get_heap_address_range(pid)
+	heap_range : tuple[int,int] = get_heap_address_range(pid)
 	find_and_replace(pid, heap_range, argv[2], argv[3])
