@@ -43,7 +43,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 	int counter = 0;
 	for (addr = mem_begin; addr <= mem_end; addr += word_size)
 	{
-		printf("addr: 0x%8ldx\n", addr);
+		printf("addr: 0x%8lx\n", addr);
 		sprintf(status_path, "/proc/%d/status", pid); /* status check */
 		FILE *status_file = fopen(status_path, "r");  /* debug */
 		if (!status_file)
@@ -81,7 +81,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 
 			memcpy(data, &word, word_size);  /* convert read value to string */
 			data[word_size - 1] = '\0';
-			printf("word: %s\n", data);  /* debug */
+			printf("comparing find: %s, and peek_data: %s\n", find, data);  /* debug */
 
 			if (strcmp(find, data) == 0)  /* look for target word */
 			{
@@ -96,7 +96,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 				}
 				break;
 			}
-			else if (strstr(find, data) != NULL)  /* find in word */
+			else if (strstr(data, find) != NULL)  /* find in word */
 			{
 				printf("Found word!\nFigure out what to do.\n");
 				break;
@@ -112,8 +112,15 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 	return (0);
 }
 
-// int main(void)
-// {
-// 	// heap_rw(610, "5570452c3000", "5570452e4000", "hi", "goodbye");
-// 	return 0;
-// }
+int main(void)
+{
+	char *mem_begin_str= "55d11d33d000";
+	char *mem_end_str = "55d11d35e000";
+	char *begin_ptr;
+	char *end_ptr;
+	long mem_begin = strtol(mem_begin_str, &begin_ptr, 16);
+	long mem_end = strtol(mem_end_str, &end_ptr, 16);
+
+	heap_rw(58535, mem_begin, mem_end, "hi", "ho");
+	return 0;
+}
