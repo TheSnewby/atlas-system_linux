@@ -62,5 +62,6 @@ if __name__ == "__main__":
 		raise TypeError("ruh roh")
 
 	pid = int(argv[1])
+	print(f"pid: {pid}")
 	heap_range : tuple[int,int] = get_heap_address_range(pid)
 	find_and_replace(pid, heap_range, argv[2], argv[3])
