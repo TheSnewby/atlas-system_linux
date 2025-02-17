@@ -37,7 +37,7 @@ def find_and_replace(pid: int, heap_range: tuple[int, int], find: str, replace: 
 	heap_rw_lib = CDLL("./heap_rw.so")  # comment these three lines out when uncommenting the other lines
 	heap_rw_lib.heap_rw.argtypes = [c_int, c_long, c_long, c_char_p, c_char_p]
 	c_return = heap_rw_lib.heap_rw(pid, heap_range[0], heap_range[1], find.encode('utf-8'), replace.encode('utf-8'))
-	if (c_return != 0)
+	if (c_return != 0):
 		print(f"Error: Call to heap_rw.c returned with code {c_return}")
 		exit(1)
 	# path = f"proc/{pid}/mem"
