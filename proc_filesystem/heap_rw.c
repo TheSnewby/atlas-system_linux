@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <stdlib.h>
 
 /**
  * heap_rw - opens a memory address, adjusted permissions, and replaces a value
@@ -19,11 +20,13 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 {
 	int ptrace_rtn = 0;
 	size_t word_size = sizeof(long);
-	char data[word_size];
+	char data[word_size], command[64];
 	long word;
 	unsigned int addr;
 
-	printf("find: %s\nreplace: %s\n", find, replace);
+	printf("find: %s\nreplace: %s\n", find, replace);  /* debug */
+	sprintf(command, "cat /proc/%d/maps", pid);
+	system(command);
 
 	ptrace_rtn = ptrace(PTRACE_ATTACH, pid, 0, 0);
 	if (ptrace_rtn == -1)
@@ -45,6 +48,13 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 		}
 		else
 		{
+			if (addr < mem_begin || addr > mem_end) /* extra check for debug */
+			{
+				fprintf(stderr, "Invalid address: 0x%x\n", addr);
+				continue;
+			}
+			addr = addr & ~(word_size - 1);  /* Align to word size */
+
 			memcpy(data, &word, word_size);
 			data[word_size - 1] = '\0';
 			printf("word: %s\n", data);  /* for debugging */
