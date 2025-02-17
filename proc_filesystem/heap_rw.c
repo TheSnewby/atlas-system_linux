@@ -3,12 +3,15 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <string.h>
+#include <sys/wait.h>
 
 /**
  * heap_rw - opens a memory address, adjusted permissions, and replaces a value
  * @pid: process id
  * @mem_begin: beginning of memory range of heap in PID
  * @mem_end: end of memory range of heap in PID
+ * @find: string to be replaced
+ * @replace: string to do the replacing with
  *
  * Return: 0 is successful, other if error
  */
@@ -29,6 +32,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 		perror(NULL);
 		return (-1);
 	}
+	waitpid(pid, NULL, 0);  /* ensures process is fully stopped */
 
 	for (addr = mem_begin; addr <= mem_end; addr += word_size)
 	{
@@ -59,7 +63,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 			}
 			else if (strstr(find, data) != NULL)  /* find in word */
 			{
-				printf("find in word!\nFigure out what to do.\n");
+				printf("Found word!\nFigure out what to do.\n");
 			}
 			/* have a case for *find being found in across multiple words? */
 		}
