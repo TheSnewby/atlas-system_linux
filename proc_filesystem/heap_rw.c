@@ -24,8 +24,10 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 	long word;
 	unsigned int addr;
 
+	printf("in c\n(0x%08x, 0x%08x)\n", mem_begin, mem_end);
+
 	printf("find: %s\nreplace: %s\n", find, replace);  /* debug */
-	sprintf(command, "cat /proc/%d/maps", pid);
+	sprintf(command, "cat /proc/%d/maps | grep heap", pid);
 	system(command);
 
 	ptrace_rtn = ptrace(PTRACE_ATTACH, pid, 0, 0);

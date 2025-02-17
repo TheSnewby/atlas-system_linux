@@ -32,7 +32,7 @@ def get_heap_address_range(pid:int) -> tuple[int, int]:
 	# mem_length : int = int(len(heap_line_memory) / 2)
 
 	# heap_range : tuple = (line[:mem_length], line [mem_length + 1:mem_length*2+1])
-	print(heap_range)
+	print(f"Heap range: {heap_range[0]:#x} - {heap_range[1]:#x}")
 	return heap_range
 
 def find_and_replace(pid: int, heap_range: tuple[int, int], find: str, replace: str):
