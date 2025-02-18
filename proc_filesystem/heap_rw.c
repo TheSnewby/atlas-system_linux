@@ -82,7 +82,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 
 			memcpy(data, &word, word_size);  /* convert read value to string */
 			data[word_size - 1] = '\0';
-			// printf("comparing find: %s, and peek_data: %s\n", find, data);  /* debug */
+			printf("at addr: 0x%8lx: peek_data: %s\n", addr, data);  /* debug */
 
 			if (strcmp(find, data) == 0)  /* look for target word */
 			{
