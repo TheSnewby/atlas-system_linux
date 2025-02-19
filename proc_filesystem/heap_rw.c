@@ -37,9 +37,10 @@ char *_memmem(const char *haystack, size_t haystack_len, const char *needle, siz
  */
 int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 {
-	int find_len = strlen(find), replace_len = strlen(replace), word_size = sizeof(long);
-	int ptrace_rtn = 0, data_size = mem_end - mem_begin;
-	char data[data_size], *data_ptr = data, *find_ptr, command[64], word_buf[word_size];
+	int find_len = strlen(find), replace_len = strlen(replace), word_size = sizeof(long), i;
+	int ptrace_rtn = 0, data_size = mem_end - mem_begin, word_count = (word_size + replace_len - 1) / word_size;
+	char data[data_size], *data_ptr = data, *find_ptr, command[64];
+	char word_buf[word_size * word_size];
 	long word, addr, target_ptr;
 
 	printf("in c\n(%08lx, %08lx)\n", mem_begin, mem_end); /* debug */
@@ -68,43 +69,45 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 			fprintf(stderr, "Failed at address: 0x%lx\n", addr);
 			return (-1);
 		}
-		memcpy(data_ptr, &word, word_size);  /* convert read value to string */
+		memcpy(data_ptr, &word, word_size);  /* convert word to string */
 		data_ptr += word_size;
 	}
 
 	find_ptr = _memmem(data, data_size, find, find_len);  /* find offset */
 	target_ptr = mem_begin + find_ptr - data;  /* mem_begin + offset */
 
-	if (find_ptr)
+	if (find_ptr)  /* if found */
 	{
-		word = ptrace(PTRACE_PEEKDATA, pid, target_ptr, NULL);  /* read data at addr */
-		if (word == -1)
+		for (i = 0; i < word_count; i++)  /* populate word_buf */
 		{
-			fprintf(stderr, "Error in ptrace peek at target_ptr: ");
-			perror(NULL);
-			fprintf(stderr, "Failed at address: 0x%lx\n", addr);
+			word = ptrace(PTRACE_PEEKDATA, pid, target_ptr, NULL);  /* read data at addr */
+			if (word == -1)
+			{
+				fprintf(stderr, "Error in ptrace peek at target_ptr: ");
+				perror(NULL);
+				fprintf(stderr, "Failed at address: 0x%lx\n", addr);
+				return (-1);
+			}
+			memcpy(&word_buf + (i * word_size), &word, word_size);  /* place long into an char array */
+		}
+
+		if (find_len >= replace_len)  /* fill replacement buffer */
+		{
+			memcpy(word_buf, replace, replace_len);
+			if (find_len > replace_len)
+				memset(word_buf + replace_len, '\0', replace_len - find_len);
+		}
+		else
+		{
+			fprintf(stderr, "Replace cannot be larger than find.\n");
 			return (-1);
 		}
 
-		memcpy(&word_buf, &word, word_size);  /* place long into an char array */
+		// word = *(long *)word_buf;  /* convert char array back into a long */
 
-		/* setup replacement buffer */
-		if ((find_len == replace_len) && (replace_len <= word_size))
+		for (i = 0; i < word_count; i++)
 		{
-			memcpy(word_buf, replace, replace_len);
-		}
-		else if ((find_len > replace_len) && (replace_len <= word_size))
-		{
-			memcpy(word_buf, replace, replace_len);
-			memset(word_buf + replace_len, '\0', replace_len - find_len);
-		}
-		else
-			fprintf(stderr, "Replace cannot be larger than find.\n");
-
-		word = *(long *)word_buf;  /* convert char array back into a long */
-
-		if (replace_len <= word_size)
-		{
+			memcpy(&word, word_buf + (i * word_size), word_size);
 			ptrace_rtn = ptrace(PTRACE_POKEDATA, pid, target_ptr, word);
 			if (ptrace_rtn == -1)
 			{
@@ -112,10 +115,8 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 				perror(NULL);
 				return (-1);
 			}
-			printf("replace succeeded\n");
 		}
-		else
-			fprintf(stderr, "Ruh Roh, make a plan for handling larger than 1 word_size\n");
+		printf("replace succeeded\n");
 	}
 	else
 		fprintf(stderr, "find_ptr not found.\n");
