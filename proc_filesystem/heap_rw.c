@@ -8,7 +8,7 @@
 
 
 /**
- * memmem - finds the pointer to a substring in a string based on GNU memmem
+ * _memmem - finds the pointer to a substring in a string based on GNU's memmem
  * @haystack: string
  * @haystack_len: length of haystack
  * @needle: substring target
@@ -16,7 +16,7 @@
  *
  * Return: pointer to memory location if found, NULL if not
  */
-char *memmem(const char *haystack, size_t haystack_len, const char *needle, size_t needle_len) {
+char *_memmem(const char *haystack, size_t haystack_len, const char *needle, size_t needle_len) {
     for (size_t i = 0; i <= haystack_len - needle_len; i++) {
         if (memcmp(haystack + i, needle, needle_len) == 0)
             return (char *)(haystack + i);
@@ -55,9 +55,10 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 		return (-1);
 	}
 
+	waitpid(pid, NULL, 0);  /* ensure the pid actually stopped */
 	// int counter = 0;
 
-	for (addr = mem_begin; addr < mem_end; addr += word_size)
+	for (addr = mem_begin; addr <= mem_end - word_size; addr += word_size)
 	{
 		word = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);  /* read data at addr */
 		if (word == -1)
@@ -71,7 +72,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 		data_ptr += word_size;
 	}
 
-	find_ptr = memmem(data, data_size, find, find_len);  /* find offset */
+	find_ptr = _memmem(data, data_size, find, find_len);  /* find offset */
 	target_ptr = mem_begin + find_ptr - data;  /* mem_begin + offset */
 
 	if (find_ptr)
@@ -103,7 +104,16 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 		word = *(long *)word_buf;  /* convert char array back into a long */
 
 		if (replace_len <= word_size)
+		{
 			ptrace_rtn = ptrace(PTRACE_POKEDATA, pid, target_ptr, word);
+			if (ptrace_rtn == -1)
+			{
+				fprintf(stderr, "Error in ptrace pokedata: ");
+				perror(NULL);
+				return (-1);
+			}
+			printf("replace succeeded\n");
+		}
 		else
 			fprintf(stderr, "Ruh Roh, make a plan for handling larger than 1 word_size\n");
 	}
