@@ -38,7 +38,8 @@ char *_memmem(const char *haystack, size_t haystack_len, const char *needle, siz
 int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 {
 	int find_len = strlen(find), replace_len = strlen(replace), word_size = sizeof(long), i;
-	int ptrace_rtn = 0, data_size = mem_end - mem_begin, word_count = (word_size + replace_len - 1) / word_size;
+	int ptrace_rtn = 0, data_size = mem_end - mem_begin;
+	int word_count = (replace_len == 0) ? 1 :(word_size + replace_len - 1) / word_size;
 	char data[data_size], *data_ptr = data, *find_ptr, command[64];
 	char word_buf[word_size * word_size];
 	long word, addr, target_ptr;
@@ -91,11 +92,13 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 			memcpy(&word_buf + (i * word_size), &word, word_size);  /* place long into an char array */
 		}
 
-		if (find_len >= replace_len)  /* fill replacement buffer */
+		if (replace_len == 0)
+			memset(word_buf, '\0', find_len);
+		else if (find_len >= replace_len)  /* fill replacement buffer */
 		{
 			memcpy(word_buf, replace, replace_len);
 			if (find_len > replace_len)
-				memset(word_buf + replace_len, '\0', replace_len - find_len);
+				memset(word_buf + replace_len, '\0', find_len - replace_len);
 		}
 		else
 		{
@@ -103,9 +106,7 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 			return (-1);
 		}
 
-		// word = *(long *)word_buf;  /* convert char array back into a long */
-
-		for (i = 0; i < word_count; i++)
+		for (i = 0; i < word_count; i++)  /* POKE back the words */
 		{
 			memcpy(&word, word_buf + (i * word_size), word_size);
 			ptrace_rtn = ptrace(PTRACE_POKEDATA, pid, target_ptr, word);
