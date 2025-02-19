@@ -43,10 +43,10 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 	char word_buf[word_size * word_size];
 	long word, addr, target_ptr;
 
-	printf("in c\n(%08lx, %08lx)\n", mem_begin, mem_end); /* debug */
-	printf("find: %s\nreplace: %s\n", find, replace);  /* debug */
-	sprintf(command, "cat /proc/%d/maps | grep heap", pid); /* debug */
-	system(command);  /* debug - prints /proc/.../maps in checker */
+	// printf("in c\n(%08lx, %08lx)\n", mem_begin, mem_end); /* debug */
+	// printf("find: %s\nreplace: %s\n", find, replace);  /* debug */
+	// sprintf(command, "cat /proc/%d/maps | grep heap", pid); /* debug */
+	// system(command);  /* debug - prints /proc/.../maps in checker */
 
 	ptrace_rtn = ptrace(PTRACE_ATTACH, pid, 0, 0);  /* attach to process */
 	if (ptrace_rtn == -1)
@@ -116,14 +116,14 @@ int heap_rw(int pid, long mem_begin, long mem_end, char *find, char *replace)
 				return (-1);
 			}
 		}
-		printf("replace succeeded\n");
+		// printf("replace succeeded\n");
 	}
 	else
 		fprintf(stderr, "find_ptr not found.\n");
 
 	ptrace_rtn = ptrace(PTRACE_DETACH, pid, 0, 0);
 		if (ptrace_rtn == 0)
-			printf("Detached successfully.\n");
+			// printf("Detached successfully.\n");
 	return (0);
 }
 

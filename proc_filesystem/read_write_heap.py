@@ -32,7 +32,7 @@ def get_heap_address_range(pid:int) -> tuple[int, int]:
 	# mem_length : int = int(len(heap_line_memory) / 2)
 
 	# heap_range : tuple = (line[:mem_length], line [mem_length + 1:mem_length*2+1])
-	print(f"Heap range: {heap_range[0]:#x} - {heap_range[1]:#x}")
+	# print(f"Heap range: {heap_range[0]:#x} - {heap_range[1]:#x}")
 	return heap_range
 
 def find_and_replace(pid: int, heap_range: tuple[int, int], find: str, replace: str):
@@ -46,6 +46,7 @@ def find_and_replace(pid: int, heap_range: tuple[int, int], find: str, replace: 
 	if (c_return != 0):
 		print(f"Error: Call to heap_rw.c returned with code {c_return}")
 		exit(1)
+	exit(0)
 	# path = f"proc/{pid}/mem"
 	# try:
 	# 	with open(path) as file:
@@ -68,6 +69,6 @@ if __name__ == "__main__":
 		raise TypeError("ruh roh")
 
 	pid = int(argv[1])
-	print(f"pid: {pid}")
+	# print(f"pid: {pid}")
 	heap_range : tuple[int,int] = get_heap_address_range(pid)
 	find_and_replace(pid, heap_range, argv[2], argv[3])
