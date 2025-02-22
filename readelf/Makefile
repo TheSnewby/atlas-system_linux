@@ -5,7 +5,7 @@ CC = gcc
 CFLAGS = -Wall -Werror -Wextra -pedantic -g
 
 # Name of the executable
-EXECUTABLE = readelf
+EXECUTABLE = 0-hreadelf
 
 # Source files
 SRC = $(wildcard *.c)
