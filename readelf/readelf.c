@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 /**
  * main - ELF file header reader
  * @argc: number of arguments
