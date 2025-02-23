@@ -566,7 +566,7 @@ int main(int argc, char **argv)
 	// 		printf(" ");
 	// 	printf("%02x", buf[i]);
 	// }
-	printf("\n");
+	// printf("\n");
 	return (0);
 }
 
