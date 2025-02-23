@@ -52,25 +52,27 @@ int main(int argc, char **argv)
 	printf("\n");
 
 	/* Class */
+	printf("  Class:                             ");
 	if (buf[4] == 1)
-		printf("  Class:\t\t\t     ELF32\n");
+		printf("ELF32\n");
 	else if (buf[4] == 2)
 	{
-		printf("  Class:\t\t\t     ELF64\n");
+		printf("ELF64\n");
 		isSixFour = 1;
 	}
 
 	/* Data */
+	printf("  Data:                              ");
 	if (buf[5] == 1)
-		printf("  Data:\t\t\t\t     2's complement, little endian\n");
+		printf("2's complement, little endian\n");
 	else if (buf[5] == 2)
-		printf("  Data:\t\t\t\t     2's complement, big endian\n");
+		printf("2's complement, big endian\n");
 
 	/* ELF Version */
-	printf("  Version:\t\t\t     1 (current)\n");
+	printf("  Version:                           1 (current)\n");
 
 	/* OS/ABI */
-	printf("  OS/ABI:\t\t\t     ");
+	printf("  OS/ABI:                            ");
 	switch(buf[7])
 	{
 		case 0:
@@ -132,10 +134,10 @@ int main(int argc, char **argv)
 	}
 
 	/* ABI Version */
-	printf("  ABI Version:\t\t\t     %d\n", buf[8]);
+	printf("  ABI Version:                       %d\n", buf[8]);
 
 	/* TYPE */
-	printf("  Type:\t\t\t\t     ");
+	printf("  Type:                              ");
 	switch (buf[16] + buf[17])
 	{
 	case 0x00:
@@ -171,7 +173,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Machine */
-	printf("  Machine:\t\t\t     ");
+	printf("  Machine:                           ");
 	switch(buf[18] + buf[19])
 	{
 		case 0x00:
@@ -384,7 +386,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Machine Version */
-	printf("  Version:\t\t\t     0x1\n");  /* consider buf[20]*/
+	printf("  Version:                           0x1\n");  /* consider buf[20]*/
 
 	/* Entry point address */
 	printf("  Entry point address:               0x");
@@ -478,15 +480,15 @@ int main(int argc, char **argv)
 	else
 		printf("%d\n", (unsigned char)buf[0x32]);
 
-	// for (i = 0; i < 64; i++)
-	// {
-	// 	if (i % 16 == 0 && i != 0)
-	// 		printf("\n");
-	// 	if (i % 16)
-	// 		printf(" ");
-	// 	printf("%02x", buf[i]);
-	// }
-	// printf("\n");
+	for (i = 0; i < 64; i++)
+	{
+		if (i % 16 == 0 && i != 0)
+			printf("\n");
+		if (i % 16)
+			printf(" ");
+		printf("%02x", buf[i]);
+	}
+	printf("\n");
 	return (0);
 }
 
