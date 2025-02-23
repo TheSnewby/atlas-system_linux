@@ -40,14 +40,18 @@ int main(int argc, char **argv)
 		return (0);
 	}
 
+	/* print Elf Header */
 	printf("ELF HEADER:\n");
-	printf("  Magic:   ");  /* print Magic Number */
+
+	/* print Magic Number */
+	printf("  Magic:   ");
 	for (i = 0; i < 16; i++)
 	{
-		if (i == 0)
-			printf("%02x", buf[i]);
-		else
-			printf(" %02x", buf[i]);
+		printf("%02x ", buf[i]);
+		// if (i == 0)
+		// 	printf("%02x", buf[i]);
+		// else
+		// 	printf(" %02x", buf[i]);
 	}
 	printf("\n");
 
