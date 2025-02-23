@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include "main.h"
 
 /**
  * main - ELF file header reader
@@ -9,13 +9,506 @@
  */
 int main(int argc, char **argv)
 {
-	int i;
+	int fread_rtn, buf_size = 64, i, isSixFour = 0;
+	FILE *fptr;
+	unsigned char buf[buf_size];  // **strtol_endptr = NULL;
+	uint32_t entryThreeTwo;
+	uint64_t entrySixFour;
 
-	if (argc < 2)
+	memset(buf, '\0', buf_size);
+	if (argc < 2)  /* too few arguments */
+	{
+		printf("argc: %d\n", argc);
 		return (0);
+	}
 
-	for (i = 0; i < argc; i++)
-		printf("%s\n", argv[i]);
 
+	fptr = fopen(argv[1], "rb");  /* opens file pointer to file with read-binary */
+	fread_rtn = fread(buf, 1, buf_size, fptr);  /* reads 64 bytes into buf */
+	if (fread_rtn < 64)
+	{
+		perror("fread_rtn < 0");
+		fclose(fptr);
+		return (0);
+	}
+	fclose(fptr);
+
+	/* ELF Check */
+	if (!(buf[0] == 0x7f) && (buf[1] == 0x45) && (buf[2] == 0x4c) && (buf[3] == 0x46))
+	{
+		fprintf(stderr, "File is not an ELF file.\n");
+		return (0);
+	}
+
+	printf("ELF HEADER:\n");
+	printf("  Magic:   ");  /* print Magic Number */
+	for (i = 0; i < 16; i++)
+	{
+		if (i == 0)
+			printf("%02x", buf[i]);
+		else
+			printf(" %02x", buf[i]);
+	}
+	printf("\n");
+
+	/* Class */
+	if (buf[4] == 1)
+		printf("  Class:\t\t\t     ELF32\n");
+	else if (buf[4] == 2)
+	{
+		printf("  Class:\t\t\t     ELF64\n");
+		isSixFour = 1;
+	}
+
+	/* Data */
+	if (buf[5] == 1)
+		printf("  Data:\t\t\t\t     2's complement, little endian\n");
+	else if (buf[5] == 2)
+		printf("  Data:\t\t\t\t     2's complement, big endian\n");
+
+	/* ELF Version */
+	printf("  Version:\t\t\t     1 (current)\n");
+
+	/* OS/ABI */
+	printf("  OS/ABI:\t\t\t     ");
+	switch(buf[7])
+	{
+		case 0:
+			printf("UNIX - System V\n");
+			break;
+		case 1:
+			printf("UNIX - HP-UX\n");
+			break;
+		case 2:
+			printf("UNIX - NetBSD\n");
+			break;
+		case 3:
+			printf("UNIX - Linux\n");
+			break;
+		case 4:
+			printf("UNIX - GNU Hurd\n");
+			break;
+		case 5:
+			printf("UNIX - Solaris\n");
+			break;
+		case 6:
+			printf("UNIX - AIX (Monterey)\n");
+			break;
+		case 7:
+			printf("UNIX - IRIX\n");
+			break;
+		case 8:
+			printf("UNIX - FreeBSD\n");
+			break;
+		case 9:
+			printf("UNIX - Tru64\n");
+			break;
+		case 10:
+			printf("UNIX - Novell Modesto\n");
+			break;
+		case 11:
+			printf("UNIX - Open BSD\n");
+			break;
+		case 12:
+			printf("UNIX - OpenVMS\n");
+			break;
+		case 13:
+			printf("UNIX - NonStop Kernel\n");
+			break;
+		case 14:
+			printf("UNIX - AROS\n");
+			break;
+		case 15:
+			printf("UNIX - FenixOS\n");
+			break;
+		case 16:
+			printf("UNIX - Nuxi CloudABI\n");
+			break;
+		case 17:
+			printf("UNIX - Stratus Technologies OpenVOS\n");
+			break;
+		default:
+			break;
+	}
+
+	/* ABI Version */
+	printf("  ABI Version:\t\t\t     %d\n", buf[8]);
+
+	/* TYPE */
+	printf("  Type:\t\t\t\t     ");
+	switch (buf[16])
+	{
+	case 0:
+		printf("Unknown\n");
+		break;
+	case 1:
+		printf("REL (Relocatable file), before linked into an executable file\n");
+		break;
+	case 2:
+		printf("EXEC (Executable file), for binaries\n");
+		break;
+	case 3:
+		printf("DYN (Shared object file), for libraries\n");
+		break;
+	case 4:
+		printf("CORE\n");
+		break;
+	default:  /* consider Reserved inclusive ranges */
+		printf("Reserved inclusive range\n");
+		break;
+	}
+
+	/* Machine */
+	printf("  Machine:\t\t\t     ");
+	switch(buf[18] + buf[19])
+	{
+		case 0x00:
+			printf("No specific instruction set\n");
+			break;
+		case 0x01:
+			printf("AT&T WE 32100\n");
+			break;
+		case 0x02:
+			printf("SPARC\n");
+			break;
+		case 0x03:
+			printf("x86\n");
+			break;
+		case 0x04:
+			printf("Motorola 68000 (M68k)\n");
+			break;
+		case 0x05:
+			printf("Motorola 88000 (M88k)\n");
+			break;
+		case 0x06:
+			printf("Intel MCU\n");
+			break;
+		case 0x07:
+			printf("Intel 80860\n");
+			break;
+		case 0x08:
+			printf("MIPS\n");
+			break;
+		case 0x09:
+			printf("IBM System/370\n");
+			break;
+		case 0x0A:
+			printf("MIPS RS3000 Little-endian\n");
+			break;
+		case 0x0F:
+			printf("Hewlett-Packard PA-RISC\n");
+			break;
+		case 0x13:
+			printf("Intel 80960\n");
+			break;
+		case 0x14:
+			printf("PowerPC\n");
+			break;
+		case 0x15:
+			printf("PowerPc (64-bit)\n");
+			break;
+		case 0x16:
+			printf("S390, including S390x\n");
+			break;
+		case 0x17:
+			printf("IBM SPU/SPC\n");
+			break;
+		case 0x24:
+			printf("NEC V800\n");
+			break;
+		case 0x25:
+			printf("Fujitsu FR20\n");
+			break;
+		case 0x26:
+			printf("TRW RH-32\n");
+			break;
+		case 0x27:
+			printf("Motorola RCE\n");
+			break;
+		case 0x28:
+			printf("Arm (up to Armv7/AArc32\n");
+			break;
+		case 0x29:
+			printf("Digital Alpha\n");
+			break;
+		case 0x2A:
+			printf("SuperH\n");
+			break;
+		case 0x2B:
+			printf("SPARC Version 9\n");
+			break;
+		case 0x2C:
+			printf("Siemens TriCore embeeded processor\n");
+			break;
+		case 0x2D:
+			printf("Argonaut RISC Core\n");
+			break;
+		case 0x2E:
+			printf("Hitachi H8/300\n");
+			break;
+		case 0x2F:
+			printf("Hitachi H8/300H\n");
+			break;
+		case 0x30:
+			printf("Hitachi H8S\n");
+			break;
+		case 0x31:
+			printf("Hitachi H8/500\n");
+			break;
+		case 0x32:
+			printf("IA-64\n");
+			break;
+		case 0x33:
+			printf("Stanford MIPS-X\n");
+			break;
+		case 0x34:
+			printf("Motorola ColdFire\n");
+			break;
+		case 0x35:
+			printf("Motorola M68HC12\n");
+			break;
+		case 0x36:
+			printf("Fujitsu MMA Multimedia Accelerator\n");
+			break;
+		case 0x37:
+			printf("Siemens PCP\n");
+			break;
+		case 0x38:
+			printf("Sony nCPU embedded RISC processor\n");
+			break;
+		case 0x39:
+			printf("Denso NDR1 microprocessor\n");
+			break;
+		case 0x3A:
+			printf("Motorola Star*Core processor\n");
+			break;
+		case 0x3B:
+			printf("Toyota ME16 processor\n");
+			break;
+		case 0x3C:
+			printf("STMicroelectronics ST100 processor\n");
+			break;
+		case 0x3D:
+			printf("Advanced Logic Corp. TinyJ embeded processor family\n");
+			break;
+		case 0x3E:
+			printf("AMD x86-64\n");
+			break;
+		case 0x3F:
+			printf("Sony DSP Processor\n");
+			break;
+		case 0x40:
+			printf("Digital Equipment Corp. PDP-10\n");
+			break;
+		case 0x41:
+			printf("Digital Equipment Corp. PDP-11\n");
+			break;
+		case 0x42:
+			printf("Siemens FX66 microcontroller\n");
+			break;
+		case 0x43:
+			printf("STMicroelectronics ST9+ 8/16 bit microcontroller\n");
+			break;
+		case 0x44:
+			printf("STMicroelectronics ST7 8-bit microcontroller\n");
+			break;
+		case 0x45:
+			printf("Motorola MC68HC16 Microcontroller\n");
+			break;
+		case 0x46:
+			printf("Motorola MC68HC11 Microcontroller\n");
+			break;
+		case 0x47:
+			printf("Motorola MC68HC08 Microcontroller\n");
+			break;
+		case 0x48:
+			printf("Motorola MC68HC05 Microcontroller\n");
+			break;
+		case 0x49:
+			printf("Silicon Graphics SVx\n");
+			break;
+		case 0x4A:
+			printf("STMicroelectronics ST19 8-bit microcontroller\n");
+			break;
+		case 0x4B:
+			printf("Digital VAX\n");
+			break;
+		case 0x4C:
+			printf("Axis Communications 32-bit embedded processor\n");
+			break;
+		case 0x4D:
+			printf("Infineon Technologies 32-bit embedded\n");
+			break;
+		case 0x4E:
+			printf("Element 14 64-bit DSP Processor\n");
+			break;
+		case 0x4F:
+			printf("LSI Logic 16-bit DSP Processor\n");
+			break;
+		case 0x8C:
+			printf("TMS320C6000 Family\n");
+			break;
+		case 0xAF:
+			printf("MCST Elbrus e2k\n");
+			break;
+		case 0xB7:
+			printf("Arm 64-bits (Armv8/AArch64)\n");
+			break;
+		case 0xDC:
+			printf("Zilog Z80\n");
+			break;
+		case 0xF3:
+			printf("RISC-V\n");
+			break;
+		case 0xF7:
+			printf("Berkeley Packet Filter\n");
+			break;
+		case 0x101:
+			printf("WDC 65C816\n");
+			break;
+		case 0x102:
+			printf("LoongArch\n");
+			break;
+	}
+
+	/* Machine Version */
+	printf("  Machine:\t\t\t     0x1\n");  /* consider buf[20]*/
+
+	/* Entry point address */
+	printf("  Entry point address:               0x");
+	if (isSixFour)
+	{
+		buildSixFour(&entrySixFour, buf, 0x18);
+		if (buf[5] == 2)  /* if big endian, reverse values */
+			entrySixFour = htobe64(entrySixFour);
+		printf("%lx\n", entrySixFour);
+	}
+	else
+	{
+		buildThreeTwo(&entryThreeTwo, buf, 0x18);
+		if (buf[5] == 2)  /* if big endian, reverse values */
+			entryThreeTwo = htobe32(entryThreeTwo);
+		printf("%x\n", entryThreeTwo);
+	}
+
+	/* Start of program headers */
+	printf("  Start of program headers:          ");
+	// printf("TRACKER: %d\n", tracker);
+	// printf("%x\n%x\n", buf[0x20], buf[0x28]);
+	if (isSixFour)
+		printf("%d (bytes into file)\n", (unsigned char)buf[0x20]);
+	else
+		printf("%d (bytes into file)\n", (unsigned char)buf[0x1C]);
+
+
+	/* START OF SECTION HEADERS */
+	printf("  Start of section headers:          ");
+	if (isSixFour)
+	{
+		buildSixFour(&entrySixFour, buf, 0x28);
+		if (buf[5] == 2)  /* if big endian, reverse values */
+			entrySixFour = htobe64(entrySixFour);
+		printf("%ld (bytes into file)\n", entrySixFour);
+	}
+	else
+	{
+		buildThreeTwo(&entryThreeTwo, buf, 0x20);
+		if (buf[5] == 2)  /* if big endian, reverse values */
+			entryThreeTwo = htobe32(entryThreeTwo);
+		printf("%d (bytes into file)\n", entryThreeTwo);
+	}
+
+	/* Flags */
+	printf("  Flags:                             ");
+	buildThreeTwo(&entryThreeTwo, buf, 0x24);
+	if (buf[5] == 2)  /* if big endian, reverse values */
+		entryThreeTwo = htobe32(entryThreeTwo);
+	printf("0x%x\n", entryThreeTwo);
+
+	/* Size of this header */
+	printf("  Size of this header:               ");
+	if (isSixFour)
+		printf("%d (bytes)\n", (unsigned char)buf[0x34]); /* consider adding buf[0x35]*/
+	else
+		printf("%d (bytes)\n", (unsigned char)buf[0x28]);
+
+	/* Size of program headers */
+	printf("  Size of program headers:           ");
+	if (isSixFour)
+		printf("%d (bytes)\n", (unsigned char)buf[0x36]); /* consider adding buf[0x37]*/
+	else
+		printf("%d (bytes)\n", (unsigned char)buf[0x2A]);
+
+	/* Number of program headers */
+	printf("  Number of program headers:         ");
+	if (isSixFour)
+		printf("%d\n", (unsigned char)buf[0x38]); /* consider adding buf[0x39]*/
+	else
+		printf("%d\n", (unsigned char)buf[0x2C]);
+
+	/* Size of section headers */
+	printf("  Size of section headers:           ");
+	if (isSixFour)
+		printf("%d (bytes)\n", (unsigned char)buf[0x3A]); /* consider adding buf[0x3B]*/
+	else
+		printf("%d (bytes)\n", (unsigned char)buf[0x2E]);
+	/* Number of section headers */
+	printf("  Number of section headers:         ");
+	if (isSixFour)
+		printf("%d\n", (unsigned char)buf[0x3C]); /* consider adding buf[0x3D]*/
+	else
+		printf("%d\n", (unsigned char)buf[0x30]);
+
+	/* Section header string table index */
+	printf("  Section header string table index: ");
+	if (isSixFour)
+		printf("%d\n", (unsigned char)buf[0x3E]); /* consider adding buf[0x3F]*/
+	else
+		printf("%d\n", (unsigned char)buf[0x32]);
+
+	// for (i = 0; i < 64; i++)
+	// {
+	// 	if (i % 16 == 0 && i != 0)
+	// 		printf("\n");
+	// 	if (i % 16)
+	// 		printf(" ");
+	// 	printf("%02x", buf[i]);
+	// }
+	// printf("\n");
 	return (0);
+}
+
+
+/**
+ * buildSixFour - builds a uint64_t from individual bytes in little-endian
+ * @entry: pointer to a uint64_t to be initiated
+ * @buf: 64-byte buffer from target file
+ * @tracker: current index of code area
+ */
+void buildSixFour(uint64_t *entry, unsigned char buf[], int tracker)
+{
+	*entry =  (uint64_t)buf[tracker]|
+	((uint64_t)buf[tracker+1] << 8)  |
+	((uint64_t)buf[tracker+2] << 16) |
+	((uint64_t)buf[tracker+3] << 24) |
+	((uint64_t)buf[tracker+4] << 32) |
+	((uint64_t)buf[tracker+5] << 40) |
+	((uint64_t)buf[tracker+6] << 48) |
+	((uint64_t)buf[tracker+7] << 56);
+
+	// printf("entrySixFour (hex): 0x%016lx\n", *entry);
+}
+
+/**
+ * buildThreeTwo - builds a uint32_t from individual bytesin little-endian
+ * @entry: pointer to a uint64_t to be initiated
+ * @buf: 32-byte buffer from target file
+ * @tracker: current index of code area
+ */
+void buildThreeTwo(uint32_t *entry, unsigned char buf[], int tracker)
+{
+	*entry =  (uint64_t)buf[tracker] |
+	((uint64_t)buf[tracker+1] << 8)  |
+	((uint64_t)buf[tracker+2] << 16) |
+	((uint64_t)buf[tracker+3] << 24);
 }
