@@ -144,8 +144,10 @@ int main(int argc, char **argv)
 
 	/* TYPE */
 	buildOneSix(&entryOneSix, buf, 0x10);
+	// printf("buildOneSix: 0x04%x\n", entryOneSix);
 	if (buf[5] == 2)
-		bswap_16(entryOneSix);
+		entryOneSix = bswap_16(entryOneSix);
+	// printf("bswap_16: 0x04%x\n", entryOneSix);
 	printf("  Type:                              ");
 	switch (entryOneSix)
 	{
@@ -176,15 +178,15 @@ int main(int argc, char **argv)
 	case 0xFFFF:
 		printf("HIPROC (Processor specific)\n");
 		break;
-	default:  /* consider Reserved inclusive ranges */
-		printf("Reserved inclusive range\n");
+	default:
+		printf("Default: Unknown\n");
 		break;
 	}
 
 	/* Machine */
 	buildOneSix(&entryOneSix, buf, 0x12);
 	if (buf[5] == 2)
-		bswap_16(entryOneSix);
+		entryOneSix = bswap_16(entryOneSix);
 	printf("  Machine:                           ");
 	switch(entryOneSix)
 	{
@@ -464,14 +466,14 @@ int main(int argc, char **argv)
 	{
 		buildOneSix(&entryOneSix, buf, 0x34);
 		if (buf[5] == 2)
-			bswap_16(entryOneSix);
+			entryOneSix = bswap_16(entryOneSix);
 		printf("%d (bytes)\n", (unsigned char)entryOneSix);
 	}
 	else
 	{
 		buildOneSix(&entryOneSix, buf, 0x28);
 		if (buf[5] == 2)
-			bswap_16(entryOneSix);
+			entryOneSix = bswap_16(entryOneSix);
 		printf("%d (bytes)\n", (unsigned char)entryOneSix);
 	}
 	/* Size of program headers */
@@ -480,14 +482,14 @@ int main(int argc, char **argv)
 	{
 		buildOneSix(&entryOneSix, buf, 0x36);
 		if (buf[5] == 2)
-			bswap_16(entryOneSix);
+			entryOneSix = bswap_16(entryOneSix);
 		printf("%d (bytes)\n", (unsigned char)entryOneSix);
 	}
 	else
 	{
 		buildOneSix(&entryOneSix, buf, 0x2A);
 		if (buf[5] == 2)
-			bswap_16(entryOneSix);
+			entryOneSix = bswap_16(entryOneSix);
 		printf("%d (bytes)\n", (unsigned char)entryOneSix);
 	}
 
@@ -497,14 +499,14 @@ int main(int argc, char **argv)
 		{
 			buildOneSix(&entryOneSix, buf, 0x38);
 			if (buf[5] == 2)
-				bswap_16(entryOneSix);
+				entryOneSix = bswap_16(entryOneSix);
 			printf("%d\n", (unsigned char)entryOneSix);
 		}
 	else
 		{
 			buildOneSix(&entryOneSix, buf, 0x2C);
 			if (buf[5] == 2)
-				bswap_16(entryOneSix);
+				entryOneSix = bswap_16(entryOneSix);
 			printf("%d\n", (unsigned char)entryOneSix);
 		}
 
@@ -514,14 +516,14 @@ int main(int argc, char **argv)
 	{
 		buildOneSix(&entryOneSix, buf, 0x3A);
 		if (buf[5] == 2)
-			bswap_16(entryOneSix);
+			entryOneSix = bswap_16(entryOneSix);
 		printf("%d (bytes)\n", (unsigned char)entryOneSix);
 	}
 	else
 	{
 		buildOneSix(&entryOneSix, buf, 0x2E);
 		if (buf[5] == 2)
-			bswap_16(entryOneSix);
+			entryOneSix = bswap_16(entryOneSix);
 		printf("%d (bytes)\n", (unsigned char)entryOneSix);
 	}
 	/* Number of section headers */
@@ -530,14 +532,14 @@ int main(int argc, char **argv)
 	{
 		buildOneSix(&entryOneSix, buf, 0x3C);
 		if (buf[5] == 2)
-			bswap_16(entryOneSix);
+			entryOneSix = bswap_16(entryOneSix);
 		printf("%d\n", (unsigned char)entryOneSix);
 	}
 	else
 	{
 		buildOneSix(&entryOneSix, buf, 0x30);
 		if (buf[5] == 2)
-			bswap_16(entryOneSix);
+			entryOneSix = bswap_16(entryOneSix);
 		printf("%d\n", (unsigned char)entryOneSix);
 	}
 
@@ -547,14 +549,14 @@ int main(int argc, char **argv)
 	{
 		buildOneSix(&entryOneSix, buf, 0x3E);
 		if (buf[5] == 2)
-			bswap_16(entryOneSix);
+			entryOneSix = bswap_16(entryOneSix);
 		printf("%d\n", (unsigned char)entryOneSix);
 	}
 	else
 	{
 		buildOneSix(&entryOneSix, buf, 0x32);
 		if (buf[5] == 2)
-			bswap_16(entryOneSix);
+			entryOneSix = bswap_16(entryOneSix);
 		printf("%d\n", (unsigned char)entryOneSix);
 	}
 
