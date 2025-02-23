@@ -320,7 +320,7 @@ int main(int argc, char **argv)
 			printf("Advanced Logic Corp. TinyJ embeded processor family\n");
 			break;
 		case 0x3E:
-			printf("AMD x86-64\n");
+			printf("Advanced Micro Devices x86-64\n");
 			break;
 		case 0x3F:
 			printf("Sony DSP Processor\n");
