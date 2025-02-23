@@ -134,7 +134,7 @@ int main(int argc, char **argv)
 			printf("UNIX - Stratus Technologies OpenVOS\n");
 			break;
 		default:
-			printf("<unknown: %x\n", buf[7]);
+			printf("<unknown: %x>\n", buf[7]);
 			break;
 	}
 
