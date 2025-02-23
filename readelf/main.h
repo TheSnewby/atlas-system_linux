@@ -6,8 +6,10 @@
 #include <string.h>
 #include <stdint.h>
 #include <endian.h>
+#include <byteswap.h>
 
 void buildSixFour(uint64_t *entry, unsigned char buf[], int tracker);
 void buildThreeTwo(uint32_t *entry, unsigned char buf[], int tracker);
+void buildOneSix(uint16_t *entry, unsigned char buf[], int tracker);
 
 #endif

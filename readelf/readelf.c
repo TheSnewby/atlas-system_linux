@@ -12,6 +12,7 @@ int main(int argc, char **argv)
 	int fread_rtn, buf_size = 64, i, isSixFour = 0;
 	FILE *fptr;
 	unsigned char buf[buf_size];  // **strtol_endptr = NULL;
+	uint16_t entryOneSix;
 	uint32_t entryThreeTwo;
 	uint64_t entrySixFour;
 
@@ -142,8 +143,11 @@ int main(int argc, char **argv)
 	printf("  ABI Version:                       %d\n", buf[8]);
 
 	/* TYPE */
+	buildOneSix(&entryOneSix, buf, 0x10);
+	if (buf[5] == 2)
+		bswap_16(entryOneSix);
 	printf("  Type:                              ");
-	switch (buf[16] + buf[17])
+	switch (entryOneSix)
 	{
 	case 0x00:
 		printf("Unknown\n");
@@ -178,8 +182,11 @@ int main(int argc, char **argv)
 	}
 
 	/* Machine */
+	buildOneSix(&entryOneSix, buf, 0x12);
+	if (buf[5] == 2)
+		bswap_16(entryOneSix);
 	printf("  Machine:                           ");
-	switch(buf[18] + buf[19])
+	switch(entryOneSix)
 	{
 		case 0x00:
 			printf("No specific instruction set\n");
@@ -399,24 +406,33 @@ int main(int argc, char **argv)
 	{
 		buildSixFour(&entrySixFour, buf, 0x18);
 		if (buf[5] == 2)  /* if big endian, reverse values */
-			entrySixFour = le64toh(entrySixFour);
+			entrySixFour = bswap_64(entrySixFour);
 		printf("%lx\n", entrySixFour);
 	}
 	else
 	{
 		buildThreeTwo(&entryThreeTwo, buf, 0x18);
 		if (buf[5] == 2)  /* if big endian, reverse values */
-			entryThreeTwo = le32toh(entryThreeTwo);
+			entryThreeTwo = bswap_32(entryThreeTwo);
 		printf("%x\n", entryThreeTwo);
 	}
 
 	/* Start of program headers */
 	printf("  Start of program headers:          ");
 	if (isSixFour)
-		printf("%d (bytes into file)\n", (unsigned char)buf[0x20]);
+		{
+			buildSixFour(&entrySixFour, buf, 0x20);
+			if (buf[5] == 2)  /* if big endian, reverse values */
+				entrySixFour = bswap_64(entrySixFour);
+			printf("%d (bytes into file)\n", (unsigned char)entrySixFour);
+		}
 	else
-		printf("%d (bytes into file)\n", (unsigned char)buf[0x1C]);
-
+	{
+		buildThreeTwo(&entryThreeTwo, buf, 0x1C);
+		if (buf[5] == 2)  /* if big endian, reverse values */
+			entryThreeTwo = bswap_32(entryThreeTwo);
+		printf("%d (bytes into file)\n", (unsigned char)entryThreeTwo);
+	}
 
 	/* START OF SECTION HEADERS */
 	printf("  Start of section headers:          ");
@@ -424,14 +440,14 @@ int main(int argc, char **argv)
 	{
 		buildSixFour(&entrySixFour, buf, 0x28);
 		if (buf[5] == 2)  /* if big endian, reverse values */
-			entrySixFour = le64toh(entrySixFour);
+			entrySixFour = bswap_64(entrySixFour);
 		printf("%ld (bytes into file)\n", entrySixFour);
 	}
 	else
 	{
 		buildThreeTwo(&entryThreeTwo, buf, 0x20);
 		if (buf[5] == 2)  /* if big endian, reverse values */
-			entryThreeTwo = le32toh(entryThreeTwo);
+			entryThreeTwo = bswap_32(entryThreeTwo);
 		printf("%d (bytes into file)\n", entryThreeTwo);
 	}
 
@@ -439,49 +455,108 @@ int main(int argc, char **argv)
 	printf("  Flags:                             ");
 	buildThreeTwo(&entryThreeTwo, buf, 0x24);
 	if (buf[5] == 2)  /* if big endian, reverse values */
-		entryThreeTwo = le32toh(entryThreeTwo);
+		entryThreeTwo = bswap_32(entryThreeTwo);
 	printf("0x%x\n", entryThreeTwo);
 
 	/* Size of this header */
 	printf("  Size of this header:               ");
 	if (isSixFour)
-		printf("%d (bytes)\n", (unsigned char)buf[0x34]); /* consider adding buf[0x35]*/
+	{
+		buildOneSix(&entryOneSix, buf, 0x34);
+		if (buf[5] == 2)
+			bswap_16(entryOneSix);
+		printf("%d (bytes)\n", (unsigned char)entryOneSix);
+	}
 	else
-		printf("%d (bytes)\n", (unsigned char)buf[0x28]);
-
+	{
+		buildOneSix(&entryOneSix, buf, 0x28);
+		if (buf[5] == 2)
+			bswap_16(entryOneSix);
+		printf("%d (bytes)\n", (unsigned char)entryOneSix);
+	}
 	/* Size of program headers */
 	printf("  Size of program headers:           ");
 	if (isSixFour)
-		printf("%d (bytes)\n", (unsigned char)buf[0x36]); /* consider adding buf[0x37]*/
+	{
+		buildOneSix(&entryOneSix, buf, 0x36);
+		if (buf[5] == 2)
+			bswap_16(entryOneSix);
+		printf("%d (bytes)\n", (unsigned char)entryOneSix);
+	}
 	else
-		printf("%d (bytes)\n", (unsigned char)buf[0x2A]);
+	{
+		buildOneSix(&entryOneSix, buf, 0x2A);
+		if (buf[5] == 2)
+			bswap_16(entryOneSix);
+		printf("%d (bytes)\n", (unsigned char)entryOneSix);
+	}
 
 	/* Number of program headers */
 	printf("  Number of program headers:         ");
 	if (isSixFour)
-		printf("%d\n", (unsigned char)buf[0x38]); /* consider adding buf[0x39]*/
+		{
+			buildOneSix(&entryOneSix, buf, 0x38);
+			if (buf[5] == 2)
+				bswap_16(entryOneSix);
+			printf("%d\n", (unsigned char)entryOneSix);
+		}
 	else
-		printf("%d\n", (unsigned char)buf[0x2C]);
+		{
+			buildOneSix(&entryOneSix, buf, 0x2C);
+			if (buf[5] == 2)
+				bswap_16(entryOneSix);
+			printf("%d\n", (unsigned char)entryOneSix);
+		}
 
 	/* Size of section headers */
 	printf("  Size of section headers:           ");
 	if (isSixFour)
-		printf("%d (bytes)\n", (unsigned char)buf[0x3A]); /* consider adding buf[0x3B]*/
+	{
+		buildOneSix(&entryOneSix, buf, 0x3A);
+		if (buf[5] == 2)
+			bswap_16(entryOneSix);
+		printf("%d (bytes)\n", (unsigned char)entryOneSix);
+	}
 	else
-		printf("%d (bytes)\n", (unsigned char)buf[0x2E]);
+	{
+		buildOneSix(&entryOneSix, buf, 0x2E);
+		if (buf[5] == 2)
+			bswap_16(entryOneSix);
+		printf("%d (bytes)\n", (unsigned char)entryOneSix);
+	}
 	/* Number of section headers */
 	printf("  Number of section headers:         ");
 	if (isSixFour)
-		printf("%d\n", (unsigned char)buf[0x3C]); /* consider adding buf[0x3D]*/
+	{
+		buildOneSix(&entryOneSix, buf, 0x3C);
+		if (buf[5] == 2)
+			bswap_16(entryOneSix);
+		printf("%d\n", (unsigned char)entryOneSix);
+	}
 	else
-		printf("%d\n", (unsigned char)buf[0x30]);
+	{
+		buildOneSix(&entryOneSix, buf, 0x30);
+		if (buf[5] == 2)
+			bswap_16(entryOneSix);
+		printf("%d\n", (unsigned char)entryOneSix);
+	}
 
 	/* Section header string table index */
 	printf("  Section header string table index: ");
 	if (isSixFour)
-		printf("%d\n", (unsigned char)buf[0x3E]); /* consider adding buf[0x3F]*/
+	{
+		buildOneSix(&entryOneSix, buf, 0x3E);
+		if (buf[5] == 2)
+			bswap_16(entryOneSix);
+		printf("%d\n", (unsigned char)entryOneSix);
+	}
 	else
-		printf("%d\n", (unsigned char)buf[0x32]);
+	{
+		buildOneSix(&entryOneSix, buf, 0x32);
+		if (buf[5] == 2)
+			bswap_16(entryOneSix);
+		printf("%d\n", (unsigned char)entryOneSix);
+	}
 
 	// for (i = 0; i < 64; i++)  /* -- DEBUG -- */
 	// {
@@ -491,7 +566,7 @@ int main(int argc, char **argv)
 	// 		printf(" ");
 	// 	printf("%02x", buf[i]);
 	// }
-	// printf("\n");
+	printf("\n");
 	return (0);
 }
 
@@ -524,8 +599,20 @@ void buildSixFour(uint64_t *entry, unsigned char buf[], int tracker)
  */
 void buildThreeTwo(uint32_t *entry, unsigned char buf[], int tracker)
 {
-	*entry =  (uint64_t)buf[tracker] |
-	((uint64_t)buf[tracker+1] << 8)  |
-	((uint64_t)buf[tracker+2] << 16) |
-	((uint64_t)buf[tracker+3] << 24);
+	*entry =  (uint32_t)buf[tracker] |
+	((uint32_t)buf[tracker+1] << 8)  |
+	((uint32_t)buf[tracker+2] << 16) |
+	((uint32_t)buf[tracker+3] << 24);
+}
+
+/**
+ * buildOneSix - builds a uint32_t from individual bytesin little-endian
+ * @entry: pointer to a uint64_t to be initiated
+ * @buf: 32-byte buffer from target file
+ * @tracker: current index of code area
+ */
+void buildOneSix(uint16_t *entry, unsigned char buf[], int tracker)
+{
+	*entry =  (uint16_t)buf[tracker] |
+	((uint16_t)buf[tracker+1] << 8);
 }
