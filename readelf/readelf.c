@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 	}
 
 	/* print Elf Header */
-	printf("ELF HEADER:\n");
+	printf("ELF Header:\n");
 
 	/* print Magic Number */
 	printf("  Magic:   ");
