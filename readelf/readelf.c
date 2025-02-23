@@ -88,43 +88,43 @@ int main(int argc, char **argv)
 		case 4:
 			printf("UNIX - GNU Hurd\n");
 			break;
-		case 5:
+		case 6:
 			printf("UNIX - Solaris\n");
 			break;
-		case 6:
+		case 7:
 			printf("UNIX - AIX (Monterey)\n");
 			break;
-		case 7:
+		case 8:
 			printf("UNIX - IRIX\n");
 			break;
-		case 8:
+		case 9:
 			printf("UNIX - FreeBSD\n");
 			break;
-		case 9:
+		case 0x0A:
 			printf("UNIX - Tru64\n");
 			break;
-		case 10:
+		case 0x0B:
 			printf("UNIX - Novell Modesto\n");
 			break;
-		case 11:
+		case 0x0C:
 			printf("UNIX - Open BSD\n");
 			break;
-		case 12:
+		case 0x0D:
 			printf("UNIX - OpenVMS\n");
 			break;
-		case 13:
+		case 0x0E:
 			printf("UNIX - NonStop Kernel\n");
 			break;
-		case 14:
+		case 0x0F:
 			printf("UNIX - AROS\n");
 			break;
-		case 15:
+		case 0x10:
 			printf("UNIX - FenixOS\n");
 			break;
-		case 16:
+		case 0x11:
 			printf("UNIX - Nuxi CloudABI\n");
 			break;
-		case 17:
+		case 0x12:
 			printf("UNIX - Stratus Technologies OpenVOS\n");
 			break;
 		default:
@@ -136,22 +136,34 @@ int main(int argc, char **argv)
 
 	/* TYPE */
 	printf("  Type:\t\t\t\t     ");
-	switch (buf[16])
+	switch (buf[16] + buf[17])
 	{
-	case 0:
+	case 0x00:
 		printf("Unknown\n");
 		break;
-	case 1:
-		printf("REL (Relocatable file), before linked into an executable file\n");
+	case 0x01:
+		printf("REL (Relocatable file)\n");
 		break;
-	case 2:
-		printf("EXEC (Executable file), for binaries\n");
+	case 0x02:
+		printf("EXEC (Executable file)\n");
 		break;
-	case 3:
-		printf("DYN (Shared object file), for libraries\n");
+	case 0x03:
+		printf("DYN (Shared object file)\n");
 		break;
-	case 4:
-		printf("CORE\n");
+	case 0x04:
+		printf("CORE (Core file)\n");
+		break;
+	case 0xFE00:
+		printf("LOOS (Reserved inclusive range)\n");
+		break;
+	case 0xFEFF:
+		printf("HIOS (Operating system specific)\n");
+		break;
+	case 0xFF00:
+		printf("LOPROC (Reserved inclusive range)\n");
+		break;
+	case 0xFFFF:
+		printf("HIPROC (Processor specific)\n");
 		break;
 	default:  /* consider Reserved inclusive ranges */
 		printf("Reserved inclusive range\n");
@@ -372,7 +384,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Machine Version */
-	printf("  Machine:\t\t\t     0x1\n");  /* consider buf[20]*/
+	printf("  Version:\t\t\t     0x1\n");  /* consider buf[20]*/
 
 	/* Entry point address */
 	printf("  Entry point address:               0x");
