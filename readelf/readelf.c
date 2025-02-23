@@ -186,7 +186,7 @@ int main(int argc, char **argv)
 			printf("SPARC\n");
 			break;
 		case 0x03:
-			printf("x86\n");
+			printf("Intel 80386\n");  /* or x86 */
 			break;
 		case 0x04:
 			printf("Motorola 68000 (M68k)\n");
@@ -480,15 +480,15 @@ int main(int argc, char **argv)
 	else
 		printf("%d\n", (unsigned char)buf[0x32]);
 
-	for (i = 0; i < 64; i++)
-	{
-		if (i % 16 == 0 && i != 0)
-			printf("\n");
-		if (i % 16)
-			printf(" ");
-		printf("%02x", buf[i]);
-	}
-	printf("\n");
+	// for (i = 0; i < 64; i++)  /* -- DEBUG -- */
+	// {
+	// 	if (i % 16 == 0 && i != 0)
+	// 		printf("\n");
+	// 	if (i % 16)
+	// 		printf(" ");
+	// 	printf("%02x", buf[i]);
+	// }
+	// printf("\n");
 	return (0);
 }
 
