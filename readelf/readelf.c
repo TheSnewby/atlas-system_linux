@@ -188,7 +188,7 @@ int main(int argc, char **argv)
 			printf("AT&T WE 32100\n");
 			break;
 		case 0x02:
-			printf("Sparc\n");
+			printf("SPARC\n");
 			break;
 		case 0x03:
 			printf("Intel 80386\n");  /* or x86 */
@@ -399,19 +399,21 @@ int main(int argc, char **argv)
 	{
 		buildSixFour(&entrySixFour, buf, 0x18);
 		if (buf[5] == 2)  /* if big endian, reverse values */
-			entrySixFour = le64toh(entrySixFour);
+			entrySixFour = htobe64(entrySixFour);
 		printf("%lx\n", entrySixFour);
 	}
 	else
 	{
 		buildThreeTwo(&entryThreeTwo, buf, 0x18);
 		if (buf[5] == 2)  /* if big endian, reverse values */
-			entryThreeTwo = le32toh(entryThreeTwo);
+			entryThreeTwo = htobe32(entryThreeTwo);
 		printf("%x\n", entryThreeTwo);
 	}
 
 	/* Start of program headers */
 	printf("  Start of program headers:          ");
+	// printf("TRACKER: %d\n", tracker);
+	// printf("%x\n%x\n", buf[0x20], buf[0x28]);
 	if (isSixFour)
 		printf("%d (bytes into file)\n", (unsigned char)buf[0x20]);
 	else
@@ -424,14 +426,14 @@ int main(int argc, char **argv)
 	{
 		buildSixFour(&entrySixFour, buf, 0x28);
 		if (buf[5] == 2)  /* if big endian, reverse values */
-			entrySixFour = le64toh(entrySixFour);
+			entrySixFour = htobe64(entrySixFour);
 		printf("%ld (bytes into file)\n", entrySixFour);
 	}
 	else
 	{
 		buildThreeTwo(&entryThreeTwo, buf, 0x20);
 		if (buf[5] == 2)  /* if big endian, reverse values */
-			entryThreeTwo = le32toh(entryThreeTwo);
+			entryThreeTwo = htobe32(entryThreeTwo);
 		printf("%d (bytes into file)\n", entryThreeTwo);
 	}
 
@@ -439,7 +441,7 @@ int main(int argc, char **argv)
 	printf("  Flags:                             ");
 	buildThreeTwo(&entryThreeTwo, buf, 0x24);
 	if (buf[5] == 2)  /* if big endian, reverse values */
-		entryThreeTwo = le32toh(entryThreeTwo);
+		entryThreeTwo = htobe32(entryThreeTwo);
 	printf("0x%x\n", entryThreeTwo);
 
 	/* Size of this header */
