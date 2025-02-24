@@ -7,11 +7,11 @@ Usage: 0-hreadelf elf_filename
 Your standard output, error output and status should be the exact same as readelf -W -h
 Your makefile must define the rule 0-hreadelf and compile the needed sources to form the executable 0-hreadelf
 
-alex@~/readelf$ make 0-hreadelf
+$ make 0-hreadelf
 [...]
-alex@~/readelf$ ./0-hreadelf ubuntu64
+$ ./0-hreadelf ubuntu64
 ELF Header:
-  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
   Class:                             ELF64
   Data:                              2's complement, little endian
   Version:                           1 (current)
@@ -30,10 +30,10 @@ ELF Header:
   Size of section headers:           64 (bytes)
   Number of section headers:         31
   Section header string table index: 28
-alex@~/readelf$ 
-alex@~/readelf$ ./0-hreadelf netbsd32
+$
+$ ./0-hreadelf netbsd32
 ELF Header:
-  Magic:   7f 45 4c 46 01 01 01 02 00 00 00 00 00 00 00 00 
+  Magic:   7f 45 4c 46 01 01 01 02 00 00 00 00 00 00 00 00
   Class:                             ELF32
   Data:                              2's complement, little endian
   Version:                           1 (current)
@@ -52,10 +52,10 @@ ELF Header:
   Size of section headers:           40 (bytes)
   Number of section headers:         24
   Section header string table index: 21
-alex@~/readelf$ 
-alex@~/readelf$ ./0-hreadelf sparcbigendian32 
+$
+$ ./0-hreadelf sparcbigendian32
 ELF Header:
-  Magic:   7f 45 4c 46 01 02 01 00 00 00 00 00 00 00 00 00 
+  Magic:   7f 45 4c 46 01 02 01 00 00 00 00 00 00 00 00 00
   Class:                             ELF32
   Data:                              2's complement, big endian
   Version:                           1 (current)
@@ -74,4 +74,4 @@ ELF Header:
   Size of section headers:           40 (bytes)
   Number of section headers:         24
   Section header string table index: 23
-alex@~/readelf$ 
+$
