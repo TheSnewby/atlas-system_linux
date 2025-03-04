@@ -7,11 +7,12 @@
 
 section .text
 	global asm_strcmp
+	BITS 64
 
 asm_strcmp:
 .loop:
-	movzx eax, byte [rdi] ; zero extended to handle signed integer
-	movzx ebx, byte [rsi]
+	movzx rax, byte [rdi] ; zero extended to handle signed integer
+	movzx rbx, byte [rsi]
 
 	cmp al, bl
 	jne .notequal
@@ -24,19 +25,19 @@ asm_strcmp:
 	jmp .loop
 
 .notequal:
-	sub eax, ebx
-	cmp eax, 0
+	sub rax, rbx
+	cmp rax, 0
 	jg .greater
 	jl .lesser
 
 .greater:
-	mov eax, 1
+	mov rax, 1
 	ret
 
 .lesser:
-	mov eax, -1
+	mov rax, -1
 	ret
 
 .equal:
-	xor eax, eax
+	xor rax, rax
 	ret
