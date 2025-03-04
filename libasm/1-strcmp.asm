@@ -1,19 +1,17 @@
 ; strcmp()
 ; @rdi: first  param
 ; @rsi: second param
-; return: rax an integer less than, equal to, or greater than zero if s1 
+; return: rax an integer less than, equal to, or greater than zero if s1
 ; 	(or the first n bytes thereof) is found, respectively,  to  be  less  than,
 ;	to match, or be greater than s2
-; BITS 64
-
 
 section .text
 	global asm_strcmp
 
 asm_strcmp:
 .loop:
-	mov al, [rdi]
-	mov bl, [rsi]
+	movzx eax, byte [rdi] ; zero extended to handle signed integer
+	movzx ebx, byte [rsi]
 
 	cmp al, bl
 	jne .notequal
@@ -26,8 +24,6 @@ asm_strcmp:
 	jmp .loop
 
 .notequal:
-	movzx eax, byte [rdi] ; zero extended to handle signed integer
-	movzx ebx, byte [rsi]
 	sub eax, ebx
 	cmp eax, 0
 	jg .greater
