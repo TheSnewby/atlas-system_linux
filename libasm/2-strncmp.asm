@@ -11,7 +11,7 @@ section .text
 	BITS 64
 
 asm_strncmp:
-	mov rcx, 0
+	mov rcx, 1
 .loop:
 	movzx rax, byte [rdi] ; zero extended to handle signed integer
 	movzx rbx, byte [rsi]
@@ -19,11 +19,11 @@ asm_strncmp:
 	cmp rcx, rdx ; compare counter with n
 	je .done
 
-	cmp al, bl
+	cmp al, bl ; compare byte of s1 with byte of s2
 	jne .done
 
 	test al, al ; test is 0 if rdi is a null byte
-	je .done ; jump if equal
+	je .done
 
 	inc rdi
 	inc rsi
@@ -33,18 +33,3 @@ asm_strncmp:
 .done:
 	sub rax, rbx
 	ret
-; 	jg .greater
-; 	jl .lesser
-; 	je .equal
-
-; .greater:
-; 	mov rax, 1
-; 	ret
-
-; .lesser:
-; 	mov rax, -1
-; 	ret
-
-; .equal:
-; 	xor rax, rax
-; 	ret
