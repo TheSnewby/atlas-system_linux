@@ -13,11 +13,11 @@ asm_strchr:
 .loop:
 	mov al, byte [rdi]
 
-	cmp al, 0
-	je .notfound
-
 	cmp al, sil ; sil is 8-bit register of rsi
 	je .found
+
+	cmp al, 0
+	je .notfound
 
 	inc rdi
 
