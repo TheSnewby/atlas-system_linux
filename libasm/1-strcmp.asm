@@ -4,10 +4,11 @@
 ; return: rax an integer less than, equal to, or greater than zero if s1 
 ; 	(or the first n bytes thereof) is found, respectively,  to  be  less  than,
 ;	to match, or be greater than s2
-BITS 64
-global asm_strcmp
+; BITS 64
 
-section .text:
+
+section .text
+	global asm_strcmp
 
 asm_strcmp:
 .loop:
