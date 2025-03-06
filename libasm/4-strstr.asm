@@ -16,11 +16,14 @@ asm_strstr:
 	mov al, byte [rdi]
 	mov bl, byte [rsi]
 
-	cmp al, 0
-	je .notFound
+	cmp bl, 0
+	je .found
 
 	cmp al, bl
 	je .matchingFirstChar
+
+	cmp al, 0
+	je .notFound
 
 	inc rdi
 	jmp .outerLoop
