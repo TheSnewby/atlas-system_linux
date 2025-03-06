@@ -8,7 +8,8 @@ section .text
 	global asm_strchr
 
 asm_strchr:
-	; while not at null byte, check for character at location
+	; do check for character at location
+	; while not at null byte, 
 	; return location if found, otherwise return 0?
 .loop:
 	mov al, byte [rdi]
