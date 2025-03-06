@@ -35,15 +35,15 @@ asm_strstr:
 	inc rcx
 
 	mov al, byte [rbx]
-	mov bl, byte [rcx]
+	mov dl, byte [rcx]
 
-	cmp bl, 0
+	cmp dl, 0
 	je .found ; check if needle is at end
 
 	cmp al, 0
 	je .notFound
 
-	cmp al, bl
+	cmp al, dl
 	je .innerLoop
 
 	inc rdi
