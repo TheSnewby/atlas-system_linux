@@ -4,28 +4,24 @@
 ; Return: rax with number of characters printed, negative if error
 
 section .text
+	extern asm_strlen
 	global asm_puts
 
 asm_puts:
 	call asm_strlen			; length of string
 	cmp rax, 0
 	jl .error				; if <= 0, return an error
-	mov rcx, rax			; store the length into the string counter register
-	push rax				; store value to later retrieval
 
-	mov rsp, rdi
+	mov rdx, rax			; store the length into the string counter register
+	mov rsi, rdi			; load memory location into source pointer
 
-	mov rsi, rsp
-	mov rax, 1
-	mov rdi, 1
-	mov rdx, rcx
+	mov rax, 1				; Write syscall
+	mov rdi, 1				; write to StdOut
 	syscall
 
-
-.error:
-	mov rax, -1
+	mov rax, rdx
 	ret
 
-.fin:
-	pop rax					; maybe?
+.error:
+	mov rax, -1				; return negative value
 	ret
