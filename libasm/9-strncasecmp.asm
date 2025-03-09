@@ -59,7 +59,10 @@ asm_strncasecmp:
 	cmp byte [rdi], 0		; check if at end of S1
 	je  .fin
 
-	cmp rbx, rdx
+	cmp byte [rsi], 0		; probably not needed
+	je  .fin
+
+	cmp rbx, rdx			; compares counter vs n-character limit
 	je 	.fin
 
 	inc rdi
@@ -67,6 +70,8 @@ asm_strncasecmp:
 	jmp .loopStart
 
 .earlyexit:
+	pop rsi
+	pop rdi
 	xor rax, rax
 	ret
 
@@ -78,7 +83,8 @@ asm_strncasecmp:
 	pop rdi
 	ret
 
-.fin						; fin
+.fin:						; fin
+	xor rax, rax
 	pop rsi
 	pop rdi
 	ret
