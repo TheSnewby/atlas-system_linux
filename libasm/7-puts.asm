@@ -8,7 +8,7 @@ section .text
 	global asm_puts
 
 asm_puts:
-	push rdi				; saves 
+	push rdi				; saves
 	call asm_strlen
 	mov rdx, rax
 
