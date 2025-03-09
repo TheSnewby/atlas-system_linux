@@ -18,4 +18,3 @@ asm_puts:
 	syscall
 
 	ret
-
