@@ -8,9 +8,9 @@ section .text
 
 asm_putc:
 	cmp rdi, 0
-	jle .error
+	jl .error
 
-	cmp rdi, 122
+	cmp rdi, 127
 	jge .error
 
 	add rsp, -1			; Increase stack by 1 byte to store a single char
