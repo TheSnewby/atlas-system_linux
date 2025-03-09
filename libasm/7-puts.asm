@@ -10,9 +10,10 @@ section .text
 asm_puts:
 	call asm_strlen			; length of string
 	cmp rax, 0
-	jl .error				; if <= 0, return an error
+	; cmovl rdx, -1				; if <= 0, return an error
+	; cmovge rdx, rax			; store the length into the string counter register
+	mov rdx, rax
 
-	mov rdx, rax			; store the length into the string counter register
 	mov rsi, rdi			; load memory location into source pointer
 
 	mov rax, 1				; Write syscall
@@ -22,6 +23,3 @@ asm_puts:
 	mov rax, rdx
 	ret
 
-.error:
-	mov rax, -1				; return negative value
-	ret
