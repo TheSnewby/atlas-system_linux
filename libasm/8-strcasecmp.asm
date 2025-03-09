@@ -20,8 +20,6 @@ asm_strcasecmp:
 .loopStart:
 	movzx rax, byte [rdi]	; load 0-extended value into free register
 	movzx rcx, byte [rsi]	; load 0-extended value into free register
-	cmp rax, 0				; check if empty
-	je  .fin
 	cmp rax, 65				; check if at least upper case
 	jge .checkS1Upper		; jump if S1 character could be Uppercase
 	jl  .checkS2			; jump to check S2 for Uppercase
@@ -52,11 +50,17 @@ asm_strcasecmp:
 	cmp rax, 0
 	jne .fin				; if not equal finish
 
+	cmp byte [rdi], 0		; check if at end of S1
+	je  .fin
+
 	inc rdi
 	inc rsi
 	jmp .loopStart
 
 .fin:
+	movzx rax, byte [rdi]	; load original values
+	movzx rcx, byte [rsi]	; load original values
+	sub rax, rcx			; compare actual values
 	pop rsi
 	pop rdi
 	ret
