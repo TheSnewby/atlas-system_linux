@@ -23,9 +23,8 @@ asm_strncasecmp:
 	mov rbx, 0				; counter for number number of chars compared
 
 .loopStart:
-	inc rbx
-	movzx rax, byte [rdi]	; load 0-extended value into free register
-	movzx rcx, byte [rsi]	; load 0-extended value into free register
+	movsx rax, byte [rdi]	; load 0-extended value into free register
+	movsx rcx, byte [rsi]	; load 0-extended value into free register
 	cmp rax, 65				; check if at least upper case
 	jge .checkS1Upper		; jump if S1 character could be Uppercase
 	jl  .checkS2			; jump to check S2 for Uppercase
@@ -62,6 +61,7 @@ asm_strncasecmp:
 	cmp byte [rsi], 0		; probably not needed
 	je  .fin
 
+	inc rbx
 	cmp rbx, rdx			; compares counter vs n-character limit
 	je 	.fin
 
@@ -76,8 +76,8 @@ asm_strncasecmp:
 	ret
 
 .finne:						; fin not equal
-	movzx rax, byte [rdi]	; load original values
-	movzx rcx, byte [rsi]	; load original values
+	movsx rax, byte [rdi]	; load original values
+	movsx rcx, byte [rsi]	; load original values
 	sub rax, rcx			; compare actual values
 	pop rsi
 	pop rdi
