@@ -17,11 +17,14 @@ void sigint_handler(int signal)
  */
 int handle_signal(void)
 {
-	if (signal(SIGINT, sigint_handler) == SIG_ERR)
+	int signal_rtn;
+	fflush(NULL);
+
+	signal_rtn = signal(SIGINT, sigint_handler);
+	if (signal_rtn == SIG_ERR)
 	{
 		printf("Failure to set handler for SIGINT\n");
 		return (-1);
 	}
-	fflush(NULL);
 	return (0);
 }
