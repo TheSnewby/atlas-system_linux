@@ -22,6 +22,6 @@ int handle_signal(void)
 		printf("Failure to set handler for SIGINT\n");
 		return (-1);
 	}
-	// fflush();
+	fflush(NULL);
 	return (0);
 }
