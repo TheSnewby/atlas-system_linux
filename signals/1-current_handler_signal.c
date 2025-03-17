@@ -1,7 +1,9 @@
 #include "signals.h"
 
 /**
- * current_handler_signal - retrives the current handler of the signal SIGINT
+ * current_handler_signal - retrieves the current handler of the signal SIGINT
+ *
+ * Return: void pointer of __sighandler_t
  */
 void (*current_handler_signal(void))(int)
 {
