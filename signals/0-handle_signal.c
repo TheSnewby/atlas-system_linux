@@ -22,9 +22,6 @@ int handle_signal(void)
 
 	signal_rtn = signal(SIGINT, sigint_handler);
 	if (signal_rtn == SIG_ERR)
-	{
-		printf("Failure to set handler for SIGINT\n");
 		return (-1);
-	}
 	return (0);
 }
