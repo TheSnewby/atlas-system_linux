@@ -8,6 +8,7 @@ void sigint_handler(int signal)
 {
 	if (signal == SIGINT)
 		printf("Gotcha! [%d]\n", SIGINT);
+	fflush(NULL);
 }
 
 /**
@@ -18,7 +19,6 @@ void sigint_handler(int signal)
 int handle_signal(void)
 {
 	__sighandler_t signal_rtn;
-	fflush(NULL);
 
 	signal_rtn = signal(SIGINT, sigint_handler);
 	if (signal_rtn == SIG_ERR)
