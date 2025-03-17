@@ -17,7 +17,7 @@ void sigint_handler(int signal)
  */
 int handle_signal(void)
 {
-	int signal_rtn;
+	__sighandler_t signal_rtn;
 	fflush(NULL);
 
 	signal_rtn = signal(SIGINT, sigint_handler);
