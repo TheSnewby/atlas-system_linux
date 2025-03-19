@@ -8,7 +8,7 @@ fi
 
 if [[ $1 =~ ^[0-9]+$ ]]; then
 	kill -0 $1
-	if [ $? -e 0 ]; then
+	if [ $? -eq 0 ]; then
 		kill -3 $1
 		exit 0
 	else
