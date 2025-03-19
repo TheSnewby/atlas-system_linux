@@ -10,13 +10,22 @@
 
 int main(int argc, char **argv)
 {
+	int pidfd;
+	pid_t pid = atoi(argv[1]);
+
 	if (argc != 2)
 	{
-		printf("Usage: %s %s\n", argv[0], argv[1]);
+		printf("Usage: %s %s\n", argv[0], pid);
 		return (EXIT_FAILURE);
 	}
 
-	if (syscall(SYS_pidfd_send_signal,atoi(argv[1]), SIGINT, NULL, 0))
-		return (EXIT_FAILURE);
+	pidfd = syscall(SYS_pidfd_open, pid, 0);
+
+	if (syscall(SYS_pidfd_send_signal, pidfd, SIGINT, NULL, 0))
+		{
+			close(pidfd);
+			return (EXIT_FAILURE);
+		}
+	close(pidfd);
 	return (EXIT_SUCCESS);
 }
