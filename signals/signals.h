@@ -1,6 +1,7 @@
 #ifndef signals_h
 #define signals_h
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
