@@ -2,13 +2,18 @@
 
 /**
  * sigquit_handler - handler for SIGQUITs
- * @newact: sigaction
+ * @sig: signal number
+ * @info: info from siginfo_t
+ * @ucontext: further context if needed
  *
  * Return: void
  */
 void sigquit_handler(int sig, siginfo_t *info, void *ucontext)
 {
-	printf("SIGQUIT sent by [%d]\n", info->pid_t);
+	(void)ucontext;
+	(void)sig;
+
+	printf("SIGQUIT sent by [%d]\n", info->si_pid);
 	fflush(stdout);
 }
 
