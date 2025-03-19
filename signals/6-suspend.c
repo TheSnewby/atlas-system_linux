@@ -12,11 +12,11 @@ void sigint_handler(int signal)
 }
 
 /**
- * handle_signal - a function that sets a handler for the signal SIGINT
+ * main - a function that waits indefinitely to handle the signal SIGINT
  *
  * Return: 0 on sucesss, -1 on error
  */
-int handle_signal(void)
+int main(void)
 {
 	signal(SIGINT, sigint_handler);
 	pause();  /* catches all signals? */
