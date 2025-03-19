@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 		return (EXIT_FAILURE);
 	}
 
-	if (pidfd_send_signal(atoi(argv[1]), SIGINT, NULL, 0))
+	if (syscall(SYS_pidfd_send_signal,atoi(argv[1]), SIGINT, NULL, 0))
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
