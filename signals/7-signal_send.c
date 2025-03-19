@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
 	if (argc != 2)
 	{
-		printf("Usage: %s %d\n", argv[0], pid);
+		printf("Usage: %s <pid>\n", argv[0], pid);
 		return (EXIT_FAILURE);
 	}
 
