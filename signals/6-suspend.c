@@ -8,7 +8,7 @@ void sigint_handler(int signal)
 {
 	printf("Caught %d\n", signal);
 	if (signal == SIGINT)
-		printf("Signal Received\n");
+		printf("Signal received\n");
 }
 
 /**
