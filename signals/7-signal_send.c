@@ -11,7 +11,9 @@
 int main(int argc, char **argv)
 {
 	int pidfd;
-	pid_t pid = atoi(argv[1]);
+	pid_t pid;
+	if (argc > 1)	
+		pid = atoi(argv[1]);
 
 	if (argc != 2)
 	{
@@ -22,10 +24,10 @@ int main(int argc, char **argv)
 	pidfd = syscall(SYS_pidfd_open, pid, 0);
 
 	if (syscall(SYS_pidfd_send_signal, pidfd, SIGINT, NULL, 0))
-		{
-			close(pidfd);
-			return (EXIT_FAILURE);
-		}
+	{
+		close(pidfd);
+		return (EXIT_FAILURE);
+	}
 	close(pidfd);
 	return (EXIT_SUCCESS);
 }
