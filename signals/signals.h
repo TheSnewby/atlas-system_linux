@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <stddef.h>
+#include <string.h>
 
 int handle_signal(void);
 void (*current_handler_signal(void))(int);

@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 	int signum = atoi(argv[1]);
 
 	if (argc != 2)
-		pritnf("Usage: %s %d\n", argv[0], signum);
+		printf("Usage: %s %d\n", argv[0], signum);
 
 	printf("%d: %s\n", signum, strsignal(signum));
 
