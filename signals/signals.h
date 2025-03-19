@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
+#include <sys/syscall.h>
 
 int handle_signal(void);
 void (*current_handler_signal(void))(int);
