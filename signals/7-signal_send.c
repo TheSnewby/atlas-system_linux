@@ -12,7 +12,8 @@ int main(int argc, char **argv)
 {
 	int pidfd;
 	pid_t pid;
-	if (argc > 1)	
+
+	if (argc > 1)
 		pid = atoi(argv[1]);
 
 	if (argc != 2)
