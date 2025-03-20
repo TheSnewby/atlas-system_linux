@@ -11,5 +11,5 @@
  */
 int main(int argc, char **argv)
 {
-	return (kill(atoi(argv[1]), 0) == 0) ? (1) : (0);
+	return ((argc == 2) && (kill(atoi(argv[1]), 0) == 0)) ? (1) : (0);
 }
