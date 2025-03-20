@@ -21,6 +21,7 @@ int handle_sigaction(void)
 {
 	struct sigaction newact;
 
+	memset(&newact, 0, sizeof(newact));
 	newact.sa_handler = sigint_handler;
 
 	if (sigaction(SIGINT, &newact, NULL) == -1)
