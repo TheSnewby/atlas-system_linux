@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <signal.h>
-//only two headers
 
 /**
  * main - tests if a process exists, given its PID
@@ -11,5 +10,5 @@
  */
 int main(int argc, char **argv)
 {
-	return ((argc == 2) && (kill(atoi(argv[1]), 0) == 0)) ? (1) : (0);
+	return (((argc == 2) && (kill(atoi(argv[1]), 0) == 0)) ? 1 : 0);
 }
