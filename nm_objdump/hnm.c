@@ -29,14 +29,14 @@ char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 	if (sym->st_shndx == SHN_UNDEF)
 		return ('U');
 
+	if (sym->st_shndx == SHN_ABS)
+		return ((binding == STB_GLOBAL) ? 'A' : 'a');
+
 	if (sym->st_shndx == SHN_COMMON)
 		return ((binding == STB_GLOBAL) ? 'C' : 'c');
 
 	if (type == STT_FUNC)
 		return ((binding == STB_GLOBAL) ? 'T' : 't');
-
-	if (sym->st_shndx == SHN_ABS)
-		return ((binding == STB_GLOBAL) ? 'A' : 'a');
 
 	section = &sections[sym->st_shndx];
 
