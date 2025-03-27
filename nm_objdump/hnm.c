@@ -302,7 +302,7 @@ int parse_symbol_table(const char *file_path)
                 char symbol_type = get_symbol_type_64(&symbols_64[i], section_headers, shstrtab);
 
                 /* Print Symbol */
-                if (symbols_64[i].st_value || symbol_type == 'U')
+                if ((symbol_type != 'a') && (strcmp(name, "") != 0) && (symbols_64[i].st_value || symbol_type == 'U'))
 				{
                     if (symbol_type == 'U')
                         printf("                 %c %s\n", symbol_type, name);
