@@ -52,7 +52,7 @@ char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 	(strcmp(name, ".fini_array") == 0) ||
 	(strcmp(name, ".text") == 0) ||
 	(section->sh_flags & SHF_EXECINSTR))
-		return ((binding == STB_GLOBAL) ? 'Z' : 'z');  /* formerly T and t */
+		return ((binding == STB_GLOBAL) ? 'T' : 't');
 
 	if ((strcmp(name, ".data") == 0) || ((section->sh_flags & SHF_ALLOC) && (section->sh_flags & SHF_WRITE)))
 		return ((binding == STB_LOCAL) ? 'D' : 'd');
