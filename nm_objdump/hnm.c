@@ -26,14 +26,14 @@ char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 			return ((type == STT_OBJECT) ? 'V' : 'W');
 	}
 
+	if (sym->st_shndx == SHN_UNDEF)
+		return ('U');
+
 	if (sym->st_shndx == SHN_COMMON)
 		return ((binding == STB_GLOBAL) ? 'C' : 'c');
 
 	if (type == STT_FUNC)
 		return ((binding == STB_GLOBAL) ? 'T' : 't');
-
-	if (sym->st_shndx == SHN_UNDEF)
-		return ('U');
 
 	if (sym->st_shndx == SHN_ABS)
 		return ((binding == STB_GLOBAL) ? 'A' : 'a');
