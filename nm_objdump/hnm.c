@@ -396,7 +396,7 @@ int parse_symbol_table(const char *file_path)
                 /* Print Symbol */
                 if (symbols_32[i].st_value || symbol_type == 'U') {
                     if (symbol_type == 'U')
-                        printf("                 %c %s\n", symbol_type, name);
+                        printf("         %c %s\n", symbol_type, name);
                     else
                         printf("%08x %c %s\n", symbols_32[i].st_value, symbol_type, name);
                 }
