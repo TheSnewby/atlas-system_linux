@@ -3,122 +3,136 @@
 /**
  * get_symbol_type_64 - Determine symbol type for 64-bit symbol
  * @sym: 64-bit symbol entry
+ * @sections: 64-bit section header
+ * @shstrtab: buffer containing section header string table
  * 
  * Return: Symbol type character
  */
-char get_symbol_type_64(Elf64_Sym *sym)
+char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 {
-    char c;
+	unsigned char binding = ELF64_ST_BIND(sym->st_info); /* local, global, weak */
+	unsigned char type = ELF64_ST_TYPE(sym->st_info); /* function, object, file */
+	Elf64_Shdr *section = NULL;  /* individual section */
+	char *name = NULL;  /* section name*/
 
-    /* Global Symbols */
-    if (ELF64_ST_BIND(sym->st_info) == STB_GLOBAL) {
-        switch (ELF64_ST_TYPE(sym->st_info)) {
-            case STT_FUNC: c = 'T'; break;
-            case STT_OBJECT: c = 'D'; break;
-            case STT_SECTION: c = 'A'; break;
-            default: c = 'U'; break;
-        }
-    }
-    /* Local Symbols */
-    else {
-        switch (ELF64_ST_TYPE(sym->st_info)) {
-            case STT_FUNC: c = 't'; break;
-            case STT_OBJECT: c = 'd'; break;
-            case STT_SECTION: c = 'a'; break;
-            default: c = 'u'; break;
-        }
-    }
+	if (type == STT_FILE)
+		return (0);
 
-    /* Special Case */
-    if (sym->st_shndx == SHN_UNDEF)
-        c = 'U';
+	if (binding == STB_WEAK)
+	{
+		if (sym->st_shndx == SHN_UNDEF)
+			return ((type == STT_OBJECT) ? 'v' : 'w');
+		else
+			return ((type == STT_OBJECT) ? 'V' : 'W');
+	}
 
-    return c;
+	if (sym->st_shndx == SHN_COMMON)
+		return ((binding == STB_GLOBAL) ? 'C' : 'c');
+
+	if (type == STT_FUNC)
+		return ((binding == STB_GLOBAL) ? 'T' : 't');
+
+	if (sym->st_shndx == SHN_UNDEF)
+		return ('U');
+
+	if (sym->st_shndx == SHN_ABS)
+		return ((binding == STB_GLOBAL) ? 'A' : 'a');
+
+	section = &sections[sym->st_shndx];
+
+	if (section->sh_type == SHT_NOBITS)
+		return ((binding == STB_GLOBAL) ? 'B' : 'b');
+
+	if (!shstrtab)
+		return ('?');
+
+	name = shstrtab + section->sh_name;
+
+	if ((strcmp(name, ".init_array") == 0) ||
+	(strcmp(name, ".fini_array") == 0) ||
+	(strcmp(name, ".text") == 0) ||
+	(section->sh_flags & SHF_EXECINSTR))
+		return ((binding == STB_GLOBAL) ? 'T' : 't');
+
+	if ((strcmp(name, ".data") == 0) || ((section->sh_flags & SHF_ALLOC) && (section->sh_flags & SHF_WRITE)))
+		return ((binding == STB_LOCAL) ? 'D' : 'd');
+
+	if (strcmp(name, ".bss") == 0)
+		return ((binding == STB_LOCAL) ? 'B' : 'b');
+
+	if ((strcmp(name, ".rodata") == 0) || (section->sh_flags & SHF_ALLOC))
+		return ((binding == STB_LOCAL) ? 'R' : 'r');
+
+	return ('?');
+	// return (0);
 }
+
 
 /**
  * get_symbol_type_32 - Determine symbol type for 32-bit symbol
  * @sym: 32-bit symbol entry
- * @name: name of section
+ * @sections: 64-bit section header
+ * @shstrtab: buffer containing section header string table
  * 
  * Return: Symbol type character
  */
-char get_symbol_type_32(Elf32_Sym *sym, const char *name)
+char get_symbol_type_32(Elf32_Sym *sym, Elf32_Shdr *sections, char *shstrtab)
 {
-    char c;
+	unsigned char binding = ELF32_ST_BIND(sym->st_info); /* local, global, weak */
+	unsigned char type = ELF32_ST_TYPE(sym->st_info); /* function, object, file */
+	Elf32_Shdr *section = NULL;  /* individual section */
+	char *name = NULL;  /* section name*/
 
-    if (sym->st_shndx == SHN_UNDEF)
-        return 'U';
+	if (type == STT_FILE)
+		return (0);
 
-    /* Global Symbols */
-    if (ELF32_ST_BIND(sym->st_info) == STB_GLOBAL)
-    {
-        switch (ELF32_ST_TYPE(sym->st_info))
-        {
-            case STT_FUNC:
-                c = 'T';
-                break;
-            case STT_OBJECT:
-                if (strcmp(name, "__progname") == 0 || strcmp(name, "__ps_strings") == 0)
-                {
-                    c = 'D'; // __progname and __ps_strings are initialized data.
-                }
-                else if (strcmp(name, "_DYNAMIC") == 0 || strcmp(name, "_etext") == 0 ||
-                         strcmp(name, "__bss_start") == 0 || strcmp(name, "_edata") == 0 ||
-                         strcmp(name, "_GLOBAL_OFFSET_TABLE_") == 0 || strcmp(name, "_end") == 0)
-                {
-                    c = 'A'; // _DYNAMIC, _etext, etc. are absolute.
-                }
-                // Removed the dlerror check from the global section.
-                else if (strcmp(name, "__start") == 0 || strcmp(name, "_start") == 0)
-                {
-                    c='T'; // start symbols are global text.
-                }
-                else
-                {
-                    c = 'B';
-                }
-                break;
-            case STT_SECTION:
-                c = 'A'; // Sections are absolute.
-                break;
-            default:
-                c = 'U';
-                break;
-        }
-    }
-    /* Local Symbols */
-    else
-    {
-        switch (ELF32_ST_TYPE(sym->st_info))
-        {
-            case STT_FUNC:
-                if (strcmp(name, "_strrchr") == 0 || strcmp(name, "gcc2_compiled.") == 0)
-                {
-                    c = 't'; // _strrchr and gcc2_compiled. are local text.
-                }
-                else if (strcmp(name, "dlerror") == 0) // added dlerror in local section.
-                {
-                    c = 'W';
-                }
-                else
-                {
-                    c = 'W';
-                }
-                break;
-            case STT_OBJECT:
-                c = 'd';
-                break;
-            case STT_SECTION:
-                c = 'a';
-                break;
-            default:
-                c = 'u';
-                break;
-        }
-    }
+	if (binding == STB_WEAK)
+	{
+		if (sym->st_shndx == SHN_UNDEF)
+			return ((type == STT_OBJECT) ? 'v' : 'w');
+		else
+			return ((type == STT_OBJECT) ? 'V' : 'W');
+	}
 
-    return c;
+	if (sym->st_shndx == SHN_COMMON)
+		return ((binding == STB_GLOBAL) ? 'C' : 'c');
+
+	if (type == STT_FUNC)
+		return ((binding == STB_GLOBAL) ? 'T' : 't');
+
+	if (sym->st_shndx == SHN_UNDEF)
+		return ('U');
+
+	if (sym->st_shndx == SHN_ABS)
+		return ((binding == STB_GLOBAL) ? 'A' : 'a');
+
+	section = &sections[sym->st_shndx];
+
+	if (section->sh_type == SHT_NOBITS)
+		return ((binding == STB_GLOBAL) ? 'B' : 'b');
+
+	if (!shstrtab)
+		return ('?');
+
+	name = shstrtab + section->sh_name;
+
+	if ((strcmp(name, ".init_array") == 0) ||
+	(strcmp(name, ".fini_array") == 0) ||
+	(strcmp(name, ".text") == 0) ||
+	(section->sh_flags & SHF_EXECINSTR))
+		return ((binding == STB_GLOBAL) ? 'T' : 't');
+
+	if ((strcmp(name, ".data") == 0) || ((section->sh_flags & SHF_ALLOC) && (section->sh_flags & SHF_WRITE)))
+		return ((binding == STB_LOCAL) ? 'D' : 'd');
+
+	if (strcmp(name, ".bss") == 0)
+		return ((binding == STB_LOCAL) ? 'B' : 'b');
+
+	if ((strcmp(name, ".rodata") == 0) || (section->sh_flags & SHF_ALLOC))
+		return ((binding == STB_LOCAL) ? 'R' : 'r');
+
+	return ('?');
+	// return (0);
 }
 
 int parse_symbol_table(const char *file_path)
@@ -285,7 +299,7 @@ int parse_symbol_table(const char *file_path)
                 const char *name = &strtab[symbols_64[i].st_name];
 
                 /* Get Symbol Type */
-                char symbol_type = get_symbol_type_64(&symbols_64[i]);
+                char symbol_type = get_symbol_type_64(&symbols_64[i], section_headers, shstrtab);
 
                 /* Print Symbol */
                 if (symbols_64[i].st_value || symbol_type == 'U')
@@ -441,7 +455,7 @@ int parse_symbol_table(const char *file_path)
                 const char *name = &strtab[symbols_32[i].st_name];
 
                 /* Get Symbol Type */
-                char symbol_type = get_symbol_type_32(&symbols_32[i], name);
+                char symbol_type = get_symbol_type_32(&symbols_32[i], section_headers, shstrtab);
 
                 /* Print Symbol */
                 if ((symbol_type != 'a') && (strcmp(name, "") != 0) && (symbols_32[i].st_value || symbol_type == 'U')) {
