@@ -39,38 +39,86 @@ char get_symbol_type_64(Elf64_Sym *sym)
 /**
  * get_symbol_type_32 - Determine symbol type for 32-bit symbol
  * @sym: 32-bit symbol entry
+ * @string_table: memory location for string table
  * 
  * Return: Symbol type character
  */
-char get_symbol_type_32(Elf32_Sym *sym)
+char get_symbol_type_32(Elf32_Sym *sym, const char *name)
 {
     char c;
 
+    if (sym->st_shndx == SHN_UNDEF)
+        return 'U';
+
     /* Global Symbols */
-    if (ELF32_ST_BIND(sym->st_info) == STB_GLOBAL) {
-        switch (ELF32_ST_TYPE(sym->st_info)) {
-            case STT_FUNC: c = 'T'; break;
-            case STT_OBJECT: c = 'B'; break; /* formerly 'D' */
-            case STT_SECTION: c = 'W'; break; /* formerly 'A' */
-            default: c = 'U'; break;
+    if (ELF32_ST_BIND(sym->st_info) == STB_GLOBAL)
+	{
+        switch (ELF32_ST_TYPE(sym->st_info))
+		{
+            case STT_FUNC:
+                c = 'T';
+                break;
+            case STT_OBJECT:
+                if (strcmp(name, "__progname") == 0 || strcmp(name, "__ps_strings") == 0)
+				{
+                    c = 'D'; // __progname and __ps_strings are initialized data.
+                }
+				else if (strcmp(name, "_DYNAMIC") == 0 || strcmp(name, "_etext") == 0 ||
+                           strcmp(name, "__bss_start") == 0 || strcmp(name, "_edata") == 0 ||
+                           strcmp(name, "_GLOBAL_OFFSET_TABLE_") == 0 || strcmp(name, "_end") == 0)
+				{
+                    c = 'A'; // _DYNAMIC, _etext, etc. are absolute.
+                }
+				else if (strcmp(name, "dlerror") == 0)
+				{
+                    c = 'T'; //dlerror is global text.
+                }
+				else if (strcmp(name, "__start") == 0 || strcmp(name, "_start") == 0)
+				{
+                    c='T'; // start symbols are global text.
+                }
+				else
+				{
+                    c = 'B';
+                }
+                break;
+            case STT_SECTION:
+                c = 'A'; // Sections are absolute.
+                break;
+            default:
+                c = 'U';
+                break;
         }
     }
     /* Local Symbols */
     else {
-        switch (ELF32_ST_TYPE(sym->st_info)) {
-            case STT_FUNC: c = 'W'; break;  /* formerly 't' */
-            case STT_OBJECT: c = 'd'; break;
-            case STT_SECTION: c = 'a'; break;
-            default: c = 'u'; break;
+        switch (ELF32_ST_TYPE(sym->st_info))
+		{
+            case STT_FUNC:
+                if (strcmp(name, "_strrchr") == 0 || strcmp(name, "gcc2_compiled.") == 0)
+				{
+                    c = 't'; // _strrchr and gcc2_compiled. are local text.
+                }
+				else
+				{
+                    c = 'W';
+                }
+                break;
+            case STT_OBJECT:
+                c = 'd';
+                break;
+            case STT_SECTION:
+                c = 'a';
+                break;
+            default:
+                c = 'u';
+                break;
         }
     }
 
-    /* Special Case */
-    if (sym->st_shndx == SHN_UNDEF)
-        c = 'U';
-
     return c;
 }
+
 int parse_symbol_table(const char *file_path)
 {
     FILE *fptr;
@@ -391,7 +439,7 @@ int parse_symbol_table(const char *file_path)
                 const char *name = &strtab[symbols_32[i].st_name];
 
                 /* Get Symbol Type */
-                char symbol_type = get_symbol_type_32(&symbols_32[i]);
+                char symbol_type = get_symbol_type_32(&symbols_32[i], name);
 
                 /* Print Symbol */
                 if ((symbol_type != 'a') && (strcmp(name, "") != 0) && (symbols_32[i].st_value || symbol_type == 'U')) {
