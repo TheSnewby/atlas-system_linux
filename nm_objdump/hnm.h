@@ -13,7 +13,8 @@
 #define BUFF_MAX 1024
 
 /* main functions */
-char get_symbol_type(Elf64_Sym *);
+char get_symbol_type_64(Elf64_Sym *);
+char get_symbol_type_32(Elf32_Sym *);
 int parse_symbol_table(const char *);
 
 /* utility functions */
