@@ -50,15 +50,15 @@ char get_symbol_type_32(Elf32_Sym *sym)
     if (ELF32_ST_BIND(sym->st_info) == STB_GLOBAL) {
         switch (ELF32_ST_TYPE(sym->st_info)) {
             case STT_FUNC: c = 'T'; break;
-            case STT_OBJECT: c = 'D'; break;
-            case STT_SECTION: c = 'A'; break;
+            case STT_OBJECT: c = 'B'; break; /* formerly 'D' */
+            case STT_SECTION: c = 'W'; break; /* formerly 'A' */
             default: c = 'U'; break;
         }
     }
     /* Local Symbols */
     else {
         switch (ELF32_ST_TYPE(sym->st_info)) {
-            case STT_FUNC: c = 't'; break;
+            case STT_FUNC: c = 'W'; break;  /* formerly 't' */
             case STT_OBJECT: c = 'd'; break;
             case STT_SECTION: c = 'a'; break;
             default: c = 'u'; break;
@@ -394,7 +394,7 @@ int parse_symbol_table(const char *file_path)
                 char symbol_type = get_symbol_type_32(&symbols_32[i]);
 
                 /* Print Symbol */
-                if (symbols_32[i].st_value || symbol_type == 'U') {
+                if ((symbol_type != 'a') && (strcmp(name, "") != 0) && (symbols_32[i].st_value || symbol_type == 'U')) {
                     if (symbol_type == 'U')
                         printf("         %c %s\n", symbol_type, name);
                     else
