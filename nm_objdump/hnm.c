@@ -98,7 +98,7 @@ char get_symbol_type_32(Elf32_Sym *sym, Elf32_Shdr *sections, char *shstrtab)
 			return ((type == STT_OBJECT) ? 'V' : 'W');
 	}
 
-	if ((sym->st_shndx == SHN_UNDEF)) //(type == STT_NOTYPE) || 
+	if ((sym->st_shndx == SHN_UNDEF) || (type == STT_NOTYPE))
 		return ('U');
 
 	if (sym->st_shndx == SHN_COMMON)
@@ -465,7 +465,7 @@ int parse_symbol_table(const char *file_path)
                 char symbol_type = get_symbol_type_32(&symbols_32[i], section_headers, shstrtab);
 
                 /* Print Symbol */
-                if ((symbol_type != 'a') && (strcmp(name, "") != 0) && (symbols_32[i].st_value || symbol_type == 'U')) {
+                if ((symbols_32[i].st_value || symbol_type == 'U')) { //(symbol_type != 'a') && (strcmp(name, "") != 0) && 
                     if (symbol_type == 'U')
                         printf("         %c %s\n", symbol_type, name);
                     else
