@@ -29,7 +29,7 @@ char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 			return ((type == STT_OBJECT) ? 'V' : 'W');
 	}
 
-	if ((type == STT_NOTYPE) || (sym->st_shndx == SHN_UNDEF))
+	if ((sym->st_shndx == SHN_UNDEF)) // || (type == STT_NOTYPE)
 		return ('U');
 
 	if (sym->st_shndx == SHN_ABS)
@@ -98,7 +98,7 @@ char get_symbol_type_32(Elf32_Sym *sym, Elf32_Shdr *sections, char *shstrtab)
 			return ((type == STT_OBJECT) ? 'V' : 'W');
 	}
 
-	if ((sym->st_shndx == SHN_UNDEF) || (type == STT_NOTYPE))
+	if ((sym->st_shndx == SHN_UNDEF)) //  || (type == STT_NOTYPE)
 		return ('U');
 
 	if (sym->st_shndx == SHN_COMMON)
