@@ -90,6 +90,9 @@ char get_symbol_type_32(Elf32_Sym *sym, Elf32_Shdr *sections, char *shstrtab)
 	if (type == STT_FILE)
 		return (0);
 
+	if ((type == STT_NOTYPE) || (sym->st_shndx == SHN_UNDEF))
+		return ('U');
+
 	if (binding == STB_WEAK)
 	{
 		if (sym->st_shndx == SHN_UNDEF)
@@ -104,8 +107,8 @@ char get_symbol_type_32(Elf32_Sym *sym, Elf32_Shdr *sections, char *shstrtab)
 	if (type == STT_FUNC)
 		return ((binding == STB_GLOBAL) ? 'T' : 't');
 
-	if (sym->st_shndx == SHN_UNDEF)
-		return ('U');
+	// if (sym->st_shndx == SHN_UNDEF)
+	// 	return ('U');
 
 	if (sym->st_shndx == SHN_ABS)
 		return ((binding == STB_GLOBAL) ? 'A' : 'a');
