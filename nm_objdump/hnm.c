@@ -18,7 +18,7 @@ char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 	if (type == STT_FILE)
 		return (0);
 
-	if (type == STT_NOTYPE)
+	if ((type == STT_NOTYPE) || (sym->st_shndx == SHN_UNDEF))
 		return ('U');
 
 	if (binding == STB_WEAK)
@@ -28,9 +28,6 @@ char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 		else
 			return ((type == STT_OBJECT) ? 'V' : 'W');
 	}
-
-	if (sym->st_shndx == SHN_UNDEF)
-		return ('U');
 
 	if (sym->st_shndx == SHN_ABS)
 		return ((binding == STB_GLOBAL) ? 'A' : 'a');
