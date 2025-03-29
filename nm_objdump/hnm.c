@@ -50,7 +50,7 @@ char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 		return ('?');
 
 	name = shstrtab + section->sh_name;
-	printf("name:     %c\n\n", name);
+	printf("name:     %s\n\n", name);
 
 	if ((strcmp(name, ".init_array") == 0) ||
 	(strcmp(name, ".fini_array") == 0) ||
