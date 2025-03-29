@@ -18,6 +18,9 @@ char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 	if (type == STT_FILE)
 		return (0);
 
+	if (type == STT_NOTYPE)
+		return ('U');
+
 	if (binding == STB_WEAK)
 	{
 		if (sym->st_shndx == SHN_UNDEF)
@@ -55,13 +58,13 @@ char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 		return ((binding == STB_GLOBAL) ? 'T' : 't');
 
 	if ((strcmp(name, ".data") == 0) || ((section->sh_flags & SHF_ALLOC) && (section->sh_flags & SHF_WRITE)))
-		return ((binding == STB_LOCAL) ? 'D' : 'd');
+		return ((binding == STB_GLOBAL) ? 'D' : 'd');
 
 	if (strcmp(name, ".bss") == 0)
-		return ((binding == STB_LOCAL) ? 'B' : 'b');
+		return ((binding == STB_GLOBAL) ? 'B' : 'b');
 
 	if ((strcmp(name, ".rodata") == 0) || (section->sh_flags & SHF_ALLOC))
-		return ((binding == STB_LOCAL) ? 'R' : 'r');
+		return ((binding == STB_GLOBAL) ? 'R' : 'r');
 
 	return ('?');
 	// return (0);
