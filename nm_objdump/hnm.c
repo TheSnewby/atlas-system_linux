@@ -14,8 +14,8 @@ char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 	unsigned char type = ELF64_ST_TYPE(sym->st_info); /* function, object, file */
 	Elf64_Shdr *section = NULL;  /* individual section */
 	char *name = NULL;  /* section name*/
-	printf("binding: %c\n", binding);
-	printf("type:    %c\n", type);
+	// printf("binding: %c\n", binding);
+	// printf("type:    %c\n", type);
 
 
 	if (type == STT_FILE)
@@ -50,7 +50,7 @@ char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 		return ('?');
 
 	name = shstrtab + section->sh_name;
-	printf("name:     %s\n\n", name);
+	// printf("name:     %s\n\n", name);
 
 	if ((strcmp(name, ".init_array") == 0) ||
 	(strcmp(name, ".fini_array") == 0) ||
