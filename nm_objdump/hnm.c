@@ -17,7 +17,6 @@ char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 	// printf("binding: %c\n", binding);
 	// printf("type:    %c\n", type);
 
-
 	if (type == STT_FILE)
 		return (0);
 
@@ -68,7 +67,6 @@ char get_symbol_type_64(Elf64_Sym *sym, Elf64_Shdr *sections, char *shstrtab)
 		return ((binding == STB_GLOBAL) ? 'R' : 'r');
 
 	return ('?');
-	// return (0);
 }
 
 
@@ -90,8 +88,8 @@ char get_symbol_type_32(Elf32_Sym *sym, Elf32_Shdr *sections, char *shstrtab)
 	if (type == STT_FILE)
 		return (0);
 
-	if ((sym->st_shndx == SHN_UNDEF)) //  || (type == STT_NOTYPE)
-		return ('U');
+	else if (binding == STB_GNU_UNIQUE)
+		return ('u');
 
 	if (binding == STB_WEAK)
 	{
@@ -101,17 +99,17 @@ char get_symbol_type_32(Elf32_Sym *sym, Elf32_Shdr *sections, char *shstrtab)
 			return ((type == STT_OBJECT) ? 'V' : 'W');
 	}
 
+	if ((sym->st_shndx == SHN_UNDEF)) //  || (type == STT_NOTYPE)
+		return ('U');
+
+	if (sym->st_shndx == SHN_ABS)
+		return ((binding == STB_GLOBAL) ? 'A' : 'a');
+
 	if (sym->st_shndx == SHN_COMMON)
 		return ((binding == STB_GLOBAL) ? 'C' : 'c');
 
 	if (type == STT_FUNC)
 		return ((binding == STB_GLOBAL) ? 'T' : 't');
-
-	// if (sym->st_shndx == SHN_UNDEF)
-	// 	return ('U');
-
-	if (sym->st_shndx == SHN_ABS)
-		return ((binding == STB_GLOBAL) ? 'A' : 'a');
 
 	section = &sections[sym->st_shndx];
 
@@ -139,7 +137,6 @@ char get_symbol_type_32(Elf32_Sym *sym, Elf32_Shdr *sections, char *shstrtab)
 		return ((binding == STB_GLOBAL) ? 'R' : 'r');
 
 	return ('?');
-	// return (0);
 }
 
 int parse_symbol_table(const char *file_path)
@@ -465,7 +462,7 @@ int parse_symbol_table(const char *file_path)
                 char symbol_type = get_symbol_type_32(&symbols_32[i], section_headers, shstrtab);
 
                 /* Print Symbol */
-                if ((symbol_type != 'a') && (strcmp(name, "") != 0) && (symbols_32[i].st_value || symbol_type == 'U')) {
+                if ((name) && (symbol_type != 'a') && (symbol_type != '\0') && (strcmp(name, "") != 0) && (symbols_32[i].st_value || symbol_type == 'U')) {
                     if (symbol_type == 'U')
                         printf("         %c %s\n", symbol_type, name);
                     else
