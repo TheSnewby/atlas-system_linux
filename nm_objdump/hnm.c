@@ -309,12 +309,12 @@ int parse_symbol_table(const char *file_path)
                 char symbol_type = get_symbol_type_64(&symbols_64[i], section_headers, shstrtab);
 
                 /* Print Symbol */
-                if ((symbol_type != 'a') && (strcmp(name, "") != 0) && (symbols_64[i].st_value || symbol_type == 'U'))
+                if ((name) && (symbol_type != '\0') && (strcmp(name, "") != 0))
 				{
-                    if (symbol_type == 'U')
-                        printf("                 %c %s\n", symbol_type, name);
+					if (!symbols_64[i].st_value || symbol_type == 'U' || symbol_type == 'w')
+                        printf("         %c %s\n", symbol_type, name);
                     else
-                        printf("%016lx %c %s\n", symbols_64[i].st_value, symbol_type, name);
+                        printf("%08x %c %s\n", symbols_64[i].st_value, symbol_type, name);
                 }
             }
             free(symbols_64);
