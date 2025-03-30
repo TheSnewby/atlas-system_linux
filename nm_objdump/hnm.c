@@ -142,6 +142,12 @@ char get_symbol_type_32(Elf32_Sym *sym, Elf32_Shdr *sections, char *shstrtab)
 	return ('?');
 }
 
+/**
+ * parse_symbole_table - parses the symbol table and prints output
+ * @file_path: fp
+ *
+ * Return: 0 if successful, -1 otherwise
+ */
 int parse_symbol_table(const char *file_path)
 {
     FILE *fptr;
@@ -243,6 +249,15 @@ int parse_symbol_table(const char *file_path)
             }
         }
 
+		if (!symtab_shdr)
+		{
+			free(section_headers);
+            free(shstrtab);
+            fclose(fptr);
+			fprintf(stderr, "hnm: %s: no symbols\n", file_path);
+			return(0);
+		}
+
         /* Process Symbols */
         if (symtab_shdr && strtab_shdr)
 		{
@@ -271,6 +286,7 @@ int parse_symbol_table(const char *file_path)
 
             /* Process Symbol Table */
             num_symbols = symtab_shdr->sh_size / sizeof(Elf64_Sym);
+
             Elf64_Sym *symbols_64 = malloc(symtab_shdr->sh_size);
             if (!symbols_64)
 			{
@@ -324,7 +340,7 @@ int parse_symbol_table(const char *file_path)
         free(shstrtab);
         fclose(fptr);
     }
-    else
+    else  /* 32 BIT */
 	{
         Elf32_Ehdr header;
         Elf32_Shdr *section_headers, *symtab_shdr = NULL, *strtab_shdr = NULL, *str_section;
@@ -392,6 +408,7 @@ int parse_symbol_table(const char *file_path)
             /* Find Symbol Table */
             if (section_headers[i].sh_type == SHT_SYMTAB)
                 symtab_shdr = &section_headers[i];
+
             /* Find Corresponding String Table */
             else if (section_headers[i].sh_type == SHT_STRTAB)
 			{
@@ -399,6 +416,15 @@ int parse_symbol_table(const char *file_path)
                     strtab_shdr = &section_headers[i];
             }
         }
+
+		if (!symtab_shdr)
+		{
+			free(section_headers);
+            free(shstrtab);
+            fclose(fptr);
+			fprintf(stderr, "hnm: %s: no symbols\n", file_path);
+			return(0);
+		}
 
         /* Process Symbols */
         if (symtab_shdr && strtab_shdr) {
