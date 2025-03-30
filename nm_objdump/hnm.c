@@ -254,7 +254,7 @@ int parse_symbol_table(const char *file_path)
 			free(section_headers);
             free(shstrtab);
             fclose(fptr);
-			fprintf(stderr, "hnm: %s: no symbols\n", file_path);
+			fprintf(stderr, "./hnm: %s: no symbols\n", file_path);
 			return(0);
 		}
 
@@ -422,7 +422,7 @@ int parse_symbol_table(const char *file_path)
 			free(section_headers);
             free(shstrtab);
             fclose(fptr);
-			fprintf(stderr, "hnm: %s: no symbols\n", file_path);
+			fprintf(stderr, "./hnm: %s: no symbols\n", file_path);
 			return(0);
 		}
 
