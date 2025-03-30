@@ -327,11 +327,26 @@ int parse_symbol_table(const char *file_path)
                 /* Print Symbol */
                 if ((name) && (symbol_type != '\0') && (strcmp(name, "") != 0))
 				{
-                    if (!symbols_64[i].st_value || symbol_type == 'U' || symbol_type == 'w')
+                    if (symbol_type == 'U' || symbol_type == 'w')
                         printf("                 %c %s\n", symbol_type, name);
                     else
                         printf("%016lx %c %s\n", symbols_64[i].st_value, symbol_type, name);
                 }
+				// else
+				// {
+				// 	printf("DEBUG: %s: %c because ", name, symbol_type);
+				// 	if (!name)
+				// 		printf("name");
+				// 	else if (symbol_type == 'a')
+				// 		printf("a");
+				// 	else if (symbol_type == '\0')
+				// 		printf("\\0");
+				// 	else if (strcmp(name, "") == 0)
+				// 		printf("empty string");
+				// 	else if (!symbols_64[i].st_value && symbol_type != 'U')
+				// 		printf("st_value");
+				// 	printf("\n");
+				// }
             }
             free(symbols_64);
             free(strtab);
@@ -493,7 +508,7 @@ int parse_symbol_table(const char *file_path)
                 /* Print Symbol */
                 if ((name) && (symbol_type != '\0') && (strcmp(name, "") != 0))
 				{
-					if (!symbols_32[i].st_value || symbol_type == 'U' || symbol_type == 'w')
+					if (symbol_type == 'U' || symbol_type == 'w')
                         printf("         %c %s\n", symbol_type, name);
                     else
                         printf("%08x %c %s\n", symbols_32[i].st_value, symbol_type, name);
