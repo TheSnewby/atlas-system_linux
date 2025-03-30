@@ -140,7 +140,7 @@ char get_symbol_type_32(Elf32_Sym *sym, Elf32_Shdr *sections, char *shstrtab)
 }
 
 /**
- * parse_symbole_table - parses the symbol table and prints output
+ * parse_symbol_table - parses the symbol table and prints output
  * @file_path: fp
  *
  * Return: 0 if successful, -1 otherwise
@@ -452,6 +452,7 @@ int parse_symbol_table(const char *file_path)
 			/* Process Symbol Table */
 			num_symbols = symtab_shdr->sh_size / sizeof(Elf32_Sym);
 			Elf32_Sym *symbols_32 = malloc(symtab_shdr->sh_size);
+
 			if (!symbols_32)
 			{
 				perror("Memory Allocation Error For Symbols");
