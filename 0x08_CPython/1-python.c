@@ -1,6 +1,6 @@
+#include <Python.h>
 #include <listobject.h>
 #include <object.h>
-#include <Python.h>
 #include <stdio.h>
 
 /**
@@ -24,11 +24,11 @@ void print_python_list(PyObject *p)
 	allocated = list->allocated;
 
 	printf("[*] Python list info\n");
-	printf("[*] Size of the Python List = %ld\n", len);
-	printf("[*] Allocated = %ld\n", allocated);
+	printf("[*] Size of the Python List = %zd\n", len);
+	printf("[*] Allocated = %zd\n", allocated);
 	for (i = 0; i < len; i++)
 	{
-		printf("Element %d: %s\n", i, list->ob_item[i])->ob_type->tp_name;
+		printf("Element %zd: %s\n", i, list->ob_item[i])->ob_type->tp_name;
 	}
 }
 
