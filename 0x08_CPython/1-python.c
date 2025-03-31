@@ -10,28 +10,25 @@ void print_python_list(PyObject *p)
 {
 	Py_ssize_t len, allocated, i;
 	char *type = NULL;
-	PyListObject *obj;
+	PyListObject *list;
 
 	if (!PyList_Check(p))
 	{
 		perror("Not a Python List.");
 		return;
 	}
-	obj = (PyListObject *)p;
+	list = (PyListObject *)p;
 
 	len = PyList_size(p);
-	allocated = obj->allocated;
+	allocated = list->allocated;
 
 	printf("[*] Python list info\n");
-	printf("[*] Size of the Python List = %d\n", len);
-	printf("[*] Allocated = %d\n", allocated);
+	printf("[*] Size of the Python List = %ld\n", len);
+	printf("[*] Allocated = %ld\n", allocated);
 	for (i = 0; i < len; i++)
 	{
-		printf("Element %d: %s\n", i, Py_TYPE(obj->ob_item[i])->tp_name);;
+		printf("Element %d: %s\n", i, list->ob_item[i])->ob_type->tp_name;
 	}
-
-
-
 }
 
 // [*] Python list info
