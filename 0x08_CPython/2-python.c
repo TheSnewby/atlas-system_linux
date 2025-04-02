@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <bytesobject.h>
 
+void print_python_bytes(PyObject *p);
+
 /**
  * print_python_list - print basic information of a Python list
  * @p: PyObject
@@ -27,7 +29,11 @@ void print_python_list(PyObject *p)
 	printf("[*] Size of the Python List = %zd\n", len);
 	printf("[*] Allocated = %zd\n", allocated);
 	for (i = 0; i < len; i++)
+	{
 		printf("Element %zd: %s\n", i, list->ob_item[i]->ob_type->tp_name);
+		if (strcmp(list->ob_item[i]->ob_type->tp_name, "bytes") == 0)
+			print_python_bytes(list->ob_item[i]);
+	}
 }
 
 /**
