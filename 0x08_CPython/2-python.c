@@ -51,11 +51,11 @@ void print_python_bytes(PyObject *p)
 	if (length < 0)
 		return;
 
-	print_len = (length < 10) ? length : 10;
+	print_len = (length < 10) ? length + 1 : 10;
 	printf("  size: %zd\n", length);
-	printf("  trying string: %.*s\n", (int)print_len, buffer);
-	printf("  first %zd bytes:", length + 1);
-	for (i = 0; i < print_len + 1; i++)
+	printf("  trying string: %s\n", buffer);
+	printf("  first %zd bytes:", print_len);
+	for (i = 0; i < print_len; i++)
 		printf(" %02x", (unsigned char)buffer[i]);
 	printf("\n");
 }
