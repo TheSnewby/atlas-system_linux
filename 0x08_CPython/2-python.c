@@ -48,14 +48,17 @@ void print_python_bytes(PyObject *p)
 	printf("[.] bytes object info\n");
 	if (!PyBytes_Check(p))
 	{
-		fprintf(stderr, "  [ERROR] Invalid Bytes Object\n");
+		fprintf(stdout, "  [ERROR] Invalid Bytes Object\n");
 		return;
 	}
 
 	PyBytes_AsStringAndSize(p, &buffer, &length);
 
 	if (length < 0)
+	{
+		fprintf(stdout, "  [ERROR] Invalid Bytes Object\n");
 		return;
+	}
 
 	print_len = (length < 10) ? length + 1 : 10;
 	printf("  size: %zd\n", length);
