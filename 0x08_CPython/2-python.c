@@ -37,8 +37,9 @@ void print_python_list(PyObject *p)
 void print_python_bytes(PyObject *p)
 {
 	char *buffer;
-	Py_ssize_t length, print_len;
+	Py_ssize_t length, print_len, i;
 
+	printf("[.] bytes object info\n");
 	if (!PyBytes_Check(p))
 	{
 		fprintf(stderr, "  [ERROR] Invalid Bytes Object\n");
@@ -51,6 +52,10 @@ void print_python_bytes(PyObject *p)
 		return;
 
 	print_len = (length < 10) ? length : 10;
-
-	printf("%.*s", (int)print_len, buffer);
+	printf("  size: %zd\n", length);
+	printf("  trying string: %.*s\n", (int)print_len, buffer);
+	printf("  first %zd bytes:", length + 1);
+	for (i = 0; i < print_len + 1; i++)
+		printf(" %02x", (unsigned char)buffer[i]);
+	printf("\n");
 }
