@@ -29,8 +29,14 @@ void print_python_int(PyObject *p)
 
 	abs_size = (size >= 0) ? size : -size;
 
+	// printf("[DEBUG]size:       %lu\n", abs_size);
+	// Py_ssize_t max_digits = ((sizeof(unsigned long int) * 8) + PyLong_SHIFT - 1) / 8;
+	// printf("[DEBUG]comparison: %lu\n", max_digits);
+
+	// printf("[DEBUG]ulong_max:  %lu\n", ULONG_MAX);
+
     /* Check if the number is too large */
-    if (abs_size > (sizeof(unsigned long int) * CHAR_BIT + PyLong_SHIFT - 1) / PyLong_SHIFT)
+    if ((unsigned long int)abs_size > (sizeof(unsigned long int) * CHAR_BIT + PyLong_SHIFT - 1) / PyLong_SHIFT)
     {
         printf("C unsigned long int overflow\n");
         return;
@@ -39,11 +45,11 @@ void print_python_int(PyObject *p)
 	digit *py_integer = p_long->ob_digit;
 
     /* Convert Python int to unsigned long int */
-    for (i = 1; i < abs_size; i++)
+    for (i = 0; i < abs_size; i++)
     {
-        sum += py_integer[i] * (1UL << (PyLong_SHIFT * i));
+        sum += (unsigned long int)py_integer[i] << (PyLong_SHIFT * i);
     }
 
     /* Print the integer */
-    printf("%s%lu", sign, sum);
+    printf("%s%lu\n", sign, sum);
 }
