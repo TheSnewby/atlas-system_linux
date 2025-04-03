@@ -1,0 +1,49 @@
+#include <Python.h>
+#include <object.h>
+#include <stdio.h>
+#include <longintrepr.h>
+#include <limits.h>
+
+/**
+ * print_python_int - prints a Python Int
+ * @p: PyObject of a Python Int
+ */
+void print_python_int(PyObject *p)
+{
+    if (!PyLong_Check(p))
+    {
+        printf("Invalid Int Object\n");
+        return;
+    }
+
+    PyLongObject *p_long = (PyLongObject *)p;
+    Py_ssize_t size = ((PyVarObject *)p)->ob_size, abs_size;
+    Py_ssize_t i;
+    unsigned long int sum = 0;
+	char *sign;
+
+	if (size < 0)
+		sign = "-";
+	else
+		sign = "";
+
+	abs_size = (size >= 0) ? size : -size;
+
+    /* Check if the number is too large */
+    if (abs_size > (sizeof(unsigned long int) * CHAR_BIT + PyLong_SHIFT - 1) / PyLong_SHIFT)
+    {
+        printf("C unsigned long int overflow\n");
+        return;
+    }
+
+	digit *py_integer = p_long->ob_digit;
+
+    /* Convert Python int to unsigned long int */
+    for (i = 1; i < abs_size; i++)
+    {
+        sum += py_integer[i] * (1UL << (PyLong_SHIFT * i));
+    }
+
+    /* Print the integer */
+    printf("%s%lu", sign, sum);
+}
