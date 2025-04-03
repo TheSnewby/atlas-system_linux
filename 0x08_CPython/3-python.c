@@ -55,7 +55,6 @@ void print_python_bytes(PyObject *p)
 		return;
 	}
 
-	// PyBytes_AsStringAndSize(p, &buffer, &length);
 	byte_obj = (PyBytesObject *)p;
 	length = PyBytes_Size(p);
 
