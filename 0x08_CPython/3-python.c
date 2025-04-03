@@ -18,7 +18,7 @@ void print_python_list(PyObject *p)
 
 	if (!PyList_Check(p))
 	{
-		perror("Not a Python List.");
+		fprintf(stdout, "Not a Python List.");
 		return;
 	}
 	list = (PyListObject *)p;
@@ -88,9 +88,8 @@ void print_python_float(PyObject *p)
 		fprintf(stdout, "  [ERROR] Invalid Float Object\n");
 		return;
 	}
-	// printf("AH\n");
+
 	p_str = PyOS_double_to_string(((PyFloatObject *)p)->ob_fval, 'g', 16, 0, NULL);
-	// printf("BH\n");
 
 	if (p_str)
 	{
