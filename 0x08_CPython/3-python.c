@@ -16,11 +16,11 @@ void print_python_list(PyObject *p)
 	Py_ssize_t len, allocated, i;
 	PyListObject *list;
 
-	if (!PyList_Check(p))
-	{
-		fprintf(stdout, "Not a Python List.");
-		return;
-	}
+	// if (!PyList_Check(p))
+	// {
+	// 	fprintf(stdout, "Not a Python List.");
+	// 	return;
+	// }
 	list = (PyListObject *)p;
 
 	len = ((PyVarObject *)p)->ob_size;
