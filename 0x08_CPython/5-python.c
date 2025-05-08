@@ -30,7 +30,7 @@ void print_python_int(PyObject *p)
 	abs_size = (size >= 0) ? size : -size;
 
 	// printf("[DEBUG]size:       %lu\n", abs_size);
-	// Py_ssize_t max_digits = ((sizeof(unsigned long int) * 8) + PyLong_SHIFT - 1) / 8;
+	// Py_ssize_t max_digits = ((sizeof(unsigned long int) * 8) + PyLong_SHIFT - 1) / PyLong_SHIFT;
 	// printf("[DEBUG]comparison: %lu\n", max_digits);
 
 	// printf("[DEBUG]ulong_max:  %lu\n", ULONG_MAX);
