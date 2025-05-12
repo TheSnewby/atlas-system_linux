@@ -13,7 +13,7 @@
 int execute_command(char **argv, char **envp)
 {
 	pid_t pid;
-	int status, ptrace_rtn, syscall;
+	int status, ptrace_rtn, syscall, i = 0;
 	struct user_regs_struct regs;
 
 	pid = fork();
@@ -41,7 +41,7 @@ int execute_command(char **argv, char **envp)
 			return (-1);
 		}
 
-		while (1)
+		while (i)
 		{
 			ptrace_rtn = ptrace(PTRACE_SYSCALL, pid, 0, 0);
 			if (ptrace_rtn == -1)
@@ -64,8 +64,11 @@ int execute_command(char **argv, char **envp)
 				perror("PTRACE_GETREGS Failed");
 				exit(EXIT_FAILURE);
 			}
+
 			syscall = regs.orig_rax;
-			printf("%d\n", syscall);
+			if ((i % 2) || (i == 1))
+				printf("%d\n", syscall);
+			i++;
 		}
 
 		// printf("%d\n", ptrace_rtn);
