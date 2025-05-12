@@ -6,6 +6,7 @@
 # include <sys/types.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <sys/user.h>
 
 /* Normally, MAX_PARAMS is always 6 */
 # define MAX_PARAMS	6
