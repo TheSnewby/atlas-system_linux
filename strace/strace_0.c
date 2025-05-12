@@ -68,7 +68,7 @@ int execute_command(char **argv, char **envp)
 				exit(EXIT_FAILURE);
 			}
 			syscall = regs.orig_rax;
-			if ((i == 1) || (i % 2 == 0))
+			if ((i % 2 == 0) && (i != 1))
 				printf("%d\n", syscall);
 			i++;
 		}
