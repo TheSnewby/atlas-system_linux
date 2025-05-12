@@ -6,10 +6,11 @@
  * Each time a syscall is intercepted,
  * you must print its number, followed by a new line
  * @argv: user-input command
- * 
+ * @envp: environment
+ *
  * Return: 0 if successful, otherwise a negative value
  */
-int execute_command(char **argv)
+int execute_command(char **argv, char **envp)
 {
 	pid_t pid;
 	int status, ptrace_rtn, syscall;
@@ -24,29 +25,45 @@ int execute_command(char **argv)
 	else if (pid == 0) /* child process */
 	{
 		ptrace_rtn = ptrace(PTRACE_TRACEME, 0, NULL, 0);
-		execve(argv[1], argv + 1, NULL); // might have to pull in environ extern
-		exit(EXIT_FAILURE);
+		if (ptrace_rtn == -1)
+		{
+			perror("PTRACE_TRACEME Failed");
+			exit(EXIT_FAILURE);
+		}
+		if (execve(argv[1], &argv[1], envp) == -1)
+			perror("execve failed"), exit(EXIT_FAILURE);
 	} /* parent process */
 	else
 	{
+		if (waitpid(pid, &status, 0) == -1)
+		{
+			perror("Error at waitpid");
+			return (-1);
+		}
+
 		while (1)
 		{
-			if (wait(&status) == -1)
-			{
-				perror("Error at waitpid");
-				return (-1);
-			}
 			ptrace_rtn = ptrace(PTRACE_SYSCALL, pid, 0, 0);
 			if (ptrace_rtn == -1)
 			{
-				perror("SYSCALL Failed");
+				perror("PTRACE_SYSCALL Failed");
 				exit(EXIT_FAILURE);
+			}
+			if (waitpid(pid, &status, 0) == -1)
+			{
+				perror("Error at waitpid");
+				return (-1);
 			}
 
 			if (WIFEXITED(status))
 				break;
 
 			ptrace_rtn = ptrace(PTRACE_GETREGS, pid, 0, &regs);
+			if (ptrace_rtn == -1)
+			{
+				perror("PTRACE_GETREGS Failed");
+				exit(EXIT_FAILURE);
+			}
 			syscall = regs.orig_rax;
 			printf("%d\n", syscall);
 		}
@@ -64,7 +81,7 @@ int execute_command(char **argv)
  *
  * Return: 0 if successful, -1 otherwise
  */
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **envp)
 {
 	if (argc < 2)
 	{
@@ -72,6 +89,6 @@ int main(int argc, char **argv)
 		return (0);
 	}
 
-	execute_command(argv);
+	execute_command(argv, envp);
 	return (0);
 }
