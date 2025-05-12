@@ -3,3 +3,13 @@
 2
 3
 4
+/strace-checker
+/checker
+_strace_0
+_strace_1
+_strace_2
+parse_strace.rb
+run-task
+strace_0
+strace_1
+strace_2
