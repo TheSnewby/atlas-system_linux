@@ -77,6 +77,12 @@ int execute_command(char **argv, char **envp)
 				else
 					fprintf(stderr, "0x%llx\n", regs.rax);
 			}
+			else
+			{
+				fprintf(stderr, "%s = ", syscalls_64_g[syscall].name);
+				if (strcmp(syscalls_64_g[syscall].name, "exit_group") == 0)
+					fprintf(stderr, "?\n");
+			}
 			i++;
 		}
 	}
