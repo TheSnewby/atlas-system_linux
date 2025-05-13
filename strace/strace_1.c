@@ -31,7 +31,7 @@ int execute_command(char **argv, char **envp)
 			exit(EXIT_FAILURE);
 		}
 
-		raise(SIGSTOP);
+		// raise(SIGSTOP);
 
 		if (execve(argv[1], &argv[1], envp) == -1)
 			perror("execve failed"), exit(EXIT_FAILURE);
