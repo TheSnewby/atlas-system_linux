@@ -10,6 +10,7 @@
 # include <sys/wait.h>
 # include <unistd.h>
 # include <signal.h>
+# include <string.h>
 
 /* Normally, MAX_PARAMS is always 6 */
 # define MAX_PARAMS	6

@@ -70,7 +70,7 @@ int execute_command(char **argv, char **envp)
 			syscall = regs.orig_rax;
 			if ((i % 2 != 0) && (i != 0))
 			{
-				fprintf(stderr, "%d: ", syscall);
+				// fprintf(stderr, "%d: ", syscall); // DEBUGGING
 				fprintf(stderr, "%s\n", syscalls_64_g[syscall].name);
 			}
 			i++;
