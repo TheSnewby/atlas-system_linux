@@ -1,5 +1,5 @@
 #include "syscalls.h"
-
+/* printf(fmt, ...) -> fprintf(stderr, fmt, ...)*/
 
 /**
  * execute_command - executes command and attaches tracer
@@ -13,7 +13,7 @@
 int execute_command(char **argv, char **envp)
 {
 	pid_t pid;
-	int status, ptrace_rtn, syscall, i = 1;
+	int status, ptrace_rtn, syscall, i = 0;
 	struct user_regs_struct regs;
 
 	pid = fork();
@@ -44,7 +44,7 @@ int execute_command(char **argv, char **envp)
 			return (-1);
 		}
 
-		while (i)
+		while (1)
 		{
 			ptrace_rtn = ptrace(PTRACE_SYSCALL, pid, 0, 0);
 			if (ptrace_rtn == -1)
@@ -65,11 +65,11 @@ int execute_command(char **argv, char **envp)
 			if (ptrace_rtn == -1)
 			{
 				perror("PTRACE_GETREGS Failed");
-				exit(EXIT_FAILURE);
+				exit(EXIT_SUCCESS);
 			}
 			syscall = regs.orig_rax;
-			if ((i % 2 == 0) && (i != 1))
-				printf("%d\n", syscall);
+			if ((i % 2 == 0) && (i != 0))
+				fprintf(stderr, "%d\n", syscall);
 			i++;
 		}
 	}
