@@ -1,7 +1,7 @@
 #include "multithreading.h"
 
 /**
- * trpintf - uses the printf family to print out a given formatted string
+ * tprintf - uses the printf family to print out a given formatted string
  * @format: string with specifiers
  *
  * Return: 0 if successful
