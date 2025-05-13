@@ -68,15 +68,14 @@ int execute_command(char **argv, char **envp)
 				exit(EXIT_SUCCESS);
 			}
 			syscall = regs.orig_rax;
-			if ((i % 2 != 0) && (i != 0))
+			if ((i % 2 == 0) && (i != 1))
 			{
-
 				// fprintf(stderr, "%d: ", syscall); // DEBUGGING
-				fprintf(stderr, "%s = 0x", syscalls_64_g[syscall].name);
+				fprintf(stderr, "%s = ", syscalls_64_g[syscall].name);
 				if (strcmp(syscalls_64_g[syscall].name, "exit_group") == 0)
 					fprintf(stderr, "?\n");
 				else
-					fprintf(stderr, "%llx\n", regs.rax);
+					fprintf(stderr, "0x%llx\n", regs.rax);
 			}
 			i++;
 		}
