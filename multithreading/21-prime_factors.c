@@ -55,7 +55,7 @@ list_t *prime_factors(char const *s)
 {
 	list_t *list = (list_t *)malloc(sizeof(list_t));
 	char *endptr;
-	unsigned long p = 2, num = strtoul(s, &endptr, 10), max_p = sqrtul(num), k;
+	unsigned long p = 2, num = strtoul(s, &endptr, 10), max_p = sqrtul(num);
 
 	list = list_init(list);
 	if (num < 2)
