@@ -1,5 +1,4 @@
 #include "multithreading.h"
-pthread_mutex_t tprintf_mutex;
 /* also consider initializing like this instead of using constructor: */
 /* phtread_mutex_t tprintf_mutex = PTHREAD_MUTEX_INITIALIZER */
 #define NB_THREADS  10

@@ -10,6 +10,8 @@
 #include <stdarg.h>
 #include "list.h"
 
+pthread_mutex_t tprintf_mutex;
+
 /**
  * struct pixel_s - RGB pixel
  *
