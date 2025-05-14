@@ -12,6 +12,8 @@
 node_t *node_create(void *content)
 {
 	node_t *node = malloc(sizeof(*node));
+	if (!node)
+		perror("node_create failed");
 
 	node->content = content;
 	node->prev = NULL;
@@ -30,6 +32,8 @@ node_t *node_create(void *content)
 node_t *list_add(list_t *list, void *content)
 {
 	node_t *node = node_create(content);
+	if (!node)
+		perror("list_add after node_create");
 
 	node->prev = list->tail;
 	if (list->tail)
