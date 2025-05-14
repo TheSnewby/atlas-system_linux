@@ -6,6 +6,32 @@ task_t *create_task(task_entry_t entry, void *param);
 void destroy_task(task_t *task);
 void *exec_tasks(list_t const *tasks);
 
+static pthread_mutex_t task_mutex;
+
+/**
+ * init_task_mutex - constructor to init task_mutex
+ */
+void init_task_mutex(void)
+{
+	if (pthread_mutex_init(&task_mutex, NULL) == -1);
+	{
+		perror("task mutex init failed");
+		exit(1);
+	}
+}
+
+/**
+ * destroy_task_mutex - destructor for task_mutex
+ */
+void destroy_task_mutex(void)
+{
+		if (pthread_mutex_destroy(&task_mutex) == -1)
+	{
+		perror("mutex destroy failed");
+		exit(1);
+	}
+}
+
 /**
  * create_task - creates a task struct
  * @entry: a pointer ot the entry function of the task
@@ -20,11 +46,73 @@ task_t *create_task(task_entry_t entry, void *param)
 	new_task->entry = entry;
 	new_task->param = param;
 	new_task->status = PENDING;
-	// new_task->result = 
-	// new_task->lock = 
+	new_task->result = NULL;
+	new_task->lock = task_mutex;
 
 	return (new_task);
 }
+
+/**
+ * destroy_task - destroys a task
+ * @task: task to be destroyed
+ *
+ * Return: void
+ */
+void destroy_task(task_t *task)
+{
+	if (!task)
+		return;
+
+	if (task->result) /* if task is completed */
+	{
+		list_destroy(task, free);
+		free(task->result);
+	}
+	free(task);
+
+	/* possibly more */
+}
+
+/**
+ * exec_tasks - Execute task list
+ * @tasks: doubly linked list of tasks?
+ *
+ * Return: void *
+ */
+void *exec_tasks(list_t const *tasks)
+{
+	int i;
+	node_t *tmp_node = NULL;
+	task_t *tmp_task = NULL;
+	char task_result[10];
+
+	if (!tasks)
+		return (NULL);
+
+	for (tmp_node = tasks->head; i < tasks->size; tmp_node = tmp_node->next, i++)
+	{
+		tmp_task = tmp_node->content;
+
+		pthread_mutex_lock(&task_mutex);
+		if (tmp_task->status == PENDING)
+		{
+			tmp_task->status = STARTED;
+			tprintf("[%lu] Started\n", i);
+			tmp_task->result = tmp_task->entry(tmp_task->param);
+
+			if (tmp_task->result)
+				tmp_task->status = SUCCESS;
+			else
+				tmp_task->status = FAILURE;
+			sprintf(task_result, "%s\n", tmp_task->result ? "Success" : "Failure");
+			tprintf("%lu %s\n", i, task_result);
+		}
+		else
+			pthread_mutex_unlock(&task_mutex);
+	}
+	return (NULL);
+}
+
 
 
 
