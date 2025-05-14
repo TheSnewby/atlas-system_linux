@@ -65,30 +65,38 @@ list_t *prime_factors(char const *s)
 		factor_list_add(list, p);
 		num /= p;
 	}
-	p = 3;
-	while (num % p == 0)
+	for (p = 3; p <= num / p; p += 2)
 	{
-		factor_list_add(list, p);
-		num /= p;
-	}
-	/* Sieve of Eratosthenes where possible prime = 6k +- 1, n > 0 */
-	for (k = 1; 6 * k + 1 <= max_p; k += 1)
-	{
-		p = (6 * k - 1);
 		while (num % p == 0)
 		{
 			factor_list_add(list, p);
 			num /= p;
-			max_p = sqrtul(num);
-		}
-		p = (6 * k + 1);
-		while (num % p == 0)
-		{
-			factor_list_add(list, p);
-			num /= p;
-			max_p = sqrtul(num);
 		}
 	}
+	// p = 3;
+	// while (num % p == 0)
+	// {
+	// 	factor_list_add(list, p);
+	// 	num /= p;
+	// }
+	// /* Sieve of Eratosthenes where possible prime = 6k +- 1, n > 0 */
+	// for (k = 1; 6 * k + 1 <= max_p; k += 1)
+	// {
+	// 	p = (6 * k - 1);
+	// 	while (num % p == 0)
+	// 	{
+	// 		factor_list_add(list, p);
+	// 		num /= p;
+	// 		max_p = sqrtul(num);
+	// 	}
+	// 	p = (6 * k + 1);
+	// 	while (num % p == 0)
+	// 	{
+	// 		factor_list_add(list, p);
+	// 		num /= p;
+	// 		max_p = sqrtul(num);
+	// 	}
+	// }
 	if (num > 1)
 		factor_list_add(list, num);
 
