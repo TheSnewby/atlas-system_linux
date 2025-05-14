@@ -65,7 +65,7 @@ list_t *prime_factors(char const *s)
 		factor_list_add(list, p);
 		num /= p;
 	}
-	for (p = 3; p <= num / p && p < max_p; p += 2)
+	for (p = 3; p <= num / p && p <= max_p; p += 2)
 	{
 		while (num % p == 0)
 		{
