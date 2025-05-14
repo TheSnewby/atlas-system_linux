@@ -82,14 +82,15 @@ list_t *prime_factors(char const *s)
 		num /= p;
 	}
 
-	/* Sieve of Eratosthenes where possible prime = 6n +- 1, n > 0*/
-	for (k = 1; k * 6 <= max_p; k += 1)
+	/* Sieve of Eratosthenes where possible prime = 6k +- 1, n > 0*/
+	for (k = 1; 6 * k + 1 <= max_p; k += 1)
 	{
 		p = (6 * k - 1);
 		while (num % p == 0)
 		{
 			factor_list_add(list, p);
 			num /= p;
+			max_p = sqrtul(num);
 		}
 
 		p = (6 * k + 1);
@@ -97,6 +98,7 @@ list_t *prime_factors(char const *s)
 		{
 			factor_list_add(list, p);
 			num /= p;
+			max_p = sqrtul(num);
 		}
 	}
 
