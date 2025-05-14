@@ -13,14 +13,11 @@
 unsigned long sqrtul(unsigned long num)
 {
 	unsigned long L = 0, M, R = num + 1;
-	// double root;
-
-	// asm("fsqrt" : "=t" (root) : "0" ((double)num));
 
 	if (num == 0)
 		return (0);
 
-	while (L != R - 1)
+	while (R - 1 != L)
 	{
 		M = (L + R) / 2;
 		if (M * M <= num)
@@ -30,7 +27,6 @@ unsigned long sqrtul(unsigned long num)
 	}
 
 	return (L);
-	// return ((unsigned long)root);
 }
 
 /**
@@ -58,31 +54,24 @@ void factor_list_add(list_t *list, unsigned long p)
 list_t *prime_factors(char const *s)
 {
 	list_t *list = (list_t *)malloc(sizeof(list_t));
-	list = list_init(list);
 	char *endptr;
-	unsigned long p, num = strtoul(s, &endptr, 10), max_p = sqrtul(num), k;
+	unsigned long p = 2, num = strtoul(s, &endptr, 10), max_p = sqrtul(num), k;
 
+	list = list_init(list);
 	if (num < 2)
 		return (NULL);
-
-	// printf("max_p: %lu\n", max_p);
-	// printf("79283472974 / 2 %% 757: %lu\n", (79283472974 / 2) % 757);
-
-	p = 2;
 	while (num % p == 0)
 	{
 		factor_list_add(list, p);
 		num /= p;
 	}
-
 	p = 3;
 	while (num % p == 0)
 	{
 		factor_list_add(list, p);
 		num /= p;
 	}
-
-	/* Sieve of Eratosthenes where possible prime = 6k +- 1, n > 0*/
+	/* Sieve of Eratosthenes where possible prime = 6k +- 1, n > 0 */
 	for (k = 1; 6 * k + 1 <= max_p; k += 1)
 	{
 		p = (6 * k - 1);
@@ -92,7 +81,6 @@ list_t *prime_factors(char const *s)
 			num /= p;
 			max_p = sqrtul(num);
 		}
-
 		p = (6 * k + 1);
 		while (num % p == 0)
 		{
@@ -101,7 +89,6 @@ list_t *prime_factors(char const *s)
 			max_p = sqrtul(num);
 		}
 	}
-
 	if (num > 1)
 		factor_list_add(list, num);
 
