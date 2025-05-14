@@ -2,10 +2,6 @@
 #include "multithreading.h"
 #define NB_THREADS  8
 
-task_t *create_task(task_entry_t entry, void *param);
-void destroy_task(task_t *task);
-void *exec_tasks(list_t const *tasks);
-
 static pthread_mutex_t task_mutex;
 
 /**
@@ -13,7 +9,7 @@ static pthread_mutex_t task_mutex;
  */
 void init_task_mutex(void)
 {
-	if (pthread_mutex_init(&task_mutex, NULL) == -1);
+	if (pthread_mutex_init(&task_mutex, NULL) == -1)
 	{
 		perror("task mutex init failed");
 		exit(1);
@@ -25,7 +21,7 @@ void init_task_mutex(void)
  */
 void destroy_task_mutex(void)
 {
-		if (pthread_mutex_destroy(&task_mutex) == -1)
+	if (pthread_mutex_destroy(&task_mutex) == -1)
 	{
 		perror("mutex destroy failed");
 		exit(1);
@@ -65,7 +61,7 @@ void destroy_task(task_t *task)
 
 	if (task->result) /* if task is completed */
 	{
-		list_destroy(task, free);
+		list_destroy(task->result, free);
 		free(task->result);
 	}
 	free(task);
@@ -81,7 +77,7 @@ void destroy_task(task_t *task)
  */
 void *exec_tasks(list_t const *tasks)
 {
-	int i;
+	size_t i;
 	node_t *tmp_node = NULL;
 	task_t *tmp_task = NULL;
 	char task_result[10];

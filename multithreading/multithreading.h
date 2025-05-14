@@ -118,5 +118,8 @@ void init_task_mutex(void) __attribute__((constructor (102)));
 void destroy_task_mutex(void) __attribute__((destructor (102)));
 list_t *prime_factors(char const *);
 task_t *create_task(task_entry_t, void *);
+task_t *create_task(task_entry_t, void *);
+void destroy_task(task_t *);
+void *exec_tasks(list_t const *);
 
 #endif
