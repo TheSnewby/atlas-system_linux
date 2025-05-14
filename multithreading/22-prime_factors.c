@@ -1,11 +1,33 @@
 #include "list.h"
 #include "multithreading.h"
+#define NB_THREADS  8
 
 task_t *create_task(task_entry_t entry, void *param);
 void destroy_task(task_t *task);
 void *exec_tasks(list_t const *tasks);
 
-#define NB_THREADS  8
+/**
+ * create_task - creates a task struct
+ * @entry: a pointer ot the entry function of the task
+ * @param: the paramter that will be passed ot the entry function
+ *
+ * Return: task
+ */
+task_t *create_task(task_entry_t entry, void *param)
+{
+	task_t *new_task = (task_t *)malloc(sizeof(task_t));
+
+	new_task->entry = entry;
+	new_task->param = param;
+	new_task->status = PENDING;
+	// new_task->result = 
+	// new_task->lock = 
+
+	return (new_task);
+}
+
+
+
 
 /**
  * print_task_result - Print the result of a task
