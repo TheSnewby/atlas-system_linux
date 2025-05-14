@@ -110,6 +110,8 @@ typedef struct task_s
 
 void *thread_entry(void *);
 int tprintf(char const *, ...);
+void init_mutex(void) __attribute__((constructor (101)));
+void destroy_mutex(void) __attribute__((destructor (101)));
 list_t *prime_factors(char const *);
 task_t *create_task(task_entry_t, void *);
 

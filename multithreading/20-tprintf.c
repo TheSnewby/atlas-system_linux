@@ -1,15 +1,20 @@
 #include "multithreading.h"
-pthread_mutex_t *tprintf_mutex;
-
-void init_mutex(void) __attribute__((constructor (101)));
-void destroy_mutex(void) __attribute__((destructor (101)));
+pthread_mutex_t tprintf_mutex;
+/* also consider initializing like this instead of using constructor: */
+/* phtread_mutex_t tprintf_mutex = PTHREAD_MUTEX_INITIALIZER */
+#define NB_THREADS  10
 
 /**
  * init_mutex - constructor to initialize the mutex before main()
  */
 void init_mutex(void)
 {
-	pthread_mutex_init(tprintf_mutex, NULL);
+	if (pthread_mutex_init(&tprintf_mutex, NULL) == -1)
+	{
+		perror("mutex init failed");
+		exit(1);
+	}
+	// tprintf("pthread_mutex_init completed\n");
 }
 
 /**
@@ -17,7 +22,11 @@ void init_mutex(void)
  */
 void destroy_mutex(void)
 {
-	pthread_mutex_destroy(tprintf_mutex);
+	if (pthread_mutex_destroy(&tprintf_mutex) == -1)
+	{
+		perror("mutex destroy failed");
+		exit(1);
+	}
 }
 
 /**
@@ -30,13 +39,13 @@ int tprintf(char const *format, ...)
 {
 	va_list args;
 
-	pthread_mutex_lock(tprintf_mutex);
+	pthread_mutex_lock(&tprintf_mutex);
 	printf("[%ld] ", pthread_self());
 
 	va_start(args, format);
 	vprintf(format, args);
 	va_end(args);
 
-	pthread_mutex_unlock(tprintf_mutex);
+	pthread_mutex_unlock(&tprintf_mutex);
 	return (0);
 }
