@@ -14,7 +14,6 @@ void init_mutex(void)
 		perror("mutex init failed");
 		exit(1);
 	}
-	// tprintf("pthread_mutex_init completed\n");
 }
 
 /**
