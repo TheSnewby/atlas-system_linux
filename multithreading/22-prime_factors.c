@@ -62,7 +62,7 @@ void destroy_task(task_t *task)
 	if (task->result) /* if task is completed */
 	{
 		list_destroy((list_t *)task->result, free);
-		free(task->result);
+		free((list_t *)task->result);
 	}
 	free(task);
 
@@ -80,7 +80,6 @@ void *exec_tasks(list_t const *tasks)
 	size_t i;
 	node_t *node = NULL;
 	task_t *task = NULL;
-	/* char task_result[10]; */
 
 	if (!tasks)
 		return (NULL);
@@ -101,7 +100,6 @@ void *exec_tasks(list_t const *tasks)
 				task->status = SUCCESS;
 			else
 				task->status = FAILURE;
-			/* sprintf(task_result, "%s\n", task->result ? "Success" : "Failure"); */
 			tprintf("[%02lu] %s\n", i, task->result ? "Success" : "Failure");
 		}
 		else
