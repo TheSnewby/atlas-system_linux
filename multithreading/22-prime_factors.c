@@ -80,7 +80,7 @@ void *exec_tasks(list_t const *tasks)
 	size_t i;
 	node_t *node = NULL;
 	task_t *task = NULL;
-	char task_result[10];
+	/* char task_result[10]; */
 
 	if (!tasks)
 		return (NULL);
