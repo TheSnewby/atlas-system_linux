@@ -94,7 +94,7 @@ void *exec_tasks(list_t const *tasks)
 		{
 			task->status = STARTED;
 			pthread_mutex_unlock(&task_mutex);
-			tprintf("[%lu] Started\n", i);
+			tprintf("[%02lu] Started\n", i);
 			task->result = task->entry(task->param);
 
 			if (task->result)
@@ -102,7 +102,7 @@ void *exec_tasks(list_t const *tasks)
 			else
 				task->status = FAILURE;
 			sprintf(task_result, "%s\n", task->result ? "Success" : "Failure");
-			tprintf("%lu %s\n", i, task_result);
+			tprintf("[%02lu] %s\n", i, task_result);
 		}
 		else
 			pthread_mutex_unlock(&task_mutex);
