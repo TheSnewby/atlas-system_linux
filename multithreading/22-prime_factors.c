@@ -61,7 +61,7 @@ void destroy_task(task_t *task)
 
 	if (task->result) /* if task is completed */
 	{
-		list_destroy(task->result, free);
+		list_destroy((list_t *)task->result, free);
 		free(task->result);
 	}
 	free(task);
@@ -78,29 +78,30 @@ void destroy_task(task_t *task)
 void *exec_tasks(list_t const *tasks)
 {
 	size_t i;
-	node_t *tmp_node = NULL;
-	task_t *tmp_task = NULL;
+	node_t *node = NULL;
+	task_t *task = NULL;
 	char task_result[10];
 
 	if (!tasks)
 		return (NULL);
 
-	for (tmp_node = tasks->head; i < tasks->size; tmp_node = tmp_node->next, i++)
+	for (node = tasks->head; i < tasks->size; node = node->next, i++)
 	{
-		tmp_task = tmp_node->content;
+		task = node->content;
 
 		pthread_mutex_lock(&task_mutex);
-		if (tmp_task->status == PENDING)
+		if (task->status == PENDING)
 		{
-			tmp_task->status = STARTED;
+			task->status = STARTED;
+			pthread_mutex_unlock(&task_mutex);
 			tprintf("[%lu] Started\n", i);
-			tmp_task->result = tmp_task->entry(tmp_task->param);
+			task->result = task->entry(task->param);
 
-			if (tmp_task->result)
-				tmp_task->status = SUCCESS;
+			if (task->result)
+				task->status = SUCCESS;
 			else
-				tmp_task->status = FAILURE;
-			sprintf(task_result, "%s\n", tmp_task->result ? "Success" : "Failure");
+				task->status = FAILURE;
+			sprintf(task_result, "%s\n", task->result ? "Success" : "Failure");
 			tprintf("%lu %s\n", i, task_result);
 		}
 		else
