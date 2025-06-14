@@ -15,7 +15,7 @@
  */
 int main(void)
 { /* fd is also the sockid, port assigned */
-	int fd, clientfd = -2, status, port = 12345;
+	int fd, clientfd = -2, port = 12345;
 	int type = SOCK_STREAM; /* full-duplex byte stream */
 	int domain = AF_INET, protocol = 0; /* IPv4 */ /* default protocol */
 	struct sockaddr_in addrport, clientaddrport;
@@ -50,8 +50,8 @@ int main(void)
 	while (clientfd == -2)
 		;
 
-	printf("client addr: %s\n", inet_ntoa(clientaddrport.sin_addr));
-	printf("client port: %d\n", ntohs(clientaddrport.sin_port));
+	printf("Server listening on port %s\n", inet_ntoa(clientaddrport.sin_addr));
+	printf("Client connected: %d\n", ntohs(clientaddrport.sin_port));
 	close(clientfd);
 
 	return (0);
