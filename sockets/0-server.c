@@ -5,6 +5,12 @@
 #include <stdio.h>
 #include <netinet/in.h>
 
+/**
+ * main - a program that opens an IPv4/TCP socket,
+ * and listens to traffic on port 12345
+ *
+ * Return: 0
+ */
 int main(void)
 {
 	int fd, status, port = 12345; /* fd is also the sockid, port assigned */
@@ -16,8 +22,8 @@ int main(void)
 	int backlog = 10;
 
 	addrport.sin_family = AF_INET; /* address family */
-	addrport.sin_port = htons(port); /* converts host order to network byte order */
-	addrport.sin_addr.s_addr = INADDR_ANY; /* sets ip addr to bind to anything */
+	addrport.sin_port = htons(port); /* converts host ord to network byte ord */
+	addrport.sin_addr.s_addr = INADDR_ANY; /* sets ip addr to bind anything */
 
 
 	fd = socket(domain, type, protocol); /* creates endpoint for communication */
@@ -28,8 +34,9 @@ int main(void)
 		exit(EXIT_SUCCESS);
 	}
 
-	status = bind(fd, (struct sockaddr *)&addrport, size); /* binds a name to a socket in kernel */
+	/* binds a name to a socket in kernel */
 	if (status < 0)
+	status = bind(fd, (struct sockaddr *)&addrport, size);
 	{
 		perror("bind failed");
 		exit(EXIT_SUCCESS);
