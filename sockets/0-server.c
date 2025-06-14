@@ -35,8 +35,8 @@ int main(void)
 	}
 
 	/* binds a name to a socket in kernel */
-	if (status < 0)
 	status = bind(fd, (struct sockaddr *)&addrport, size);
+	if (status < 0)
 	{
 		perror("bind failed");
 		exit(EXIT_SUCCESS);
