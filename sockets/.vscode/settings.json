@@ -1,5 +1,7 @@
 {
 	"files.associations": {
-		"functional": "c"
+		"functional": "c",
+		"in.h": "c",
+		"types.h": "c"
 	}
 }
