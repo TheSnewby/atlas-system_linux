@@ -11,3 +11,7 @@
 1-client
 2-server
 3-client
+2-server:Zone.Identifier
+2-server.htm:Zone.Identifier
+3-client:Zone.Identifier
+3-client:htm:Zone.Identifier
