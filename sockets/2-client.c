@@ -48,12 +48,11 @@ int main(int argc, char **argv)
 		return (EXIT_FAILURE);
 	}
 
-	status = connect(fd, (struct sockaddr *)&foreignAddr, sizeof(foreignAddr));
-	if (status)
+	if (connect(fd, (struct sockaddr *)&foreignAddr, sizeof(foreignAddr)))
 	{
 		perror("Failed to Connect");
 		return (EXIT_FAILURE);
 	}
-	printf("Status: %d\n", status);
+	printf("Connected to %s:%s\n", argv[1], argv[2]);
 	return (0);
 }
