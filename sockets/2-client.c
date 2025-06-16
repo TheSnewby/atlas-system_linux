@@ -35,6 +35,12 @@ int main(int argc, char **argv)
 	else
 		foreignAddr.sin_addr.s_addr = inet_addr(argv[1]);
 
+	if (foreignAddr.sin_addr.s_addr == INADDR_NONE)
+	{
+		perror("Failed to attach address");
+		return (EXIT_FAILURE);
+	}
+
 	fd = socket(domain, type, protocol);
 	if (fd < 0)
 	{
