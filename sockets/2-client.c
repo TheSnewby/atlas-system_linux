@@ -15,7 +15,7 @@
  */
 int main(int argc, char **argv)
 {
-	int fd, port, status;
+	int fd, port;
 	int type = SOCK_STREAM; /* full-duplex byte stream */
 	int domain = AF_INET, protocol = 0; /* IPv4 */ /* default protocol */
 	struct sockaddr_in foreignAddr;
