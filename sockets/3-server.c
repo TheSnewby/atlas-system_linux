@@ -54,8 +54,8 @@ int main(void)
 	while (clientfd == -2)
 		;
 
-	printf("Server listening on port %s\n", inet_ntoa(clientaddrport.sin_addr));
-	printf("Client connected: %d\n", ntohs(clientaddrport.sin_port));
+	printf("Server listening on port %s\n", port);
+	printf("Client connected: %d\n", inet_ntoa(clientaddrport.sin_addr));
 
 	bytesRecv = recv(clientfd, (void *)recvBuf, recvBufLen, flags);
 	if (bytesRecv == 1024)
