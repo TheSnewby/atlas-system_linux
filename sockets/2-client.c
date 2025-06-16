@@ -20,16 +20,17 @@ int main(int argc, char **argv)
 	int domain = AF_INET, protocol = 0; /* IPv4 */ /* default protocol */
 	struct sockaddr_in foreignAddr;
 
+	printf("Z\n"); /* DEBUG */
 	if (argc != 3)
 	{
 		printf("Usage: %s <host> <port>\n", argv[0]);
 		return (EXIT_FAILURE);
 	}
-
+	printf("A\n"); /* DEBUG */
 	port = atoi(argv[2]);
 	foreignAddr.sin_family = AF_INET;
 	foreignAddr.sin_port = htons(port);
-
+	printf("B\n"); /* DEBUG */
 	if (strcmp(argv[1], "localhost") == 0)
 		foreignAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	else
@@ -40,18 +41,19 @@ int main(int argc, char **argv)
 		perror("Failed to attach address");
 		return (EXIT_FAILURE);
 	}
-
+	printf("C\n"); /* DEBUG */
 	fd = socket(domain, type, protocol);
 	if (fd < 0)
 	{
 		perror("Failed to Create a Socket");
 		return (EXIT_FAILURE);
 	}
-
+	printf("D\n"); /* DEBUG */
 	if (connect(fd, (struct sockaddr *)&foreignAddr, sizeof(foreignAddr)))
 	{
 		perror("Failed to Connect");
 		return (EXIT_FAILURE);
 	}
+	printf("E\n"); /* DEBUG */
 	return (0);
 }
