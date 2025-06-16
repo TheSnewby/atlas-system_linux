@@ -21,9 +21,9 @@ int main(void)
 	int domain = AF_INET, protocol = 0; /* IPv4 */ /* default protocol */
 	struct sockaddr_in addrport, clientaddrport;
 	socklen_t size = sizeof(struct sockaddr_in);
-	int backlog = 10, flags = 0, bytesRecv; /* queue for accept; flags & bytesRecv for recv */
+	int backlog = 10, flags = 0, bytesRecv = 0; /* queue for accept; flags & bytesRecv for recv */
 	char recvBuf[1024]; /* message from recv */
-	size_t recvBufLen; /* length of recv message */
+	size_t recvBufLen = 1024; /* length of recv message */
 
 	addrport.sin_family = AF_INET; /* address family */
 	addrport.sin_port = htons(port); /* converts host ord to network byte ord */
