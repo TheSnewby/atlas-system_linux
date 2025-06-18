@@ -11,6 +11,45 @@
 #define BUFFER_SIZE 1024
 
 /**
+ * parseMessage - parses the received message, ASSUMES WELL-FORMED MESSAGE
+ * @msg: received message
+ * @size: size of message
+ */
+void parseMessage(char msg[], size_t size)
+{
+	size_t i, sscanfRtn;
+	char *parse[5][BUFFER_SIZE], token = NULL;
+	char method[10], path[20], version[20], client_conected[20];
+
+	if (size < BUFFER_SIZE - 1)
+		msg[size] = '\0';
+
+	token = strtok(msg, "\n");
+	strcpy(parse[0], token);
+	for (i = 0; i < size - 1; i++)
+	{
+		token = strtok(NULL, "\n");
+		strcpy(parse[i + 1], token);
+	}
+
+	sscanfRtn = sscanf(parse[0], "%s %s %s", method, path, version);
+	if (sscanfRtn != 3)
+	{
+		perror("Error in first sscanf: ");
+		return (EXIT_SUCCESS);
+	}
+	sscanfRtn = sscanf(parse[1], "Client connected: %s", client_conected);
+	if (sscanfRtn != 1)
+	{
+		perror("Error in first sscanf: ");
+		return (EXIT_SUCCESS);
+	}
+
+	printf("Method: %s\nPath: %s\nVersion: %s\n", method, path, version);
+	printf("Client connected: %s\n", client_conected);
+}
+
+/**
  * serverRecvAndSend - waits for a message and then prints the message
  * @clientfd: fd of the client
  */
@@ -19,6 +58,7 @@ void serverRecvAndSend(int clientfd)
 	int flags = 0, bytesRecv = 0; /* for recv */
 	char recvBuf[BUFFER_SIZE]; /* message from recv */
 	size_t recvBufLen = BUFFER_SIZE; /* length of recv message */
+	char success[] = "HTTP 200 OK";
 
 	memset(recvBuf, 0, BUFFER_SIZE);
 
@@ -30,8 +70,10 @@ void serverRecvAndSend(int clientfd)
 		perror("Error in recv");
 		exit(EXIT_SUCCESS);
 	}
-	printf("Message received: \"");
+	printf("Raw request: \"");
 	printf("%.*s\"\n", bytesRecv, recvBuf);
+	parseMessage(recvBuf, bytesRecv);
+	send(clientfd, success, 11, 0);
 }
 
 /**
@@ -59,7 +101,6 @@ int main(void)
 		perror("socket failed");
 		exit(EXIT_SUCCESS);
 	}
-
 	/* binds a name to a socket in kernel */
 	if (bind(fd, (struct sockaddr *)&addrport, size) < 0)
 	{
@@ -79,12 +120,8 @@ int main(void)
 
 	printf("Server listening on port %d\n", port);
 	printf("Client connected: %s\n", inet_ntoa(clientaddrport.sin_addr));
-	serverRecvAndSend(clientfd);
-	/* Print the full received HTTP request
-	Print the break-down of the first line of the received HTTP request (See example)
-	Send back a response to the connected client (HTTP 200 OK)
-	Close the connection with the client
-	Wait for the next connection */
+	while (1)
+		serverRecvAndSend(clientfd);
 	close(clientfd);
 	return (0);
 }
