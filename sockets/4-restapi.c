@@ -110,6 +110,10 @@ int main(void)
 		clientfd = accept(fd, (struct sockaddr *)&clientaddrport, &size);
 		while (clientfd == -2)
 			;
+		if (clientfd == -1) {
+			perror("accept failed");
+			continue;  // or handle appropriately
+		}
 
 		printf("Client connected: %s\n", inet_ntoa(clientaddrport.sin_addr));
 		serverRecvAndSend(clientfd);
