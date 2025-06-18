@@ -17,7 +17,7 @@
  */
 void parseMessage(char msg[], size_t size)
 {
-	size_t i, sscanfRtn;
+	size_t i = 0, sscanfRtn;
 	char parse[10][BUFFER_SIZE], *token = NULL;
 	char method[10], path[20], version[20];
 
