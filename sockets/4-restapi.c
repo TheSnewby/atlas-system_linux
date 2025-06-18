@@ -18,18 +18,17 @@
 void parseMessage(char msg[], size_t size)
 {
 	size_t i, sscanfRtn;
-	char parse[5][BUFFER_SIZE], *token = NULL;
-	char method[10], path[20], version[20], client_conected[20];
+	char parse[10][BUFFER_SIZE], *token = NULL;
+	char method[10], path[20], version[20];
 
 	if (size < BUFFER_SIZE - 1)
 		msg[size] = '\0';
 
 	token = strtok(msg, "\n");
-	strcpy(parse[0], token);
-	for (i = 0; i < size - 1; i++)
+	while(token && i < 2)
 	{
+		strcpy(parse[i++], token);
 		token = strtok(NULL, "\n");
-		strcpy(parse[i + 1], token);
 	}
 
 	sscanfRtn = sscanf(parse[0], "%s %s %s", method, path, version);
@@ -38,15 +37,8 @@ void parseMessage(char msg[], size_t size)
 		perror("Error in first sscanf: ");
 		exit (EXIT_SUCCESS);
 	}
-	sscanfRtn = sscanf(parse[1], "Client connected: %s", client_conected);
-	if (sscanfRtn != 1)
-	{
-		perror("Error in first sscanf: ");
-		exit (EXIT_SUCCESS);
-	}
 
 	printf("Method: %s\nPath: %s\nVersion: %s\n", method, path, version);
-	printf("Client connected: %s\n", client_conected);
 }
 
 /**
@@ -84,7 +76,7 @@ void serverRecvAndSend(int clientfd)
  */
 int main(void)
 { /* fd is also the sockid, port assigned */
-	int fd, clientfd = -2, port = 8080;
+	int fd, clientfd = -2, port = 12345;
 	int type = SOCK_STREAM; /* full-duplex byte stream */
 	int domain = AF_INET, protocol = 0; /* IPv4 */ /* default protocol */
 	struct sockaddr_in addrport, clientaddrport;
@@ -107,21 +99,22 @@ int main(void)
 		perror("bind failed");
 		exit(EXIT_SUCCESS);
 	}
-
 	if (listen(fd, backlog) < 0) /* instructs kernel socket to listen */
 	{
 		perror("listen failed");
 		exit(EXIT_SUCCESS);
 	}
-
-	clientfd = accept(fd, (struct sockaddr *)&clientaddrport, &size);
-	while (clientfd == -2)
-		;
-
 	printf("Server listening on port %d\n", port);
-	printf("Client connected: %s\n", inet_ntoa(clientaddrport.sin_addr));
 	while (1)
+	{
+		clientfd = accept(fd, (struct sockaddr *)&clientaddrport, &size);
+		while (clientfd == -2)
+			;
+
+		printf("Client connected: %s\n", inet_ntoa(clientaddrport.sin_addr));
 		serverRecvAndSend(clientfd);
-	close(clientfd);
+		close(clientfd);
+		clientfd = -2;
+	}
 	return (0);
 }
