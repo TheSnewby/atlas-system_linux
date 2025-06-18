@@ -76,7 +76,7 @@ void serverRecvAndSend(int clientfd)
  */
 int main(void)
 { /* fd is also the sockid, port assigned */
-	int fd, clientfd = -2, port = 12345;
+	int fd, clientfd = -2, port = 8080;
 	int type = SOCK_STREAM; /* full-duplex byte stream */
 	int domain = AF_INET, protocol = 0; /* IPv4 */ /* default protocol */
 	struct sockaddr_in addrport, clientaddrport;
