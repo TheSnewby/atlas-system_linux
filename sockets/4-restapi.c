@@ -107,6 +107,7 @@ int main(void)
 	printf("Server listening on port %d\n", port);
 	while (1)
 	{
+		size = sizeof(struct sockaddr_in);
 		clientfd = accept(fd, (struct sockaddr *)&clientaddrport, &size);
 		while (clientfd == -2)
 			;
