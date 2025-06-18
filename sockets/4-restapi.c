@@ -36,13 +36,13 @@ void parseMessage(char msg[], size_t size)
 	if (sscanfRtn != 3)
 	{
 		perror("Error in first sscanf: ");
-		return (EXIT_SUCCESS);
+		exit (EXIT_SUCCESS);
 	}
 	sscanfRtn = sscanf(parse[1], "Client connected: %s", client_conected);
 	if (sscanfRtn != 1)
 	{
 		perror("Error in first sscanf: ");
-		return (EXIT_SUCCESS);
+		exit (EXIT_SUCCESS);
 	}
 
 	printf("Method: %s\nPath: %s\nVersion: %s\n", method, path, version);
