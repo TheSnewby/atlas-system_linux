@@ -15,3 +15,4 @@
 2-server.htm:Zone.Identifier
 3-client:Zone.Identifier
 3-client:htm:Zone.Identifier
+*.o
