@@ -34,10 +34,10 @@ void parseMessage(char msg[], size_t size)
 	sscanfRtn = sscanf(parse[0], "%s %s %s", method, path, version);
 	if (sscanfRtn != 3)
 	{
-		perror("Error in first sscanf: ");
+		perror("Error in sscanf: ");
 		exit (EXIT_SUCCESS);
 	}
-
+	fflush(stdout);
 	printf("Method: %s\nPath: %s\nVersion: %s\n", method, path, version);
 }
 
@@ -62,6 +62,7 @@ void serverRecvAndSend(int clientfd)
 		perror("Error in recv");
 		exit(EXIT_SUCCESS);
 	}
+	fflush(stdout);
 	printf("Raw request: \"");
 	printf("%.*s\"\n", bytesRecv, recvBuf);
 	parseMessage(recvBuf, bytesRecv);
@@ -115,7 +116,7 @@ int main(void)
 			perror("accept failed");
 			continue;  // or handle appropriately
 		}
-
+		fflush(stdout);
 		printf("Client connected: %s\n", inet_ntoa(clientaddrport.sin_addr));
 		serverRecvAndSend(clientfd);
 		close(clientfd);
