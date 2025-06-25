@@ -84,6 +84,7 @@ int main(void)
 	socklen_t size = sizeof(struct sockaddr_in);
 	int backlog = 10; /* queue for accept */
 
+	printf("DEBUG\n");
 	addrport.sin_family = AF_INET; /* address family */
 	addrport.sin_port = htons(port); /* converts host ord to network byte ord */
 	addrport.sin_addr.s_addr = INADDR_ANY; /* sets ip addr to bind anything */
