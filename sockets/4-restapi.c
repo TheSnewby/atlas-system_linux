@@ -50,7 +50,7 @@ void serverRecvAndSend(int clientfd)
 	int flags = 0, bytesRecv = 0; /* for recv */
 	char recvBuf[BUFFER_SIZE]; /* message from recv */
 	size_t recvBufLen = BUFFER_SIZE; /* length of recv message */
-	char success[] = "HTTP 200 OK";
+	char success[] = "HTTP/1.1 200 OK";
 
 	memset(recvBuf, 0, BUFFER_SIZE);
 
@@ -66,7 +66,7 @@ void serverRecvAndSend(int clientfd)
 	printf("Raw request: \"");
 	printf("%.*s\"\n", bytesRecv, recvBuf);
 	parseMessage(recvBuf, bytesRecv);
-	send(clientfd, success, 11, 0);
+	send(clientfd, success, 14, 0);
 }
 
 /**
