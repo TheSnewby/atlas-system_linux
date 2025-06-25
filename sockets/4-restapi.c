@@ -37,8 +37,8 @@ void parseMessage(char msg[], size_t size)
 		perror("Error in sscanf: ");
 		exit (EXIT_SUCCESS);
 	}
-	fflush(stdout);
 	printf("Method: %s\nPath: %s\nVersion: %s\n", method, path, version);
+	fflush(stdout);
 }
 
 /**
